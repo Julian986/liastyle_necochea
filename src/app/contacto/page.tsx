@@ -8,6 +8,16 @@ import Link from "next/link";
 
 import { AppBottomNav } from "@/components/app-bottom-nav";
 
+const SALON_ADDRESS = "Av. 91 1534, B7630 Necochea, Provincia de Buenos Aires";
+const WHATSAPP_DISPLAY = "+54 9 2262 30-8862";
+const WHATSAPP_HREF = "https://wa.me/5492262308862";
+const INSTAGRAM_HANDLE = "@_liastyle.necochea";
+const INSTAGRAM_HREF = "https://www.instagram.com/_liastyle.necochea";
+const MAPS_HREF =
+  "https://www.google.com/maps/place/LiaStyle+-+Peluqueria/@-38.5746678,-58.7465452,17z/data=!3m1!4b1!4m6!3m5!1s0x958fbd7fbeb5959f:0x83240dc669789b76!8m2!3d-38.5746678!4d-58.7443703";
+const MAP_EMBED_SRC =
+  "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3119.224930814865!2d-58.74654522277769!3d-38.57466777179468!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x958fbd7fbeb5959f%3A0x83240dc669789b76!2sLiaStyle%20-%20Peluqueria!5e0!3m2!1ses!2sar!4v1781221338375!5m2!1ses!2sar";
+
 function WhatsappIcon(props: React.SVGProps<SVGSVGElement>) {
   return (
     <svg
@@ -34,25 +44,22 @@ type ContactItem = {
 const contactItems: ContactItem[] = [
   {
     label: "Dirección",
-    description: "",
+    description: SALON_ADDRESS,
     icon: MapPin,
+    href: MAPS_HREF,
   },
   {
     label: "WhatsApp",
-    description: "+54 9 341 398-2210",
+    description: WHATSAPP_DISPLAY,
     icon: WhatsappIcon,
-    href: "https://wa.me/5493413982210",
+    href: WHATSAPP_HREF,
   },
   {
     label: "Instagram",
-    description: "",
+    description: INSTAGRAM_HANDLE,
     icon: Instagram,
+    href: INSTAGRAM_HREF,
   },
-  // {
-  //   label: "Horarios",
-  //   description: "Ver detalle de horarios de atención",
-  //   icon: CalendarClock,
-  // },
 ];
 
 export default function ContactoPage() {
@@ -83,7 +90,7 @@ export default function ContactoPage() {
                       <p className="text-[15px] font-medium text-[var(--soft-gray)]">
                         {item.label}
                       </p>
-                      <p className="mt-0.5 text-[11px] text-[var(--soft-gray)]/60">
+                      <p className="mt-0.5 max-w-[240px] text-[11px] leading-snug text-[var(--soft-gray)]/60">
                         {item.description || "—"}
                       </p>
                     </div>
@@ -113,6 +120,17 @@ export default function ContactoPage() {
               );
             })}
           </div>
+        </section>
+
+        <section className="overflow-hidden rounded-2xl border border-white/8 bg-[#181818] shadow-[0_14px_30px_rgba(0,0,0,0.65)]">
+          <iframe
+            src={MAP_EMBED_SRC}
+            title="Mapa Lia Style Necochea"
+            loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
+            allowFullScreen
+            className="aspect-[4/3] h-auto w-full border-0"
+          />
         </section>
 
         {/*
