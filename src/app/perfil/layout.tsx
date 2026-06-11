@@ -1,14 +1,14 @@
 import type { ReactNode } from "react";
 
-import { PerfilBottomNav } from "@/components/perfil/perfil-bottom-nav";
+import { AppBottomNav } from "@/components/app-bottom-nav";
 import { PerfilSessionProvider } from "@/components/perfil/perfil-session-provider";
 
 export default function PerfilLayout({ children }: { children: ReactNode }) {
   return (
     <PerfilSessionProvider>
-      <div className="min-h-screen bg-[#111111] text-white">
+      <div className="min-h-screen bg-white text-gray-900">
         {children}
-        <PerfilBottomNav />
+        <AppBottomNav active="perfil" />
       </div>
     </PerfilSessionProvider>
   );

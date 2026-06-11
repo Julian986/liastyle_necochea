@@ -1,5 +1,5 @@
 /**
- * Genera favicons, iconos PWA y og:image desde public/logo_marce.png
+ * Genera favicons, iconos PWA y og:image desde public/logo lia style.PNG
  * Uso: npm run icons
  */
 import fs from "node:fs";
@@ -9,11 +9,11 @@ import sharp from "sharp";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.join(__dirname, "..");
-const input = path.join(root, "public", "logo_marce.png");
+const input = path.join(root, "public", "logo lia style.PNG");
 const outDir = path.join(root, "public");
 
-const WHITE = { r: 255, g: 255, b: 255, alpha: 1 };
-const SPLASH_BG = { r: 17, g: 17, b: 17, alpha: 1 };
+const TRANSPARENT = { r: 0, g: 0, b: 0, alpha: 0 };
+const SPLASH_BG = { r: 248, g: 246, b: 242, alpha: 1 };
 
 function pipeline() {
   return sharp(input).rotate();
@@ -28,21 +28,24 @@ async function ensureSourceLogo() {
     `<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
       <rect width="512" height="512" fill="#111111"/>
       <circle cx="256" cy="256" r="168" fill="none" stroke="#e4c48f" stroke-width="28"/>
-      <text x="256" y="280" text-anchor="middle" font-family="Georgia,serif" font-size="120" fill="#e4c48f">MP</text>
+      <text x="256" y="280" text-anchor="middle" font-family="Georgia,serif" font-size="72" fill="#b88e2f">Lia</text>
     </svg>`,
   );
   await sharp(svg).png().toFile(input);
 }
 
 async function paddedSquare(size, filename) {
-  const resized = await pipeline().resize(size, size, { fit: "contain", background: WHITE }).toBuffer();
+  const resized = await pipeline()
+    .ensureAlpha()
+    .resize(size, size, { fit: "contain", background: TRANSPARENT })
+    .toBuffer();
 
   await sharp({
     create: {
       width: size,
       height: size,
       channels: 4,
-      background: WHITE,
+      background: TRANSPARENT,
     },
   })
     .composite([{ input: resized, gravity: "centre" }])
@@ -59,10 +62,7 @@ async function main() {
     [32, "favicon-32.png"],
     [16, "favicon-16.png"],
   ]) {
-    await pipeline()
-      .resize(size, size, { fit: "cover", position: "centre" })
-      .png({ compressionLevel: 9, effort: 10 })
-      .toFile(path.join(outDir, name));
+    await paddedSquare(size, name);
   }
 
   await paddedSquare(180, "apple-touch-icon.png");

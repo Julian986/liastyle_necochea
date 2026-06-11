@@ -1,8 +1,8 @@
 "use client";
 
+import { AppBottomNav } from "@/components/app-bottom-nav";
 import { BrandLogo } from "@/components/brand-logo";
 import { HOME_HERO_IMAGE_URL } from "@/lib/home-hero-image";
-import { CalendarDays, Home as HomeIcon, Percent, Scissors, User } from "lucide-react";
 import Link from "next/link";
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 
@@ -147,51 +147,7 @@ function HomeContent() {
         </section>
       </main>
 
-      <nav className="fixed right-0 bottom-0 left-0 z-50 border-t border-[var(--outline)]/10 bg-[var(--nav-bg)] shadow-lg">
-        <div className="mx-auto flex h-20 max-w-md items-center justify-around px-4 pb-[env(safe-area-inset-bottom,0px)]">
-          <button
-            type="button"
-            className="flex flex-col items-center justify-center text-[var(--premium-gold-light)] transition-all active:scale-90"
-            aria-label="Inicio"
-            aria-current="page"
-          >
-            <HomeIcon className="h-6 w-6" strokeWidth={2.2} fill="currentColor" />
-            <span className="mt-1 text-[10px] font-bold tracking-wider uppercase">Inicio</span>
-          </button>
-          <Link
-            href="/tratamientos"
-            className="flex flex-col items-center justify-center text-[var(--soft-gray)] transition-colors hover:text-[var(--premium-gold-light)] active:scale-90"
-            aria-label="Tratamientos"
-          >
-            <Scissors className="h-6 w-6" strokeWidth={1.8} />
-            <span className="mt-1 text-[10px] font-bold tracking-wider uppercase">Tratamientos</span>
-          </Link>
-          <Link
-            href="/turnos"
-            className="flex flex-col items-center justify-center text-[var(--soft-gray)] transition-colors hover:text-[var(--premium-gold-light)] active:scale-90"
-            aria-label="Turnos"
-          >
-            <CalendarDays className="h-6 w-6" strokeWidth={1.8} />
-            <span className="mt-1 text-[10px] font-bold tracking-wider uppercase">Turnos</span>
-          </Link>
-          <Link
-            href="/promociones"
-            className="flex flex-col items-center justify-center text-[var(--soft-gray)] transition-colors hover:text-[var(--premium-gold-light)] active:scale-90"
-            aria-label="Promos"
-          >
-            <Percent className="h-6 w-6" strokeWidth={1.8} />
-            <span className="mt-1 text-[10px] font-bold tracking-wider uppercase">Promos</span>
-          </Link>
-          <Link
-            href="/perfil"
-            className="flex flex-col items-center justify-center text-[var(--soft-gray)] transition-colors hover:text-[var(--premium-gold-light)] active:scale-90"
-            aria-label="Perfil"
-          >
-            <User className="h-6 w-6" strokeWidth={1.8} />
-            <span className="mt-1 text-[10px] font-bold tracking-wider uppercase">Perfil</span>
-          </Link>
-        </div>
-      </nav>
+      <AppBottomNav active="inicio" />
     </div>
   );
 }

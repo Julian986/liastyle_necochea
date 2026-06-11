@@ -19,7 +19,7 @@ const playfair = Playfair_Display({
 });
 
 /** Query en favicons / PWA; la imagen OG va sin query (mejor compatibilidad con scrapers de WhatsApp). */
-const ASSET_V = "2";
+const ASSET_V = "4";
 
 export async function generateMetadata(): Promise<Metadata> {
   const h = await headers();

@@ -350,6 +350,7 @@ export async function insertPublicConfirmedReservationWithoutPayment(
 
 export type PanelReservationInsertInput = {
   treatmentId: string;
+  serviceIds?: string[];
   dateKey: string;
   timeLocal: string;
   customerName: string;
@@ -360,6 +361,64 @@ export type PanelReservationInsertInput = {
 
 const PANEL_NOTES_MAX_LEN = 2000;
 
+async function validatePanelReservation(
+  db: Db,
+  input: Pick<PanelReservationInsertInput, "treatmentId" | "serviceIds" | "dateKey" | "timeLocal">,
+): Promise<PublicTurnosValidation> {
+  const parsedServices = buildServiceItemsForInput({
+    treatmentId: input.treatmentId,
+    serviceIds: input.serviceIds,
+  } as CreateReservationInput);
+  if (!parsedServices) {
+    return { ok: false, error: "Tratamiento inválido.", code: "INVALID_TREATMENT" };
+  }
+  const { primaryTreatment, serviceItems, isCombo } = parsedServices;
+  const totalDurationMinutes = serviceItems.reduce((acc, s) => acc + s.durationMinutes, 0);
+
+  const dateKey = input.dateKey.trim();
+  const timeLocal = input.timeLocal.trim();
+  const startsAt = computeStartsAtUtc(dateKey, timeLocal);
+  if (!startsAt) {
+    return { ok: false, error: "Fecha u horario inválidos.", code: "INVALID_SLOT" };
+  }
+
+  const now = new Date();
+  await ensureReservationIndexes(db);
+
+  const allowedTimes =
+    serviceItems.length > 1
+      ? await computeBookableSlotsForTreatmentIds(db, {
+          dateKey,
+          treatmentIds: serviceItems.map((s) => s.treatmentId),
+          now,
+          scope: "panel",
+        })
+      : await computeBookableSlots(db, {
+          dateKey,
+          treatmentId: primaryTreatment.id,
+          now,
+          scope: "panel",
+        });
+  if (!allowedTimes.includes(timeLocal)) {
+    return { ok: false, error: "Ese horario no está disponible.", code: "SLOT_UNAVAILABLE" };
+  }
+
+  const interval = slotIntervalMs(dateKey, timeLocal, totalDurationMinutes);
+  if (!interval) {
+    return { ok: false, error: "Fecha u horario inválidos.", code: "INVALID_SLOT" };
+  }
+  const capGetterPanel = await buildCapGetterForDate(db, dateKey);
+  if (await reservationWouldExceedSalonCapacity(db, dateKey, interval, capGetterPanel)) {
+    return {
+      ok: false,
+      error: "Ese horario ya no tiene cupo en esa franja. Elegí otro.",
+      code: "SLOT_OVERLAP",
+    };
+  }
+
+  return { ok: true, startsAt, now, primaryTreatment, serviceItems, totalDurationMinutes, isCombo };
+}
+
 /**
  * Alta manual desde el panel (sin Mercado Pago). Valida cupos (9–11:30: hasta 3 turnos solapados).
  */
@@ -367,43 +426,12 @@ export async function insertPanelReservation(
   db: Db,
   input: PanelReservationInsertInput,
 ): Promise<{ ok: true; id: string } | { error: string; code?: string }> {
-  const treatment = SALON_TREATMENTS.find((t) => t.id === input.treatmentId.trim());
-  if (!treatment) {
-    return { error: "Tratamiento inválido.", code: "INVALID_TREATMENT" };
-  }
+  const v = await validatePanelReservation(db, input);
+  if (!v.ok) return { error: v.error, code: v.code };
 
+  const { primaryTreatment, serviceItems, totalDurationMinutes, isCombo, startsAt, now } = v;
   const dateKey = input.dateKey.trim();
   const timeLocal = input.timeLocal.trim();
-  const startsAt = computeStartsAtUtc(dateKey, timeLocal);
-  if (!startsAt) {
-    return { error: "Fecha u horario inválidos.", code: "INVALID_SLOT" };
-  }
-
-  const now = new Date();
-
-  await ensureReservationIndexes(db);
-
-  const allowedTimes = await computeBookableSlots(db, {
-    dateKey,
-    treatmentId: treatment.id,
-    now,
-    scope: "panel",
-  });
-  if (!allowedTimes.includes(timeLocal)) {
-    return { error: "Ese horario no está disponible.", code: "SLOT_UNAVAILABLE" };
-  }
-
-  const interval = slotIntervalMs(dateKey, timeLocal, treatment.durationMinutes);
-  if (!interval) {
-    return { error: "Fecha u horario inválidos.", code: "INVALID_SLOT" };
-  }
-  const capGetterPanel = await buildCapGetterForDate(db, dateKey);
-  if (await reservationWouldExceedSalonCapacity(db, dateKey, interval, capGetterPanel)) {
-    return {
-      error: "Ese horario ya no tiene cupo en esa franja. Elegí otro.",
-      code: "SLOT_OVERLAP",
-    };
-  }
 
   let panelNotes: string | null = null;
   if (input.panelNotes != null && String(input.panelNotes).trim()) {
@@ -416,17 +444,22 @@ export async function insertPanelReservation(
 
   const displayDate = formatSalonDisplayDate(dateKey);
   const createdBy = (process.env.PANEL_TURNOS_CREATED_BY ?? "panel").trim() || "panel";
+  const treatmentNameCombo = serviceItems.map((s) => s.treatmentName).join(" + ");
+  const subtitleCombo = `${serviceItems.length} servicios · ${totalDurationMinutes} min`;
 
   const doc = {
-    treatmentId: treatment.id,
-    treatmentName: treatment.name,
-    subtitle: treatment.subtitle,
-    category: treatment.category,
+    treatmentId: primaryTreatment.id,
+    treatmentName: isCombo ? treatmentNameCombo : primaryTreatment.name,
+    subtitle: isCombo ? subtitleCombo : primaryTreatment.subtitle,
+    category: primaryTreatment.category,
     dateKey,
     timeLocal,
     displayDate,
     startsAt,
-    durationMinutes: treatment.durationMinutes,
+    durationMinutes: totalDurationMinutes,
+    totalDurationMinutes,
+    serviceItems,
+    bookingMode: isCombo ? "combo" : "single",
     customerName: input.customerName.trim(),
     customerPhone: input.customerPhone.trim(),
     customerPhoneDigits: canonicalPhoneDigitsAR(input.customerPhone.trim()),

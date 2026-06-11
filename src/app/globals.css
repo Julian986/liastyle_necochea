@@ -13,6 +13,7 @@
   --on-surface-variant: #c4c7c7;
   --outline: #8e9192;
   --nav-bg: #ffffff;
+  --light-surface: #f8f6f2;
 }
 
 @theme inline {
@@ -22,6 +23,10 @@
   --color-premium-gold: var(--premium-gold);
   --color-accent-coral: var(--accent-coral);
   --color-accent-orange: var(--accent-orange);
+}
+
+html {
+  scrollbar-gutter: stable;
 }
 
 body {
