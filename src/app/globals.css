@@ -1,0 +1,54 @@
+@import "tailwindcss";
+
+:root {
+  --background: #141313;
+  --foreground: #e5e2e1;
+  --soft-gray: #9797a0;
+  --premium-gold: #dfc565;
+  --premium-gold-light: #b88e2f;
+  --accent-coral: #b64b54;
+  --accent-orange: #ce7832;
+  /* Texto sobre botones rellenos en tono dorado */
+  --on-accent: #1f1814;
+  --on-surface-variant: #c4c7c7;
+  --outline: #8e9192;
+  --nav-bg: #ffffff;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-soft-gray: var(--soft-gray);
+  --color-premium-gold: var(--premium-gold);
+  --color-accent-coral: var(--accent-coral);
+  --color-accent-orange: var(--accent-orange);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-montserrat), sans-serif;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.font-heading {
+  font-family: var(--font-playfair), serif;
+}
+
+.home-glass-button {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.home-glass-card {
+  background: rgba(14, 14, 14, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.home-hero-gradient {
+  background: linear-gradient(to bottom, rgba(20, 19, 19, 0.4) 0%, rgba(20, 19, 19, 1) 90%);
+}
