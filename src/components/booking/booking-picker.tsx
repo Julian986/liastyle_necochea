@@ -103,8 +103,8 @@ export function BookingPicker({
     ? "rounded-2xl border border-[var(--outline)]/10 bg-white shadow-sm"
     : "rounded-2xl border border-white/8 bg-[#171717]";
   const cardActive = isLight
-    ? "border-[var(--premium-gold-light)] shadow-[0_0_0_1px_rgba(184,142,47,0.18)]"
-    : "border-[var(--premium-gold)] shadow-[0_0_0_1px_rgba(228,202,105,0.22),0_0_22px_rgba(206,120,50,0.18)]";
+    ? "border-[var(--premium-gold-light)] shadow-[0_0_0_1px_rgba(125,163,196,0.18)]"
+    : "border-[var(--premium-gold)] shadow-[0_0_0_1px_rgba(155,183,212,0.22),0_0_22px_rgba(125,163,196,0.18)]";
   const [visibleMonthDate, setVisibleMonthDate] = useState(() => {
     const today = new Date();
     if (bookingContext === "panel") {
@@ -220,6 +220,31 @@ export function BookingPicker({
     setIsTreatmentModalOpen(true);
   }, [openModalCategory]);
 
+  useEffect(() => {
+    if (!isTreatmentModalOpen) return;
+
+    const scrollY = window.scrollY;
+    const { overflow, position, top, width, paddingRight } = document.body.style;
+    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+
+    document.body.style.overflow = "hidden";
+    document.body.style.position = "fixed";
+    document.body.style.top = `-${scrollY}px`;
+    document.body.style.width = "100%";
+    if (scrollbarWidth > 0) {
+      document.body.style.paddingRight = `${scrollbarWidth}px`;
+    }
+
+    return () => {
+      document.body.style.overflow = overflow;
+      document.body.style.position = position;
+      document.body.style.top = top;
+      document.body.style.width = width;
+      document.body.style.paddingRight = paddingRight;
+      window.scrollTo(0, scrollY);
+    };
+  }, [isTreatmentModalOpen]);
+
   const closeTreatmentModal = (confirmed = false) => {
     setIsTreatmentModalOpen(false);
     setActiveTreatmentCategory(null);
@@ -288,7 +313,7 @@ export function BookingPicker({
                           onClick={() => onTimeChange(time)}
                           className={`h-12 cursor-pointer rounded-xl border text-[16px] font-medium transition-colors ${
                             isActive
-                              ? "border-[var(--premium-gold-light)] bg-[var(--premium-gold-light)] text-white shadow-[0_4px_14px_rgba(184,142,47,0.35)]"
+                              ? "border-[var(--premium-gold-light)] bg-[var(--premium-gold-light)] text-white shadow-[0_4px_14px_rgba(125,163,196,0.35)]"
                               : "border-[var(--outline)]/15 bg-white text-[#1c1b1b] hover:border-[var(--premium-gold-light)]/40"
                           }`}
                         >
@@ -609,7 +634,7 @@ export function BookingPicker({
                       ? "border-[var(--premium-gold-light)]/35 bg-[var(--premium-gold)]/10 text-[#1c1b1b]"
                       : bookingContext === "panel"
                         ? "border-white/8 bg-[#171717]"
-                        : "border-[var(--premium-gold)]/35 bg-[rgba(206,120,50,0.14)]"
+                        : "border-[var(--premium-gold)]/35 bg-[rgba(125,163,196,0.14)]"
                 }`}
               >
                 {selectedDate ? (
@@ -649,7 +674,7 @@ export function BookingPicker({
       ) : null}
 
       {isTreatmentModalOpen && (
-        <div className="fixed inset-0 z-[60] flex items-end bg-black/60 backdrop-blur-[3px]">
+        <div className="fixed inset-0 z-[60] flex items-end overscroll-none bg-black/60 backdrop-blur-[3px]">
           <button
             type="button"
             aria-label="Cerrar selector de servicio"
@@ -772,6 +797,15 @@ export function BookingPicker({
                         <p className={`mt-1.5 text-[15px] font-medium ${isLight ? "text-[#5f5c5a]" : "text-[var(--soft-gray)]/65"}`}>
                           {treatment.subtitle}
                         </p>
+                        {treatment.bookingNote ? (
+                          <p
+                            className={`mt-1 text-[13px] leading-snug ${
+                              isLight ? "text-[#7f7c7a]" : "text-[var(--soft-gray)]/55"
+                            }`}
+                          >
+                            {treatment.bookingNote}
+                          </p>
+                        ) : null}
                       </button>
                     );
                   })}

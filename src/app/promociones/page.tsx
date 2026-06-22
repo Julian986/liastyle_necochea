@@ -17,48 +17,58 @@ type Promo = {
   subtitle: string;
   details: string;
   category: TreatmentCategory;
+  /** Id del servicio en catálogo para preseleccionar en /turnos. */
+  treatmentId: string;
 };
 
 const promos: Promo[] = [
   {
-    id: "servicio-completo",
-    title: "Servicio completo",
-    subtitle: "Color + lavado + corte + peinado",
-    details: "1 h 30 min · Todo en una visita.",
-    category: "Cortes y peinado",
-  },
-  {
-    id: "balayage-promo",
-    title: "Balayage",
-    subtitle: "Luz natural",
-    details: "2 h · Consultá tonos y mantenimiento.",
+    id: "color-crecimiento-mascara-promo",
+    title: "Color en crecimiento + máscara",
+    subtitle: "$85.000",
+    details: "2 h · Incluye cierre técnico y modelado.",
     category: "Color",
+    treatmentId: "color-crecimiento-mascara",
   },
   {
-    id: "keratina-promo",
-    title: "Keratina",
-    subtitle: "Brillo y alisado",
-    details: "1 h · Incluye peinado.",
-    category: "Tratamiento",
+    id: "color-crecimiento-tratamiento-promo",
+    title: "Color en crecimiento + tratamiento",
+    subtitle: "$120.000",
+    details: "2 h 30 min · Incluye cierre técnico y modelado.",
+    category: "Color",
+    treatmentId: "color-crecimiento-tratamiento",
   },
   {
-    id: "corte-dama-promo",
-    title: "Corte Dama",
-    subtitle: "Estilo y forma",
-    details: "30 min · Lavado incluido.",
+    id: "corte-nutricion-promo",
+    title: "Corte + nutrición",
+    subtitle: "$50.000",
+    details: "1 h 30 min · Diseño & tendencias con nutrición. Incluye modelado.",
     category: "Cortes y peinado",
+    treatmentId: "diseno-tendencias-nutricion",
+  },
+  {
+    id: "corte-tratamiento-promo",
+    title: "Corte + tratamiento",
+    subtitle: "$65.000",
+    details: "1 h 30 min · Incluye modelado.",
+    category: "Cortes y peinado",
+    treatmentId: "diseno-tendencias-tratamiento",
   },
 ];
 
 function CategoryIcon({ category }: { category: TreatmentCategory }) {
-  const cls = "h-8 w-8 text-[var(--premium-gold)]";
+  const cls = "h-7 w-7 text-[var(--premium-gold-light)]";
   if (category === "Cortes y peinado") return <Scissors className={cls} strokeWidth={1.9} />;
   if (category === "Color") return <Palette className={cls} strokeWidth={1.9} />;
   return <Sparkles className={cls} strokeWidth={1.9} />;
 }
 
 export default function PromotionsPage() {
-  const [activeCategory, setActiveCategory] = useState<TreatmentCategory>("Cortes y peinado");
+  const promoCategories = useMemo(
+    () => TREATMENT_CATEGORIES.filter((category) => promos.some((promo) => promo.category === category)),
+    [],
+  );
+  const [activeCategory, setActiveCategory] = useState<TreatmentCategory>(promoCategories[0] ?? "Color");
 
   const filteredPromos = useMemo(
     () => promos.filter((promo) => promo.category === activeCategory),
@@ -66,23 +76,25 @@ export default function PromotionsPage() {
   );
 
   return (
-    <div className="min-h-screen bg-[#111111] text-white">
-      <main className="mx-auto w-full max-w-md px-4 pt-6 pb-24">
+    <div className="min-h-screen overflow-x-hidden bg-[#f8f6f2] pb-32 text-[#1c1b1b]">
+      <main className="mx-auto w-full max-w-md px-4 pt-8 pb-24">
         <header className="mb-4 text-center">
-          <h1 className="text-[34px] leading-none font-heading">Promociones</h1>
+          <h1 className="font-heading text-[34px] leading-none font-semibold">Promociones</h1>
+          <p className="mt-3 text-[13px] text-[#7f7c7a]">Combos destacados del mes</p>
         </header>
 
         <section className="mb-4 flex items-center gap-2 overflow-x-auto pb-1">
-          {TREATMENT_CATEGORIES.map((category) => {
+          {promoCategories.map((category) => {
             const isActive = category === activeCategory;
             return (
               <button
                 key={category}
+                type="button"
                 onClick={() => setActiveCategory(category)}
                 className={`shrink-0 rounded-full px-4 py-1.5 text-sm transition-colors ${
                   isActive
-                    ? "bg-[#2a2a2a] text-[var(--soft-gray)]"
-                    : "bg-transparent text-[var(--soft-gray)]/70"
+                    ? "bg-white text-[var(--premium-gold-light)] shadow-sm ring-1 ring-[var(--premium-gold)]/25"
+                    : "bg-transparent text-[#7f7c7a] hover:text-[#1c1b1b]"
                 }`}
               >
                 {category}
@@ -95,31 +107,28 @@ export default function PromotionsPage() {
           {filteredPromos.map((promo) => (
             <article
               key={promo.id}
-              className="relative overflow-hidden rounded-2xl border border-white/8 bg-[#1a1a1a] shadow-[0_10px_24px_rgba(0,0,0,0.45)]"
+              className="overflow-hidden rounded-2xl border border-[var(--outline)]/10 bg-white shadow-[0_4px_20px_rgba(0,0,0,0.05)]"
             >
-              <div className="absolute inset-0 grid grid-cols-[47%_53%]">
-                <div className="relative flex min-h-[148px] flex-col overflow-hidden border-r border-white/6 bg-[#141414]">
-                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_16%,rgba(228,202,105,0.22),transparent_44%),linear-gradient(135deg,#191919_0%,#111111_62%,#0e0e0e_100%)]" />
-                  <div className="relative z-10 flex flex-1 flex-col items-center justify-center gap-2">
-                    <CategoryIcon category={promo.category} />
-                    <span className="text-[10px] tracking-[0.12em] text-[var(--soft-gray)]/68">
-                      PROMO
-                    </span>
-                  </div>
+              <div className="flex gap-4 p-4">
+                <div className="flex shrink-0 flex-col items-center justify-center gap-1.5 rounded-2xl bg-[#eef4f8] px-4 py-5">
+                  <CategoryIcon category={promo.category} />
+                  <span className="flex items-center gap-1 text-[10px] font-bold tracking-[0.14em] text-[var(--premium-gold-light)] uppercase">
+                    <Percent className="h-3 w-3" strokeWidth={2.2} />
+                    Promo
+                  </span>
                 </div>
-                <div className="min-h-[148px] bg-[linear-gradient(180deg,#f4ecdd_0%,#eadfc9_100%)]" />
-              </div>
 
-              <div className="relative z-10 ml-auto flex w-[53%] flex-col px-3 py-3">
-                <h2 className="text-[22px] leading-tight font-heading text-[#1b1916] sm:text-[26px]">
-                  {promo.title}
-                </h2>
-                <p className="mt-1 text-[11px] text-[#2c2922]/80">{promo.subtitle}</p>
-                <p className="mt-1 text-[11px] leading-tight text-[#2c2922]/90">{promo.details}</p>
-                <div className="mt-3">
+                <div className="flex min-w-0 flex-1 flex-col">
+                  <h2 className="text-[20px] leading-tight font-heading font-semibold text-[#1c1b1b]">
+                    {promo.title}
+                  </h2>
+                  <p className="mt-1 text-[14px] font-semibold text-[var(--premium-gold-light)]">
+                    {promo.subtitle}
+                  </p>
+                  <p className="mt-1 text-[12px] leading-snug text-[#7f7c7a]">{promo.details}</p>
                   <Link
-                    href={`/turnos?treatment=${encodeURIComponent(promo.title)}`}
-                    className="flex h-9 w-full items-center justify-center rounded-full bg-gradient-to-r from-[var(--accent-orange)] to-[var(--premium-gold)] text-[13px] font-medium text-white"
+                    href={`/turnos?treatment=${encodeURIComponent(promo.treatmentId)}`}
+                    className="mt-4 flex h-10 w-full items-center justify-center rounded-full bg-[var(--premium-gold-light)] text-[14px] font-semibold text-white shadow-sm transition active:scale-[0.98]"
                   >
                     Reservar
                   </Link>

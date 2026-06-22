@@ -124,14 +124,14 @@ function HomeContent() {
                 Destacado
               </span>
               <h3 className="font-heading text-[32px] leading-10 font-semibold text-[#e5e2e1]">
-                Servicio completo
+                Color global
               </h3>
               <p className="mt-3 max-w-[240px] text-sm leading-5 text-[var(--on-surface-variant)]">
-                Color, lavado, corte y peinado en una sola visita (1 h 30 min).
+                Desde $95.000 · 2 h con cierre técnico y modelado incluidos.
               </p>
               <div className="mt-8 flex items-center justify-between">
                 <Link
-                  href="/turnos?treatment=Servicio%20completo"
+                  href="/turnos?treatment=Color%20global%20%C2%B7%20corto%20(hombro)"
                   className="rounded-full bg-[var(--premium-gold)] px-6 py-3 text-[13px] font-semibold tracking-wider text-[var(--on-accent)] uppercase transition-all hover:opacity-90 active:scale-95"
                 >
                   Reservar ahora

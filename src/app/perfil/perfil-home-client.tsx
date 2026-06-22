@@ -132,7 +132,7 @@ export function PerfilHomeClient() {
           id="acceso"
           className="mb-6 rounded-[24px] border border-gray-100 bg-[#F5F5F5] p-6 shadow-[0_4px_20px_rgba(0,0,0,0.05)]"
         >
-          <p className="text-sm font-semibold tracking-wide text-[#B88E2F] uppercase">Acceso rápido</p>
+          <p className="text-sm font-semibold tracking-wide text-[#7da3c4] uppercase">Acceso rápido</p>
           <p className="mt-2 text-[16px] text-gray-700">Usá el mismo WhatsApp que al reservar en la web o en el salón.</p>
           <form onSubmit={(e) => void handleLogin(e)} className="mt-4 space-y-4">
             <div>
@@ -148,7 +148,7 @@ export function PerfilHomeClient() {
                 value={phoneInput}
                 onChange={(e) => setPhoneInput(e.target.value)}
                 placeholder="Ej: +54 9 11 2345-6789"
-                className="mt-2 w-full rounded-xl border border-gray-200 bg-white px-4 py-3.5 text-[16px] text-gray-900 outline-none placeholder:text-gray-400 focus:border-[#B88E2F] focus:ring-2 focus:ring-[#B88E2F]/25"
+                className="mt-2 w-full rounded-xl border border-gray-200 bg-white px-4 py-3.5 text-[16px] text-gray-900 outline-none placeholder:text-gray-400 focus:border-[#7da3c4] focus:ring-2 focus:ring-[#7da3c4]/25"
               />
             </div>
             {error ? (
@@ -167,7 +167,7 @@ export function PerfilHomeClient() {
         <>
           <Link
             href="/turnos"
-            className="mb-4 flex h-14 w-full items-center justify-center rounded-full bg-[#B88E2F] text-lg font-semibold text-white shadow-lg transition active:scale-[0.98]"
+            className="mb-4 flex h-14 w-full items-center justify-center rounded-full bg-[#7da3c4] text-lg font-semibold text-white shadow-lg transition active:scale-[0.98]"
           >
             Reservar nuevo turno
           </Link>
@@ -175,14 +175,14 @@ export function PerfilHomeClient() {
           {nextAppointment ? (
             <Link
               href="/perfil/mis-turnos"
-              className="mb-6 block rounded-[24px] border border-[#B88E2F]/30 bg-[#B88E2F]/8 p-5 shadow-[0_4px_20px_rgba(0,0,0,0.04)] transition hover:border-[#B88E2F]/50"
+              className="mb-6 block rounded-[24px] border border-[#7da3c4]/30 bg-[#7da3c4]/8 p-5 shadow-[0_4px_20px_rgba(0,0,0,0.04)] transition hover:border-[#7da3c4]/50"
             >
-              <p className="text-sm font-semibold text-[#B88E2F] uppercase tracking-wide">Próximo turno</p>
+              <p className="text-sm font-semibold text-[#7da3c4] uppercase tracking-wide">Próximo turno</p>
               <p className="mt-2 text-xl font-semibold text-gray-900">{nextAppointment.treatmentName}</p>
               <p className="mt-1 text-[16px] text-gray-600">
                 {nextAppointment.displayDate} · {nextAppointment.timeLocal} hs
               </p>
-              <p className="mt-3 text-[15px] font-medium text-[#B88E2F]">Ver detalle →</p>
+              <p className="mt-3 text-[15px] font-medium text-[#7da3c4]">Ver detalle →</p>
             </Link>
           ) : (
             <p className="mb-6 rounded-[24px] border border-gray-100 bg-white px-5 py-4 text-[16px] text-gray-600 shadow-[0_4px_20px_rgba(0,0,0,0.04)]">
@@ -214,11 +214,11 @@ export function PerfilHomeClient() {
             <Link
               key={href}
               href={href}
-              className="flex cursor-pointer items-center justify-between rounded-[24px] border border-gray-50 bg-white px-5 py-4 shadow-[0_4px_20px_rgba(0,0,0,0.05)] transition active:scale-[0.99] hover:border-[#B88E2F]/25"
+              className="flex cursor-pointer items-center justify-between rounded-[24px] border border-gray-50 bg-white px-5 py-4 shadow-[0_4px_20px_rgba(0,0,0,0.05)] transition active:scale-[0.99] hover:border-[#7da3c4]/25"
             >
               <div className="flex items-center gap-4">
                 <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#F5F5F5]">
-                  <Icon className="h-6 w-6 text-[#B88E2F]" strokeWidth={1.6} />
+                  <Icon className="h-6 w-6 text-[#7da3c4]" strokeWidth={1.6} />
                 </div>
                 <div>
                   <p className="text-[17px] font-semibold text-gray-900">{title}</p>
@@ -227,7 +227,7 @@ export function PerfilHomeClient() {
               </div>
               <div className="flex items-center gap-2">
                 {badge !== undefined && Number(badge) > 0 ? (
-                  <span className="rounded-full bg-[#B88E2F] px-2.5 py-0.5 text-[13px] font-semibold text-white">
+                  <span className="rounded-full bg-[#7da3c4] px-2.5 py-0.5 text-[13px] font-semibold text-white">
                     {badge}
                   </span>
                 ) : null}

@@ -29,8 +29,8 @@ const NAV_ITEMS: NavItem[] = [
 const tabClass = (isActive: boolean) =>
   `flex w-full flex-col items-center justify-center gap-1 transition-colors active:scale-95 ${
     isActive
-      ? "text-[var(--premium-gold-light)]"
-      : "text-[var(--soft-gray)] hover:text-[var(--premium-gold-light)]"
+      ? "text-[var(--premium-gold)]"
+      : "text-[var(--soft-gray)] hover:text-[var(--premium-gold)]"
   }`;
 
 function NavIcon({ Icon, isActive, filledWhenActive }: { Icon: LucideIcon; isActive: boolean; filledWhenActive?: boolean }) {

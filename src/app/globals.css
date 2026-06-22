@@ -4,11 +4,11 @@
   --background: #141313;
   --foreground: #e5e2e1;
   --soft-gray: #9797a0;
-  --premium-gold: #dfc565;
-  --premium-gold-light: #b88e2f;
+  --premium-gold: #9bb7d4;
+  --premium-gold-light: #7da3c4;
   --accent-coral: #b64b54;
   --accent-orange: #ce7832;
-  /* Texto sobre botones rellenos en tono dorado */
+  /* Texto sobre botones rellenos en tono acento */
   --on-accent: #1f1814;
   --on-surface-variant: #c4c7c7;
   --outline: #8e9192;

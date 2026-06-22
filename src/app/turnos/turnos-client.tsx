@@ -146,7 +146,7 @@ export default function TurnosClient({ initialTreatment = "" }: TurnosClientProp
 
   const lightCard = "rounded-2xl border border-[var(--outline)]/10 bg-white shadow-sm";
   const lightCardActive =
-    "border-[var(--premium-gold-light)] shadow-[0_0_0_1px_rgba(184,142,47,0.18)]";
+    "border-[var(--premium-gold-light)] shadow-[0_0_0_1px_rgba(125,163,196,0.18)]";
   const sessionBootstrappedRef = useRef(false);
 
   useEffect(() => {
@@ -652,7 +652,7 @@ export default function TurnosClient({ initialTreatment = "" }: TurnosClientProp
                         datosComplete && !checkoutLoading
                           ? requiresDeposit
                             ? "cursor-pointer bg-[#009EE3] text-white shadow-[0_8px_24px_rgba(0,158,227,0.35)]"
-                            : "cursor-pointer bg-[var(--premium-gold-light)] text-[var(--on-accent)] shadow-[0_8px_24px_rgba(184,142,47,0.28)]"
+                            : "cursor-pointer bg-[var(--premium-gold-light)] text-[var(--on-accent)] shadow-[0_8px_24px_rgba(125,163,196,0.28)]"
                           : "cursor-not-allowed bg-[#e5e2e1] text-[#7f7c7a]"
                       } ${checkoutLoading ? "cursor-wait" : ""}`}
                     >

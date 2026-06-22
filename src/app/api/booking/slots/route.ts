@@ -4,6 +4,7 @@ import { NextResponse } from "next/server";
 import { computeBookableSlots, computeBookableSlotsForTreatmentIds } from "@/lib/booking/compute-bookable-slots";
 import { getDb } from "@/lib/mongodb";
 import { verifyPanelCookie } from "@/lib/panel-turnos-auth";
+import { validateServiceCombo } from "@/lib/treatments/booking-rules";
 import { findSalonTreatmentById } from "@/lib/treatments/catalog";
 
 export const dynamic = "force-dynamic";
@@ -36,18 +37,9 @@ export async function GET(request: Request) {
     if (serviceIds.some((id) => !findSalonTreatmentById(id))) {
       return NextResponse.json({ error: "Hay servicios invalidos." }, { status: 400 });
     }
-    if (serviceIds.includes("servicio-completo") && serviceIds.length > 1) {
-      return NextResponse.json(
-        { error: "Servicio completo no se puede combinar con otros servicios." },
-        { status: 400 },
-      );
-    }
-    const keratinaIdx = serviceIds.indexOf("keratina");
-    if (keratinaIdx >= 0 && keratinaIdx !== serviceIds.length - 1) {
-      return NextResponse.json(
-        { error: "Keratina solo se puede combinar si queda al final del turno." },
-        { status: 400 },
-      );
+    const comboError = validateServiceCombo(serviceIds);
+    if (comboError) {
+      return NextResponse.json({ error: comboError }, { status: 400 });
     }
   } else if (!findSalonTreatmentById(treatmentId)) {
     return NextResponse.json({ error: "Tratamiento invalido." }, { status: 400 });

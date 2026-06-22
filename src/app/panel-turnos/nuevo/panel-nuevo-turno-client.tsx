@@ -14,8 +14,8 @@ import {
   formatSalonDisplayDate,
   isLikelyWhatsappNumber,
 } from "@/lib/booking/salon-availability";
-import { findSalonTreatmentById } from "@/lib/treatments/catalog";
-import type { TreatmentCategory } from "@/lib/treatments/catalog";
+import { isSoloComboTreatmentId } from "@/lib/treatments/booking-rules";
+import { findSalonTreatmentById, type TreatmentCategory } from "@/lib/treatments/catalog";
 
 export function PanelNuevoTurnoClient() {
   const router = useRouter();
@@ -114,7 +114,7 @@ export function PanelNuevoTurnoClient() {
 
   const lightCard = "rounded-2xl border border-[var(--outline)]/10 bg-white shadow-sm";
   const lightCardActive =
-    "border-[var(--premium-gold-light)] shadow-[0_0_0_1px_rgba(184,142,47,0.18)]";
+    "border-[var(--premium-gold-light)] shadow-[0_0_0_1px_rgba(125,163,196,0.18)]";
 
   useEffect(() => {
     if (!selectedDate) setDateStepConfirmed(false);
@@ -283,12 +283,12 @@ export function PanelNuevoTurnoClient() {
     onToggleTreatmentId: (id: string) => {
       setSelectedServiceIds((prev) => {
         if (prev.includes(id)) return prev.filter((x) => x !== id);
-        if (id === "servicio-completo" && prev.length > 0) {
-          setServiceLimitHint("No podés seleccionar Servicio completo porque ya elegiste otros servicios.");
+        if (isSoloComboTreatmentId(id) && prev.length > 0) {
+          setServiceLimitHint("Este servicio no se puede combinar con otros en el mismo turno.");
           return prev;
         }
-        if (prev.includes("servicio-completo")) {
-          setServiceLimitHint("No podés agregar otro servicio porque ya seleccionaste Servicio completo.");
+        if (prev.some((x) => isSoloComboTreatmentId(x))) {
+          setServiceLimitHint("No podés agregar otro servicio porque ya elegiste uno que va solo en el turno.");
           return prev;
         }
         if (id !== "keratina" && prev.includes("keratina")) {
@@ -313,7 +313,8 @@ export function PanelNuevoTurnoClient() {
       setServiceSelectionConfirmed(false);
       setDateStepConfirmed(false);
     },
-    comboHintText: "Podés elegir hasta 4 servicios. Servicio completo va solo y Keratina debe quedar al final.",
+    comboHintText:
+      "Podés elegir hasta 4 servicios. Alisado vegano y balayage/air touch van solos en el turno.",
     comboDurationLabel: totalSelectedDurationLabel,
     comboAlertText: serviceLimitHint,
     variant: "light" as const,
@@ -500,7 +501,7 @@ export function PanelNuevoTurnoClient() {
                   onClick={() => void handleConfirmTurno()}
                   className={`${panelPrimaryBtn} rounded-xl ${
                     datosComplete && !submitting
-                      ? "bg-[var(--premium-gold-light)] text-[var(--on-accent)] shadow-[0_8px_24px_rgba(184,142,47,0.28)]"
+                      ? "bg-[var(--premium-gold-light)] text-[var(--on-accent)] shadow-[0_8px_24px_rgba(125,163,196,0.28)]"
                       : ""
                   } ${submitting ? "cursor-wait" : ""}`}
                 >

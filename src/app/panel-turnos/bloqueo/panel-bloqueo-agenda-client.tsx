@@ -199,10 +199,10 @@ export function PanelBloqueoAgendaClient() {
               aria-expanded={calendarOpen}
               aria-haspopup="dialog"
               onClick={toggleCalendar}
-              className="mt-1.5 flex w-full cursor-pointer items-center justify-between gap-2 rounded-xl border border-gray-200 bg-white px-3 py-3 text-left text-[15px] text-gray-900 outline-none transition hover:border-gray-300 focus:border-[#B88E2F]/50"
+              className="mt-1.5 flex w-full cursor-pointer items-center justify-between gap-2 rounded-xl border border-gray-200 bg-white px-3 py-3 text-left text-[15px] text-gray-900 outline-none transition hover:border-gray-300 focus:border-[#7da3c4]/50"
             >
               <span className="flex min-w-0 items-center gap-2">
-                <CalendarDays className="h-4 w-4 shrink-0 text-[#B88E2F]" strokeWidth={1.85} />
+                <CalendarDays className="h-4 w-4 shrink-0 text-[#7da3c4]" strokeWidth={1.85} />
                 <span className="truncate">{formatSalonDisplayDate(anchorDateKey)}</span>
               </span>
               <ChevronDown
@@ -314,11 +314,11 @@ export function PanelBloqueoAgendaClient() {
                 <label
                   key={opt.v}
                   className={`flex cursor-pointer flex-col rounded-xl border px-3 py-2.5 transition ${
-                    scope === opt.v ? "border-[#B88E2F]/50 bg-[#B88E2F]/8" : "border-gray-200 bg-gray-50"
+                    scope === opt.v ? "border-[#7da3c4]/50 bg-[#7da3c4]/8" : "border-gray-200 bg-gray-50"
                   }`}
                 >
                   <div className="flex items-center gap-2">
-                    <input type="radio" name="scope" value={opt.v} checked={scope === opt.v} onChange={() => setScope(opt.v)} className="accent-[#B88E2F]" />
+                    <input type="radio" name="scope" value={opt.v} checked={scope === opt.v} onChange={() => setScope(opt.v)} className="accent-[#7da3c4]" />
                     <span className="text-[14px] font-medium text-gray-900">{opt.label}</span>
                   </div>
                   <span className="mt-1 pl-6 text-[11px] leading-snug text-gray-500">{opt.hint}</span>
@@ -332,19 +332,19 @@ export function PanelBloqueoAgendaClient() {
             <div className="mt-2 space-y-2">
               <label
                 className={`flex cursor-pointer items-center gap-2 rounded-xl border px-3 py-2.5 ${
-                  recurrenceType === "once" ? "border-[#B88E2F]/50 bg-[#B88E2F]/8" : "border-gray-200 bg-gray-50"
+                  recurrenceType === "once" ? "border-[#7da3c4]/50 bg-[#7da3c4]/8" : "border-gray-200 bg-gray-50"
                 }`}
               >
-                <input type="radio" name="recurrence" checked={recurrenceType === "once"} onChange={() => setRecurrenceType("once")} className="accent-[#B88E2F]" />
+                <input type="radio" name="recurrence" checked={recurrenceType === "once"} onChange={() => setRecurrenceType("once")} className="accent-[#7da3c4]" />
                 <span className="text-[14px] text-gray-900">Solo esta fecha</span>
               </label>
               <label
                 className={`flex cursor-pointer flex-col gap-2 rounded-xl border px-3 py-2.5 ${
-                  recurrenceType === "weekly" ? "border-[#B88E2F]/50 bg-[#B88E2F]/8" : "border-gray-200 bg-gray-50"
+                  recurrenceType === "weekly" ? "border-[#7da3c4]/50 bg-[#7da3c4]/8" : "border-gray-200 bg-gray-50"
                 }`}
               >
                 <div className="flex items-center gap-2">
-                  <input type="radio" name="recurrence" checked={recurrenceType === "weekly"} onChange={() => setRecurrenceType("weekly")} className="accent-[#B88E2F]" />
+                  <input type="radio" name="recurrence" checked={recurrenceType === "weekly"} onChange={() => setRecurrenceType("weekly")} className="accent-[#7da3c4]" />
                   <span className="text-[14px] text-gray-900">Cada semana (mismo día de la semana)</span>
                 </div>
                 {recurrenceType === "weekly" ? (

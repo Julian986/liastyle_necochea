@@ -109,7 +109,7 @@ export function MisTurnosClient() {
           type="button"
           onClick={() => setTab("upcoming")}
           className={`flex-1 cursor-pointer rounded-xl py-3 text-[15px] font-semibold transition ${
-            tab === "upcoming" ? "bg-[#B88E2F] text-white shadow-sm" : "text-gray-600 hover:bg-white/80"
+            tab === "upcoming" ? "bg-[#7da3c4] text-white shadow-sm" : "text-gray-600 hover:bg-white/80"
           }`}
         >
           Próximos ({upcoming.length})
@@ -118,7 +118,7 @@ export function MisTurnosClient() {
           type="button"
           onClick={() => setTab("past")}
           className={`flex-1 cursor-pointer rounded-xl py-3 text-[15px] font-semibold transition ${
-            tab === "past" ? "bg-[#B88E2F] text-white shadow-sm" : "text-gray-600 hover:bg-white/80"
+            tab === "past" ? "bg-[#7da3c4] text-white shadow-sm" : "text-gray-600 hover:bg-white/80"
           }`}
         >
           Pasados ({past.length})
@@ -128,7 +128,7 @@ export function MisTurnosClient() {
       {error ? (
         <p role="alert" className="mb-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-[16px] text-amber-900">
           {error}{" "}
-          <Link href="/perfil#acceso" className="font-semibold text-[#B88E2F] underline-offset-2 hover:underline">
+          <Link href="/perfil#acceso" className="font-semibold text-[#7da3c4] underline-offset-2 hover:underline">
             Ir a acceso
           </Link>
         </p>
@@ -157,9 +157,9 @@ export function MisTurnosClient() {
           {list.map((r) => (
             <li key={r.id} className={`${perfilCard} px-5 py-5`}>
               <p className="text-[18px] font-semibold leading-tight text-gray-900">
-                <span className="text-[#B88E2F]">
+                <span className="text-[#7da3c4]">
                   {r.timeLocal}
-                  <span className="ml-1 text-[15px] font-medium text-[#B88E2F]/80">hs</span>
+                  <span className="ml-1 text-[15px] font-medium text-[#7da3c4]/80">hs</span>
                 </span>
                 <span className="text-gray-700"> · {formatDayMonthFromKey(r.dateKey)}</span>
               </p>
@@ -185,7 +185,7 @@ export function MisTurnosClient() {
                 <div className="mt-4 flex flex-wrap items-center gap-2">
                   <Link
                     href={`/perfil/mis-turnos/${encodeURIComponent(r.id)}/reprogramar`}
-                    className="inline-flex h-10 cursor-pointer items-center rounded-xl border border-[#B88E2F] bg-[#B88E2F]/10 px-4 text-[14px] font-semibold text-[#996515] transition hover:bg-[#B88E2F]/18"
+                    className="inline-flex h-10 cursor-pointer items-center rounded-xl border border-[#7da3c4] bg-[#7da3c4]/10 px-4 text-[14px] font-semibold text-[#5f7a8f] transition hover:bg-[#7da3c4]/18"
                   >
                     Cambiar horario
                   </Link>

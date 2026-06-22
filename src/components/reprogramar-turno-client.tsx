@@ -351,7 +351,7 @@ export function ReprogramarTurnoClient({
         >
           {loadError}{" "}
           {variant === "customer" ? (
-            <Link href="/perfil#acceso" className="font-semibold text-[#B88E2F] underline-offset-2 hover:underline">
+            <Link href="/perfil#acceso" className="font-semibold text-[#7da3c4] underline-offset-2 hover:underline">
               Ir a acceso
             </Link>
           ) : null}
@@ -385,7 +385,7 @@ export function ReprogramarTurnoClient({
             </p>
             <p className={`mt-3 text-[13px] ${light ? "text-gray-600" : "text-[var(--soft-gray)]/55"}`}>
               Turno actual:{" "}
-              <span className={`font-semibold ${light ? "text-[#B88E2F]" : "text-[var(--premium-gold)]"}`}>
+              <span className={`font-semibold ${light ? "text-[#7da3c4]" : "text-[var(--premium-gold)]"}`}>
                 {reservation.timeLocal} · {reservation.displayDate}
               </span>
             </p>
@@ -405,12 +405,12 @@ export function ReprogramarTurnoClient({
                 onClick={() => setDayPickerOpen((o) => !o)}
                 className={
                   light
-                    ? "flex w-full cursor-pointer items-center justify-between gap-3 rounded-xl border border-gray-200 bg-white px-3 py-3 text-left outline-none transition hover:border-gray-300 focus-visible:border-[#B88E2F]/50"
+                    ? "flex w-full cursor-pointer items-center justify-between gap-3 rounded-xl border border-gray-200 bg-white px-3 py-3 text-left outline-none transition hover:border-gray-300 focus-visible:border-[#7da3c4]/50"
                     : "flex w-full cursor-pointer items-center justify-between gap-3 rounded-xl border border-white/12 bg-[#141414] px-3 py-3 text-left outline-none transition hover:border-white/18 focus-visible:border-[var(--premium-gold)]/45"
                 }
               >
                 <span className="flex min-w-0 items-center gap-2.5">
-                  <CalendarDays className={`h-4 w-4 shrink-0 ${light ? "text-[#B88E2F]" : "text-[var(--premium-gold)]"}`} strokeWidth={1.75} />
+                  <CalendarDays className={`h-4 w-4 shrink-0 ${light ? "text-[#7da3c4]" : "text-[var(--premium-gold)]"}`} strokeWidth={1.75} />
                   <span className={`min-w-0 flex-1 text-[14px] leading-snug ${light ? "text-gray-800" : "text-[var(--soft-gray)]"}`}>
                     {/^\d{4}-\d{2}-\d{2}$/.test(dateKey) ? (
                       <>
@@ -530,7 +530,7 @@ export function ReprogramarTurnoClient({
                           </span>
                           <span className="mt-0.5 flex h-2 items-center justify-center">
                             {busyCount > 0 ? (
-                              <span className="block h-1 w-1 rounded-full bg-[#B88E2F]" />
+                              <span className="block h-1 w-1 rounded-full bg-[#7da3c4]" />
                             ) : (
                               <span className="block h-1 w-1 rounded-full bg-transparent" />
                             )}
@@ -574,7 +574,7 @@ export function ReprogramarTurnoClient({
                             "w-full cursor-pointer rounded-xl border px-3.5 py-2.5 text-left text-[13px] font-semibold transition",
                             timeLocal === row.timeLocal
                               ? light
-                                ? "border-[#B88E2F] bg-[#B88E2F]/10 text-[#8B6914]"
+                                ? "border-[#7da3c4] bg-[#7da3c4]/10 text-[#5f7a8f]"
                                 : "border-[var(--premium-gold)] bg-[var(--premium-gold)]/18 text-[var(--premium-gold)]"
                               : light
                                 ? "border-gray-200 bg-white text-gray-800 hover:bg-gray-50"

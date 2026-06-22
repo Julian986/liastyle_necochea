@@ -287,7 +287,7 @@ export function PanelTurnosDashboard() {
           <div className="mt-4 grid grid-cols-2 gap-3">
             <Link
               href="/panel-turnos/nuevo"
-              className="flex h-12 cursor-pointer items-center justify-center gap-2 rounded-2xl bg-[#B88E2F] text-[14px] font-semibold text-white shadow-md transition active:scale-[0.98]"
+              className="flex h-12 cursor-pointer items-center justify-center gap-2 rounded-2xl bg-[#7da3c4] text-[14px] font-semibold text-white shadow-md transition active:scale-[0.98]"
             >
               <Plus className="h-5 w-5" strokeWidth={2.2} />
               Agregar turno
@@ -357,7 +357,7 @@ export function PanelTurnosDashboard() {
                   </span>
                   <span className="mt-0.5 flex h-2 items-center justify-center">
                     {count > 0 ? (
-                      <span className="block h-1.5 w-1.5 rounded-full bg-[#B88E2F]" />
+                      <span className="block h-1.5 w-1.5 rounded-full bg-[#7da3c4]" />
                     ) : (
                       <span className="block h-1.5 w-1.5 rounded-full bg-transparent" />
                     )}
@@ -393,7 +393,7 @@ export function PanelTurnosDashboard() {
               <span className="font-semibold">{cancelledLabel}</span>
             </button>
             <div className={panelChip}>
-              <CalendarDays className="h-4 w-4 text-[#B88E2F]" strokeWidth={1.75} />
+              <CalendarDays className="h-4 w-4 text-[#7da3c4]" strokeWidth={1.75} />
               <span className="font-semibold">
                 {dayRows.length} {dayRows.length === 1 ? "evento" : "eventos"}
               </span>
@@ -447,7 +447,7 @@ export function PanelTurnosDashboard() {
             type="button"
             onClick={handleLogout}
             disabled={logoutBusy}
-            className="cursor-pointer text-[13px] text-gray-400 underline-offset-4 hover:text-[#B88E2F] hover:underline disabled:cursor-not-allowed disabled:opacity-50"
+            className="cursor-pointer text-[13px] text-gray-400 underline-offset-4 hover:text-[#7da3c4] hover:underline disabled:cursor-not-allowed disabled:opacity-50"
           >
             Cerrar sesión del panel
           </button>

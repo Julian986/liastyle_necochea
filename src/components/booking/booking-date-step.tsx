@@ -136,7 +136,7 @@ export function BookingDateStep({
                 }}
                 className={`mx-auto flex h-10 w-10 cursor-pointer items-center justify-center rounded-xl text-sm font-medium transition-all disabled:cursor-not-allowed ${
                   isSelected
-                    ? "bg-[var(--premium-gold-light)] text-white shadow-[0_4px_16px_rgba(184,142,47,0.45)]"
+                    ? "bg-[var(--premium-gold-light)] text-white shadow-[0_4px_16px_rgba(125,163,196,0.45)]"
                     : fullyBooked
                       ? "text-[#c4c0b8] line-through decoration-[#c4c0b8]"
                       : !day.isCurrentMonth

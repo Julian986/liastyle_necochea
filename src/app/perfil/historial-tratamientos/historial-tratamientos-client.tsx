@@ -65,7 +65,7 @@ export function HistorialTratamientosClient() {
       {error ? (
         <p role="alert" className="mb-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-[16px] text-amber-900">
           {error}{" "}
-          <Link href="/perfil#acceso" className="font-semibold text-[#B88E2F] underline-offset-2 hover:underline">
+          <Link href="/perfil#acceso" className="font-semibold text-[#7da3c4] underline-offset-2 hover:underline">
             Ir a acceso
           </Link>
         </p>
@@ -88,7 +88,7 @@ export function HistorialTratamientosClient() {
             <li key={g.treatmentName} className={`${perfilCard} px-5 py-5`}>
               <p className="text-[18px] font-semibold text-gray-900">{g.treatmentName}</p>
               <p className="mt-2 text-[16px] text-gray-600">
-                <span className="font-bold text-[#B88E2F]">{g.sessions}</span>{" "}
+                <span className="font-bold text-[#7da3c4]">{g.sessions}</span>{" "}
                 {g.sessions === 1 ? "sesión realizada" : "sesiones realizadas"}
               </p>
               <p className="mt-1 text-[15px] text-gray-400">Última: {formatShortDateFromKey(g.lastDateKey)}</p>

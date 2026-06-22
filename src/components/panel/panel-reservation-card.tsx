@@ -31,7 +31,7 @@ type PanelReservationCardProps = {
 };
 
 function ServiceLineIcon({ category, muted }: { category: string; muted?: boolean }) {
-  const cls = `h-4 w-4 shrink-0 ${muted ? "text-gray-500" : "text-[#B88E2F]"}`;
+  const cls = `h-4 w-4 shrink-0 ${muted ? "text-gray-500" : "text-[#7da3c4]"}`;
   if (category === "Cortes y peinado") return <Scissors className={cls} strokeWidth={1.85} />;
   if (category === "Color") return <Palette className={cls} strokeWidth={1.85} />;
   if (category === "Tratamiento") return <Sparkles className={cls} strokeWidth={1.85} />;
@@ -99,7 +99,7 @@ export const PanelReservationCard = forwardRef<HTMLElement, PanelReservationCard
         ref={ref}
         className={[
           "overflow-hidden rounded-[22px] border bg-white shadow-[0_6px_24px_rgba(0,0,0,0.08)] transition-shadow",
-          focused ? "border-[#E8D5A8] ring-2 ring-[#B88E2F]/30" : "border-gray-200",
+          focused ? "border-[#c5dae8] ring-2 ring-[#7da3c4]/30" : "border-gray-200",
         ].join(" ")}
       >
         <div className="p-4 pb-3">
@@ -116,7 +116,7 @@ export const PanelReservationCard = forwardRef<HTMLElement, PanelReservationCard
               <span
                 className={[
                   "shrink-0 text-[15px] font-semibold tabular-nums tracking-tight",
-                  focused ? "text-[#8B6914]" : "text-gray-600",
+                  focused ? "text-[#5f7a8f]" : "text-gray-600",
                 ].join(" ")}
               >
                 {duration}
@@ -136,7 +136,7 @@ export const PanelReservationCard = forwardRef<HTMLElement, PanelReservationCard
           <p
             className={[
               "mt-2 flex items-start gap-2 text-[14px] leading-snug",
-              focused ? "text-[#8B6914]" : "text-gray-600",
+              focused ? "text-[#5f7a8f]" : "text-gray-600",
             ].join(" ")}
           >
             <ServiceLineIcon category={r.category} muted={!focused} />
@@ -173,7 +173,7 @@ export const PanelReservationCard = forwardRef<HTMLElement, PanelReservationCard
               className={[
                 "flex h-11 w-full cursor-pointer items-center justify-center gap-2 rounded-xl text-[15px] font-semibold transition active:scale-[0.99]",
                 focused
-                  ? "bg-[#B88E2F] text-white shadow-sm hover:bg-[#A67D28]"
+                  ? "bg-[#7da3c4] text-white shadow-sm hover:bg-[#6a92b3]"
                   : "border-2 border-gray-300 bg-white text-gray-700 hover:bg-gray-50",
               ].join(" ")}
             >

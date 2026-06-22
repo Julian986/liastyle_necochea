@@ -2,7 +2,7 @@
  * Reglas de agenda indicadas por el salón.
  *
  * Trabajos técnicos (martes a viernes):
- *   → No pueden empezar después de las 14:00 (el salón cierra a las 16:00).
+ *   → No pueden empezar después de las 14:00 (cierre 16:30).
  *
  * Trabajos técnicos (sábados):
  *   → Deben TERMINAR a las 13:00 o antes (después trabaja solo peinados).
@@ -17,33 +17,42 @@ export const TECH_LATEST_START_TUE_FRI = "14:00";
 /** Minutos del día en que terminan los trabajos técnicos los sábados (13:00). */
 const SAT_TECH_END_MINUTES = 13 * 60; // 780
 
-// ─── Tratamientos técnicos (id → durationMinutes) ────────────────────────────
+// ─── Trabajos técnicos (id → durationMinutes) ────────────────────────────────
 
 /**
  * Trabajos técnicos del salón con sus duraciones (en minutos).
  * Estos servicios tienen restricción horaria en Tue-Vie y Sábados.
  */
 const TECHNICAL_TREATMENTS = new Map<string, number>([
-  ["servicio-completo", 90],       // Servicio completo
-  ["color", 60],                   // Color / color con retoque
-  ["color-retoque-reflejos", 60],  // Color con retoque de reflejos
-  ["color-mechas-total", 90],      // Color con mechas
-  ["mechas-contramechas", 120],    // Mechas y contra mechas
-  ["balayage", 120],               // Balayage
-  ["reflejos-gorra", 120],         // Reflejos gorra
-  ["reflejos-papel-retoque", 90],  // Reflejos papel retoque
-  ["reflejos-papel-completo", 120],// Reflejos papel completo
-  ["barrido", 45],                 // Barrido
-  ["planchado", 60],               // Planchado
+  ["correccion-color", 90],
+  ["color-global-corto", 120],
+  ["color-global-medio", 120],
+  ["color-global-largo", 120],
+  ["reflejos-gorra-corto", 180],
+  ["reflejos-gorra-medio", 180],
+  ["reflejos-gorra-largo", 180],
+  ["color-crecimiento", 90],
+  ["color-crecimiento-mascara", 120],
+  ["color-crecimiento-tratamiento", 150],
+  ["mechas-papel-corto", 300],
+  ["mechas-papel-medio", 300],
+  ["mechas-papel-largo", 300],
+  ["alisado-vegano-corto", 270],
+  ["alisado-vegano-medio", 270],
+  ["alisado-vegano-largo", 270],
+  // Reservas antiguas (catálogo previo)
+  ["servicio-completo", 90],
+  ["color", 60],
+  ["color-retoque-reflejos", 60],
+  ["color-mechas-total", 90],
+  ["mechas-contramechas", 120],
+  ["balayage", 120],
+  ["reflejos-gorra", 120],
+  ["reflejos-papel-retoque", 90],
+  ["reflejos-papel-completo", 120],
+  ["barrido", 45],
+  ["keratina", 60],
 ]);
-
-// ─── Keratina ─────────────────────────────────────────────────────────────────
-
-/**
- * Único inicio permitido para keratina (reserva pública).
- * Con cierre 16:00 y servicio de 1 h, 15:30 ya no entra; queda 15:00.
- */
-export const KERATINA_ONLY_TIME_LOCAL = "15:00";
 
 // ─── Helpers internos ─────────────────────────────────────────────────────────
 
@@ -74,18 +83,16 @@ export function isTechnicalTreatment(treatmentId: string): boolean {
   return TECHNICAL_TREATMENTS.has(treatmentId);
 }
 
+/** Solo para reservas antiguas con keratina en el catálogo previo. */
 export function treatmentIsKeratinaOnly1530(treatmentId: string): boolean {
   return treatmentId === "keratina";
 }
 
+export const KERATINA_ONLY_TIME_LOCAL = "15:00";
+
 /**
  * Filtra los slots según las reglas de negocio del tratamiento.
  * Pasar `dateKey` para aplicar las restricciones del sábado.
- *
- * Reglas aplicadas (por orden de prioridad):
- *  1. Keratina → solo 15:00
- *  2. Trabajo técnico en sábado → slots que terminan antes de las 13:00
- *  3. Trabajo técnico en martes–viernes → inicio no posterior a 14:00
  */
 export function filterPublicSlotsByTreatmentRules(
   treatmentId: string | undefined,
@@ -94,26 +101,23 @@ export function filterPublicSlotsByTreatmentRules(
 ): string[] {
   if (!treatmentId) return slots;
 
-  // 1. Keratina: único horario fijo
   if (treatmentIsKeratinaOnly1530(treatmentId)) {
     return slots.filter((t) => t === KERATINA_ONLY_TIME_LOCAL);
   }
 
   const duration = TECHNICAL_TREATMENTS.get(treatmentId);
-  if (duration === undefined) return slots; // no es técnico → sin restricción
+  if (duration === undefined) return slots;
 
-  // 2. Sábado: el trabajo debe TERMINAR antes de las 13:00
   if (dateKey && isSaturday(dateKey)) {
     const lastStart = saturdayTechLastStart(duration);
     return slots.filter((t) => t <= lastStart);
   }
 
-  // 3. Martes–Viernes: inicio no posterior a 14:00
   return slots.filter((t) => t <= TECH_LATEST_START_TUE_FRI);
 }
 
-// Mantener por retrocompatibilidad (no se usa fuera de este módulo pero por claridad)
 export const REFLEJOS_BALAYAGE_LATEST_START = TECH_LATEST_START_TUE_FRI;
+
 export function treatmentRequiresStartNoLaterThan14(treatmentId: string): boolean {
   return TECHNICAL_TREATMENTS.has(treatmentId);
 }

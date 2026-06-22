@@ -12,6 +12,7 @@ import { formatSalonDisplayDate } from "@/lib/booking/salon-availability";
 import { canonicalPhoneDigitsAR, customerPhoneDigitsQueryValues } from "@/lib/customer/phone-canonical-ar";
 import { isPublicLeadTimeViolated } from "@/lib/booking/public-slot-lead";
 import { reservationWouldExceedSalonCapacity, slotIntervalMs } from "@/lib/booking/slot-overlap";
+import { validateServiceCombo } from "@/lib/treatments/booking-rules";
 import { SALON_TREATMENTS, findSalonTreatmentById, type SalonTreatment } from "@/lib/treatments/catalog";
 
 import { backfillCustomerPhoneDigitsBatch, renormalizeCustomerPhoneDigitsBatch } from "@/lib/reservations/customer-queries";
@@ -109,10 +110,8 @@ function buildServiceItemsForInput(input: CreateReservationInput): {
 } | null {
   const comboIds = (input.serviceIds ?? []).map((v) => v.trim()).filter(Boolean);
   const uniqueIds = [...new Set(comboIds)];
-  if (uniqueIds.length > 4) return null;
-  if (uniqueIds.includes("servicio-completo") && uniqueIds.length > 1) return null;
-  const keratinaIdx = uniqueIds.indexOf("keratina");
-  if (keratinaIdx >= 0 && keratinaIdx !== uniqueIds.length - 1) return null;
+  const comboError = validateServiceCombo(uniqueIds);
+  if (comboError) return null;
   if (uniqueIds.length > 0) {
     const treatments = uniqueIds
       .map((id) => findSalonTreatmentById(id))

@@ -9,6 +9,7 @@ export type SalonTreatmentOption = {
   id: string;
   name: string;
   subtitle: string;
+  bookingNote?: string;
   category: TreatmentCategory;
 };
 
@@ -18,11 +19,18 @@ export const SALON_TREATMENT_OPTIONS: SalonTreatmentOption[] = SALON_TREATMENTS.
   id: t.id,
   name: t.name,
   subtitle: t.subtitle,
+  bookingNote: t.bookingNote,
   category: t.category,
 }));
 
-/** Minuto del día (0–24h): el servicio debe *terminar* a esta hora o antes (16:00 = cierre puntual). */
-export const SALON_LAST_SERVICE_END_MINUTES = 16 * 60;
+/** Cierre martes–viernes: último minuto del día en que puede terminar un servicio (16:30). */
+export const SALON_LAST_SERVICE_END_MINUTES_TUE_FRI = 16 * 60 + 30;
+
+/** Cierre sábados (17:30). */
+export const SALON_LAST_SERVICE_END_MINUTES_SAT = 17 * 60 + 30;
+
+/** @deprecated Preferí `getSalonLastServiceEndMinutes(dateKey)`. */
+export const SALON_LAST_SERVICE_END_MINUTES = SALON_LAST_SERVICE_END_MINUTES_TUE_FRI;
 
 const SLOT_STEP_MINUTES = 30;
 
@@ -54,25 +62,37 @@ function buildStepSlots(openH: number, openM: number, closeH: number, closeM: nu
 }
 
 /**
- * Horarios base según Google Maps (ART): lun y dom cerrados; mar–vie 9:00–16:00; sáb 10:00–16:00.
- * Grilla cada 30 min (último inicio 15:30).
+ * Horario corrido (Analia, jun 2026): lun y dom cerrados;
+ * mar–vie 10:00–16:30; sáb 11:00–17:30. Grilla cada 30 min.
  */
+const SLOTS_TUE_FRI = buildStepSlots(10, 0, 16, 30);
+const SLOTS_SAT = buildStepSlots(11, 0, 17, 30);
+
 const availableTimesByWeekday: Record<number, string[]> = {
   0: [],
   1: [],
-  2: buildStepSlots(9, 0, 16, 0),
-  3: buildStepSlots(9, 0, 16, 0),
-  4: buildStepSlots(9, 0, 16, 0),
-  5: buildStepSlots(9, 0, 16, 0),
-  6: buildStepSlots(10, 0, 16, 0),
+  2: SLOTS_TUE_FRI,
+  3: SLOTS_TUE_FRI,
+  4: SLOTS_TUE_FRI,
+  5: SLOTS_TUE_FRI,
+  6: SLOTS_SAT,
 };
 
-/** Quita inicios donde el servicio pasaría de `SALON_LAST_SERVICE_END_MINUTES`. */
+export function getSalonLastServiceEndMinutes(dateKey: string): number {
+  const [y, m, d] = dateKey.split("-").map(Number);
+  if (!y || !m || !d) return SALON_LAST_SERVICE_END_MINUTES_TUE_FRI;
+  return new Date(y, m - 1, d).getDay() === 6
+    ? SALON_LAST_SERVICE_END_MINUTES_SAT
+    : SALON_LAST_SERVICE_END_MINUTES_TUE_FRI;
+}
+
+/** Quita inicios donde el servicio pasaría del cierre del día. */
 export function filterSlotsServiceEndsOnOrBeforeClose(
   slots: string[],
   durationMinutes: number,
-  lastServiceEndMinutes: number = SALON_LAST_SERVICE_END_MINUTES,
+  dateKey: string,
 ): string[] {
+  const lastServiceEndMinutes = getSalonLastServiceEndMinutes(dateKey);
   return slots.filter((t) => hhmmToMinutes(t) + durationMinutes <= lastServiceEndMinutes);
 }
 

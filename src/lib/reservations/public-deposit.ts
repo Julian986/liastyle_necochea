@@ -1,8 +1,13 @@
 /**
- * Seña en reserva pública (Mercado Pago): todo el catálogo excepto corte, despuntado y peinados.
+ * Seña en reserva pública: cortes básicos y peinados simples sin seña.
  * En combos, si algún servicio exige seña, el turno completo va por Mercado Pago.
  */
 const NO_DEPOSIT_IDS = new Set([
+  "diseno-tendencias",
+  "puntas",
+  "peinado-alisado-temporal",
+  "peinado-ondas",
+  // Catálogo anterior (reservas legacy)
   "corte-dama",
   "despuntado",
   "peinado-brushing",

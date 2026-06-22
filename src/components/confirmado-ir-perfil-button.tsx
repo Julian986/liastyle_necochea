@@ -39,7 +39,7 @@ export function ConfirmadoIrPerfilButton({ phone }: Props) {
       type="button"
       onClick={handleClick}
       disabled={loading}
-      className="flex h-[52px] w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-[var(--premium-gold-light)] text-[15px] font-semibold text-[var(--on-accent)] shadow-[0_8px_24px_rgba(184,142,47,0.28)] transition-all active:scale-[0.99] disabled:cursor-default disabled:opacity-70"
+      className="flex h-[52px] w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-[var(--premium-gold-light)] text-[15px] font-semibold text-[var(--on-accent)] shadow-[0_8px_24px_rgba(125,163,196,0.28)] transition-all active:scale-[0.99] disabled:cursor-default disabled:opacity-70"
     >
       {loading ? "Ingresando a perfil…" : "Ver mi turno en el perfil"}
     </button>

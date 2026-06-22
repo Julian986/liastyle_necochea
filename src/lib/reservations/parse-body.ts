@@ -1,3 +1,4 @@
+import { validateServiceCombo } from "@/lib/treatments/booking-rules";
 import { TREATMENT_CATEGORIES } from "@/lib/treatments/catalog";
 import type { CreateReservationInput, TreatmentCategory } from "./types";
 
@@ -42,19 +43,8 @@ export function parseCreateReservationBody(
   if (d.length < 10 || d.length > 15) return { ok: false, message: "El teléfono no es válido." };
   if (!whatsappOptIn) return { ok: false, message: "Tenés que aceptar recordatorios por WhatsApp." };
   if (serviceIds.length > 4) return { ok: false, message: "Podés combinar hasta 4 servicios por turno." };
-  if (serviceIds.includes("servicio-completo") && serviceIds.length > 1) {
-    return {
-      ok: false,
-      message: "Servicio completo ya incluye varios servicios y no se puede combinar con otros.",
-    };
-  }
-  const keratinaIdx = serviceIds.indexOf("keratina");
-  if (keratinaIdx >= 0 && keratinaIdx !== serviceIds.length - 1) {
-    return {
-      ok: false,
-      message: "Keratina solo se puede combinar si queda al final del turno.",
-    };
-  }
+  const comboError = validateServiceCombo(serviceIds);
+  if (comboError) return { ok: false, message: comboError };
 
   return {
     ok: true,

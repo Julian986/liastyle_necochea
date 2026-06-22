@@ -39,7 +39,7 @@ export function PanelLogin() {
       <div className="mb-8 flex flex-col items-center gap-4 text-center">
         <BrandLogo size="compact" className="mx-auto" />
         <div>
-          <h1 className="font-heading text-[28px] font-bold text-[#B88E2F]">Panel de turnos</h1>
+          <h1 className="font-heading text-[28px] font-bold text-[#7da3c4]">Panel de turnos</h1>
           <p className="mt-2 max-w-xs text-[15px] leading-relaxed text-gray-600">
             Ingresá la contraseña para ver y gestionar la agenda de Lia Style Necochea.
           </p>
