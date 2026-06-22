@@ -10,7 +10,7 @@ export type BookingCategoryCard = {
 export const BOOKING_CATEGORY_CARDS: BookingCategoryCard[] = [
   {
     category: "Cortes y peinado",
-    title: "Corte",
+    title: "Corte y peinado",
     subtitle: "Diseño y estilo personalizado",
     imageUrl:
       "https://images.unsplash.com/photo-1562322140-8baeececf3df?auto=format&fit=crop&w=900&q=80",
@@ -36,3 +36,7 @@ export const BOOKING_STEP_HINTS: Record<1 | 2 | 3, string> = {
   2: "Elegí una fecha disponible",
   3: "Seleccioná un horario para continuar",
 };
+
+export function bookingCategoryTitle(category: TreatmentCategory): string {
+  return BOOKING_CATEGORY_CARDS.find((c) => c.category === category)?.title ?? category;
+}

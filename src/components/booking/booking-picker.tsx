@@ -4,6 +4,7 @@ import { ChevronLeft, ChevronRight, Trash2 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
 import type { TreatmentCategory } from "@/lib/treatments/catalog";
+import { bookingCategoryTitle } from "@/lib/booking/category-cards";
 import { BookingDateStep } from "@/components/booking/booking-date-step";
 import {
   SALON_TREATMENT_CATEGORIES,
@@ -679,7 +680,7 @@ export function BookingPicker({
                 )}
 
                 <h2 className={`text-[26px] leading-none font-heading ${isLight ? "text-[#1c1b1b]" : "text-[var(--soft-gray)]"}`}>
-                  {activeTreatmentCategory ?? "Elegí servicio"}
+                  {activeTreatmentCategory ? bookingCategoryTitle(activeTreatmentCategory) : "Elegí servicio"}
                 </h2>
 
                 <button

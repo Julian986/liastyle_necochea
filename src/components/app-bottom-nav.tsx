@@ -20,7 +20,7 @@ type NavItem = {
 
 const NAV_ITEMS: NavItem[] = [
   { id: "inicio", href: "/", label: "Inicio", Icon: HomeIcon, filledWhenActive: true },
-  { id: "tratamientos", href: "/tratamientos", label: "Tratamientos", Icon: Scissors },
+  { id: "tratamientos", href: "/tratamientos", label: "Servicios", Icon: Scissors },
   { id: "turnos", href: "/turnos", label: "Turnos", Icon: CalendarDays, filledWhenActive: true },
   { id: "promos", href: "/promociones", label: "Promos", Icon: Percent },
   { id: "perfil", href: "/perfil", label: "Perfil", Icon: User },
