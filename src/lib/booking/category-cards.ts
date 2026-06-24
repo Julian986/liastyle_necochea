@@ -5,6 +5,8 @@ export type BookingCategoryCard = {
   title: string;
   subtitle: string;
   imageUrl: string;
+  /** Ajuste fino de `object-position` (ej. mostrar rostro en recortes). */
+  imageObjectPosition?: string;
 };
 
 export const BOOKING_CATEGORY_CARDS: BookingCategoryCard[] = [
@@ -12,8 +14,8 @@ export const BOOKING_CATEGORY_CARDS: BookingCategoryCard[] = [
     category: "Cortes y peinado",
     title: "Corte y peinado",
     subtitle: "Diseño y estilo personalizado",
-    imageUrl:
-      "https://images.unsplash.com/photo-1562322140-8baeececf3df?auto=format&fit=crop&w=900&q=80",
+    imageUrl: "/fondo_cortes.webp",
+    imageObjectPosition: "68% 18%",
   },
   {
     category: "Color",

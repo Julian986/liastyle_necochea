@@ -40,7 +40,12 @@ export function BookingCategoryStep({ onSelectCategory }: BookingCategoryStepPro
         >
           <div className="relative h-56 w-full">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={card.imageUrl} alt="" className="h-full w-full object-cover" />
+            <img
+              src={card.imageUrl}
+              alt=""
+              className="h-full w-full object-cover"
+              style={card.imageObjectPosition ? { objectPosition: card.imageObjectPosition } : undefined}
+            />
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" aria-hidden />
             <div className="absolute bottom-6 left-6 text-white">
               <h2 className="font-heading text-[32px] leading-10 font-semibold">{card.title}</h2>

@@ -47,27 +47,31 @@ function SplashScreen({ onLogoReady }: { onLogoReady: () => void }) {
 }
 
 function HomeContent() {
-  const heroImageRef = useRef<HTMLDivElement>(null);
+  const heroShellRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    const onScroll = () => {
-      const heroImage = heroImageRef.current;
-      if (!heroImage) return;
-      heroImage.style.transform = `translateY(${window.scrollY * 0.4}px)`;
+  useLayoutEffect(() => {
+    const shell = heroShellRef.current;
+    if (!shell) return;
+    const lockHeight = () => {
+      const h = window.innerHeight;
+      shell.style.height = `${h}px`;
+      shell.style.maxHeight = `${h}px`;
     };
-
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+    lockHeight();
+    window.addEventListener("orientationchange", lockHeight);
+    return () => window.removeEventListener("orientationchange", lockHeight);
   }, []);
 
   return (
     <div className="relative min-h-screen overflow-x-hidden bg-[#141313] text-[#e5e2e1]">
-      <div className="fixed inset-0 z-0 overflow-hidden">
-        <div
-          ref={heroImageRef}
-          className="absolute inset-0 bg-cover bg-center will-change-transform"
-          style={{ backgroundImage: `url('${HOME_HERO_IMAGE_URL}')` }}
-          aria-hidden
+      <div ref={heroShellRef} className="home-hero-fixed">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={HOME_HERO_IMAGE_URL}
+          alt=""
+          className="absolute inset-0 h-full w-full object-cover object-center"
+          fetchPriority="high"
+          decoding="async"
         />
         <div className="home-hero-gradient absolute inset-0" aria-hidden />
       </div>

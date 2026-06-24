@@ -4,6 +4,7 @@ import { ChevronLeft, ChevronRight, Trash2 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
 import type { TreatmentCategory } from "@/lib/treatments/catalog";
+import { COLOR_BOOKING_SECTIONS } from "@/lib/booking/color-booking-sections";
 import { bookingCategoryTitle } from "@/lib/booking/category-cards";
 import { BookingDateStep } from "@/components/booking/booking-date-step";
 import {
@@ -128,6 +129,10 @@ export function BookingPicker({
         ? SALON_TREATMENT_OPTIONS.filter((option) => option.category === activeTreatmentCategory)
         : [],
     [activeTreatmentCategory],
+  );
+  const visibleTreatmentById = useMemo(
+    () => new Map(visibleTreatments.map((treatment) => [treatment.id, treatment])),
+    [visibleTreatments],
   );
   const calendarItems = useMemo(
     () => buildSalonCalendarItems(visibleMonthDate.getFullYear(), visibleMonthDate.getMonth()),
@@ -262,6 +267,110 @@ export function BookingPicker({
     }
     closeTreatmentModal();
   };
+
+  const renderTreatmentOption = (treatment: (typeof visibleTreatments)[number]) => {
+    const isSelected = multiSelect
+      ? selectedTreatmentIds.includes(treatment.id)
+      : treatment.id === selectedTreatmentId;
+
+    return (
+      <button
+        key={treatment.id}
+        type="button"
+        onClick={() => selectTreatment(treatment.id)}
+        className={`w-full cursor-pointer rounded-2xl border px-4 py-3.5 text-left transition-colors ${
+          isSelected
+            ? "border-[var(--premium-gold-light)] bg-[var(--premium-gold)]/10"
+            : isLight
+              ? "border-[var(--outline)]/10 bg-white"
+              : "border-white/8 bg-[#1c1c1c]"
+        }`}
+      >
+        <p
+          className={`text-[18px] leading-snug font-semibold tracking-tight ${
+            isLight ? "text-[#1c1b1b]" : "text-[var(--soft-gray)]"
+          }`}
+        >
+          {treatment.name}
+        </p>
+        <p className={`mt-1.5 text-[15px] font-medium ${isLight ? "text-[#5f5c5a]" : "text-[var(--soft-gray)]/65"}`}>
+          {treatment.subtitle}
+        </p>
+        {treatment.bookingNote ? (
+          <p
+            className={`mt-1 text-[13px] leading-snug ${
+              isLight ? "text-[#7f7c7a]" : "text-[var(--soft-gray)]/55"
+            }`}
+          >
+            {treatment.bookingNote}
+          </p>
+        ) : null}
+      </button>
+    );
+  };
+
+  const renderColorBookingSections = () => (
+    <div className="space-y-4">
+      {COLOR_BOOKING_SECTIONS.map((section) => {
+        const showSectionShell = Boolean(section.title);
+
+        return (
+          <div
+            key={section.id}
+            className={
+              showSectionShell
+                ? `rounded-[20px] border px-3 py-3 ${
+                    isLight
+                      ? "border-[var(--outline)]/8 bg-[#f8f6f2]/90"
+                      : "border-white/8 bg-[#1a1a1a]"
+                  }`
+                : undefined
+            }
+          >
+            {section.title ? (
+              <header className="mb-2.5">
+                <p className="text-[11px] font-semibold tracking-[0.14em] text-[var(--premium-gold-light)] uppercase">
+                  {section.title}
+                </p>
+                {section.subtitle ? (
+                  <p className={`mt-1 text-[12px] leading-snug ${textMuted}`}>{section.subtitle}</p>
+                ) : null}
+              </header>
+            ) : null}
+
+            {section.subsections ? (
+              <div className="space-y-4">
+                {section.subsections.map((subsection) => (
+                  <div key={subsection.title}>
+                    <p
+                      className={`mb-2 text-[13px] font-medium ${
+                        isLight ? "text-[#5f5c5a]" : "text-[var(--soft-gray)]/72"
+                      }`}
+                    >
+                      {subsection.title}
+                    </p>
+                    <div className="space-y-2">
+                      {subsection.treatmentIds.map((treatmentId) => {
+                        const treatment = visibleTreatmentById.get(treatmentId);
+                        return treatment ? renderTreatmentOption(treatment) : null;
+                      })}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="space-y-2">
+                {(section.treatmentIds ?? []).map((treatmentId) => {
+                  const treatment = visibleTreatmentById.get(treatmentId);
+                  return treatment ? renderTreatmentOption(treatment) : null;
+                })}
+              </div>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
 
   return (
     <>
@@ -768,48 +877,13 @@ export function BookingPicker({
 
             <div className="min-h-0 flex-1 overflow-y-auto px-4 pb-2">
               {activeTreatmentCategory ? (
-                <div className="space-y-2">
-                  {visibleTreatments.map((treatment) => {
-                    const isSelected = multiSelect
-                      ? selectedTreatmentIds.includes(treatment.id)
-                      : treatment.id === selectedTreatmentId;
-
-                    return (
-                      <button
-                        key={treatment.id}
-                        type="button"
-                        onClick={() => selectTreatment(treatment.id)}
-                        className={`w-full cursor-pointer rounded-2xl border px-4 py-3.5 text-left transition-colors ${
-                          isSelected
-                            ? "border-[var(--premium-gold-light)] bg-[var(--premium-gold)]/10"
-                            : isLight
-                              ? "border-[var(--outline)]/10 bg-white"
-                              : "border-white/8 bg-[#1c1c1c]"
-                        }`}
-                      >
-                        <p
-                          className={`text-[18px] leading-snug font-semibold tracking-tight ${
-                            isLight ? "text-[#1c1b1b]" : "text-[var(--soft-gray)]"
-                          }`}
-                        >
-                          {treatment.name}
-                        </p>
-                        <p className={`mt-1.5 text-[15px] font-medium ${isLight ? "text-[#5f5c5a]" : "text-[var(--soft-gray)]/65"}`}>
-                          {treatment.subtitle}
-                        </p>
-                        {treatment.bookingNote ? (
-                          <p
-                            className={`mt-1 text-[13px] leading-snug ${
-                              isLight ? "text-[#7f7c7a]" : "text-[var(--soft-gray)]/55"
-                            }`}
-                          >
-                            {treatment.bookingNote}
-                          </p>
-                        ) : null}
-                      </button>
-                    );
-                  })}
-                </div>
+                activeTreatmentCategory === "Color" ? (
+                  renderColorBookingSections()
+                ) : (
+                  <div className="space-y-2">
+                    {visibleTreatments.map((treatment) => renderTreatmentOption(treatment))}
+                  </div>
+                )
               ) : (
                 <div className="space-y-2">
                   {SALON_TREATMENT_CATEGORIES.map((category) => (

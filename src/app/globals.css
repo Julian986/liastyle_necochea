@@ -57,3 +57,16 @@ body {
 .home-hero-gradient {
   background: linear-gradient(to bottom, rgba(20, 19, 19, 0.4) 0%, rgba(20, 19, 19, 1) 90%);
 }
+
+/* Fondo fijo de inicio: altura estable al scrollear (evita zoom de bg-cover en móvil). */
+.home-hero-fixed {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100vh;
+  height: 100svh;
+  overflow: hidden;
+  pointer-events: none;
+}
