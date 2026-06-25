@@ -2,7 +2,7 @@
 
 import { AppBottomNav } from "@/components/app-bottom-nav";
 import { BrandLogo } from "@/components/brand-logo";
-import { HOME_HERO_IMAGE_URL } from "@/lib/home-hero-image";
+import { HOME_HERO_IMAGE_URL, HOME_HERO_OBJECT_POSITION } from "@/lib/home-hero-image";
 import Link from "next/link";
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 
@@ -69,7 +69,8 @@ function HomeContent() {
         <img
           src={HOME_HERO_IMAGE_URL}
           alt=""
-          className="absolute inset-0 h-full w-full object-cover object-center"
+          className="absolute inset-0 h-full w-full object-cover"
+          style={{ objectPosition: HOME_HERO_OBJECT_POSITION }}
           fetchPriority="high"
           decoding="async"
         />

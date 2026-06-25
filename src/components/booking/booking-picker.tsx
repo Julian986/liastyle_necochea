@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronLeft, ChevronRight, Trash2 } from "lucide-react";
+import { ChevronLeft, ChevronRight, Info, Trash2 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
 import type { TreatmentCategory } from "@/lib/treatments/catalog";
@@ -334,6 +334,28 @@ export function BookingPicker({
                 </p>
                 {section.subtitle ? (
                   <p className={`mt-1 text-[12px] leading-snug ${textMuted}`}>{section.subtitle}</p>
+                ) : null}
+                {section.notice ? (
+                  <div
+                    className={`mt-2.5 flex gap-2 rounded-xl border px-3 py-2.5 ${
+                      isLight
+                        ? "border-[var(--premium-gold)]/25 bg-[var(--premium-gold)]/8"
+                        : "border-[var(--premium-gold)]/30 bg-[var(--premium-gold)]/10"
+                    }`}
+                  >
+                    <Info
+                      className="mt-0.5 h-4 w-4 shrink-0 text-[var(--premium-gold-light)]"
+                      strokeWidth={2}
+                      aria-hidden
+                    />
+                    <p
+                      className={`text-[12px] leading-snug ${
+                        isLight ? "text-[#4f5f6f]" : "text-[var(--soft-gray)]/82"
+                      }`}
+                    >
+                      {section.notice}
+                    </p>
+                  </div>
                 ) : null}
               </header>
             ) : null}

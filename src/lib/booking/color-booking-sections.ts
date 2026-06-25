@@ -10,6 +10,8 @@ export type ColorBookingSection = {
   /** Vacío = solo servicios, sin encabezado de bloque. */
   title: string;
   subtitle?: string;
+  /** Aviso informativo visible bajo el encabezado del bloque. */
+  notice?: string;
   treatmentIds?: string[];
   subsections?: ColorBookingSubsection[];
 };
@@ -39,6 +41,8 @@ export const COLOR_BOOKING_SECTIONS: ColorBookingSection[] = [
     id: "tecnico",
     title: "Color técnico",
     subtitle: "Incluye cierre técnico, Plex y modelado",
+    notice:
+      "¿Primera vez en Lia Style? Para Balayage, mechas o reflejos, solicitá cita previa.",
     subsections: [
       {
         title: "Balayage · diseño con mechas papel",
