@@ -2,6 +2,7 @@
 
 export type ColorBookingSubsection = {
   title: string;
+  subtitle?: string;
   treatmentIds: string[];
 };
 
@@ -41,15 +42,20 @@ export const COLOR_BOOKING_SECTIONS: ColorBookingSection[] = [
     id: "tecnico",
     title: "Color técnico",
     subtitle: "Incluye cierre técnico, Plex y modelado",
-    notice:
-      "¿Primera vez en Lia Style? Para Balayage, mechas o reflejos, solicitá cita previa.",
     subsections: [
       {
-        title: "Balayage · diseño con mechas papel",
+        title: "Diseño mechas con papel",
+        subtitle: "El valor puede variar según procesos químicos previos",
+        treatmentIds: ["mechas-papel-corto", "mechas-papel-medio", "mechas-papel-largo"],
+      },
+      {
+        title: "Balayage",
+        subtitle: "El valor puede variar según procesos químicos previos",
         treatmentIds: ["balayage-corto", "balayage-medio", "balayage-largo"],
       },
       {
-        title: "Air Touch · diseño con mechas papel",
+        title: "Air Touch",
+        subtitle: "El valor puede variar según procesos químicos previos",
         treatmentIds: ["air-touch-corto", "air-touch-medio", "air-touch-largo"],
       },
       {

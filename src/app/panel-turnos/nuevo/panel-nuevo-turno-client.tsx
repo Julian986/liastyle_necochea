@@ -314,7 +314,7 @@ export function PanelNuevoTurnoClient() {
       setDateStepConfirmed(false);
     },
     comboHintText:
-      "Podés elegir hasta 4 servicios. Alisado vegano y balayage/air touch van solos en el turno.",
+      "Podés elegir hasta 4 servicios. Alisado vegano, diseño mechas con papel, Balayage y Air Touch van solos en el turno.",
     comboDurationLabel: totalSelectedDurationLabel,
     comboAlertText: serviceLimitHint,
     variant: "light" as const,

@@ -7,10 +7,11 @@ import {
 import Link from "next/link";
 
 import { AppBottomNav } from "@/components/app-bottom-nav";
+import { SALON_WHATSAPP_DISPLAY, SALON_WHATSAPP_HREF } from "@/lib/salon-contact";
 
 const SALON_ADDRESS = "Av. 91 1534, B7630 Necochea, Provincia de Buenos Aires";
-const WHATSAPP_DISPLAY = "+54 9 2262 30-8862";
-const WHATSAPP_HREF = "https://wa.me/5492262308862";
+const WHATSAPP_DISPLAY = SALON_WHATSAPP_DISPLAY;
+const WHATSAPP_HREF = SALON_WHATSAPP_HREF;
 const INSTAGRAM_HANDLE = "@_liastyle.necochea";
 const INSTAGRAM_HREF = "https://www.instagram.com/_liastyle.necochea";
 const MAPS_HREF =

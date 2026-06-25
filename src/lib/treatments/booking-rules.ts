@@ -10,7 +10,6 @@ export const SOLO_COMBO_TREATMENT_IDS = new Set([
   "air-touch-corto",
   "air-touch-medio",
   "air-touch-largo",
-  // Reservas antiguas
   "mechas-papel-corto",
   "mechas-papel-medio",
   "mechas-papel-largo",
@@ -36,7 +35,7 @@ export function validateServiceCombo(serviceIds: string[]): string | null {
       return "El alisado vegano no se puede combinar con otros servicios en el mismo turno.";
     }
     if (id.startsWith("balayage") || id.startsWith("air-touch") || id.startsWith("mechas-papel")) {
-      return "Balayage y Air Touch no se pueden combinar con otros servicios en el mismo turno.";
+      return "Diseño mechas con papel, Balayage y Air Touch no se pueden combinar con otros servicios en el mismo turno.";
     }
     return "Este servicio no se puede combinar con otros en el mismo turno.";
   }

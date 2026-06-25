@@ -1,11 +1,13 @@
 "use client";
 
-import { ChevronLeft, ChevronRight, Info, Trash2 } from "lucide-react";
+import { ChevronLeft, ChevronRight, Info, MessageCircle, Trash2 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
 import type { TreatmentCategory } from "@/lib/treatments/catalog";
 import { COLOR_BOOKING_SECTIONS } from "@/lib/booking/color-booking-sections";
+import { isColorTechnicalTreatmentId } from "@/lib/booking/color-technical-first-visit";
 import { bookingCategoryTitle } from "@/lib/booking/category-cards";
+import { colorTechnicalPriorAppointmentWhatsAppUrl } from "@/lib/salon-contact";
 import { BookingDateStep } from "@/components/booking/booking-date-step";
 import {
   SALON_TREATMENT_CATEGORIES,
@@ -118,6 +120,9 @@ export function BookingPicker({
   const [monthAvailability, setMonthAvailability] = useState<Record<string, boolean> | null | undefined>(undefined);
   const [isTreatmentModalOpen, setIsTreatmentModalOpen] = useState(false);
   const [activeTreatmentCategory, setActiveTreatmentCategory] = useState<TreatmentCategory | null>(null);
+  const [colorTechnicalFirstVisit, setColorTechnicalFirstVisit] = useState<"yes" | "no" | null>(null);
+  const showColorTechnicalFirstVisitGate =
+    bookingContext === "public" && activeTreatmentCategory === "Color";
 
   const selectedTreatment = useMemo(
     () => SALON_TREATMENT_OPTIONS.find((option) => option.id === selectedTreatmentId),
@@ -226,6 +231,12 @@ export function BookingPicker({
   }, [openModalCategory]);
 
   useEffect(() => {
+    if (!isTreatmentModalOpen || activeTreatmentCategory !== "Color") {
+      setColorTechnicalFirstVisit(null);
+    }
+  }, [isTreatmentModalOpen, activeTreatmentCategory]);
+
+  useEffect(() => {
     if (!isTreatmentModalOpen) return;
 
     const scrollY = window.scrollY;
@@ -260,6 +271,13 @@ export function BookingPicker({
   };
 
   const selectTreatment = (treatmentId: string) => {
+    if (
+      bookingContext === "public" &&
+      isColorTechnicalTreatmentId(treatmentId) &&
+      colorTechnicalFirstVisit !== "no"
+    ) {
+      return;
+    }
     onTreatmentIdChange(treatmentId);
     if (multiSelect && onToggleTreatmentId) {
       onToggleTreatmentId(treatmentId);
@@ -306,6 +324,65 @@ export function BookingPicker({
           </p>
         ) : null}
       </button>
+    );
+  };
+
+  const renderColorTechnicalFirstVisitGate = () => {
+    if (colorTechnicalFirstVisit === "yes") {
+      return (
+        <div className="mb-1 space-y-3">
+          <p className={`text-[13px] leading-snug ${isLight ? "text-[#5f5c5a]" : "text-[var(--soft-gray)]/82"}`}>
+            Para tu primera visita, coordinemos una cita previa por WhatsApp antes de reservar color técnico online.
+          </p>
+          <a
+            href={colorTechnicalPriorAppointmentWhatsAppUrl()}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex w-full items-center justify-center gap-2 rounded-full bg-[#25D366] py-3.5 text-[14px] font-semibold tracking-wide text-white uppercase transition-all hover:opacity-95 active:scale-[0.98]"
+          >
+            <MessageCircle className="h-4 w-4" strokeWidth={2} aria-hidden />
+            Escribinos por WhatsApp
+          </a>
+          <button
+            type="button"
+            onClick={() => setColorTechnicalFirstVisit(null)}
+            className={`w-full cursor-pointer py-1 text-center text-[12px] underline-offset-2 hover:underline ${textMuted}`}
+          >
+            Volver a responder
+          </button>
+        </div>
+      );
+    }
+
+    return (
+      <div className="mb-1 space-y-3">
+        <p className={`text-[13px] font-medium ${isLight ? "text-[#5f5c5a]" : "text-[var(--soft-gray)]/82"}`}>
+          ¿Es tu primera vez en Lia Style?
+        </p>
+        <p className={`text-[12px] leading-snug ${textMuted}`}>
+          Para diseño mechas con papel, Balayage, Air Touch o reflejos, la primera visita requiere cita previa.
+        </p>
+        <div className="grid grid-cols-2 gap-2">
+          <button
+            type="button"
+            onClick={() => setColorTechnicalFirstVisit("yes")}
+            className={`cursor-pointer rounded-xl border px-3 py-3 text-[13px] font-semibold transition-colors ${
+              isLight
+                ? "border-[var(--outline)]/12 bg-white text-[#1c1b1b] hover:border-[var(--premium-gold-light)]/40"
+                : "border-white/10 bg-[#222] text-[var(--soft-gray)] hover:border-[var(--premium-gold-light)]/40"
+            }`}
+          >
+            Sí, es mi primera vez
+          </button>
+          <button
+            type="button"
+            onClick={() => setColorTechnicalFirstVisit("no")}
+            className="cursor-pointer rounded-xl border border-[var(--premium-gold-light)]/35 bg-[var(--premium-gold)]/10 px-3 py-3 text-[13px] font-semibold text-[var(--premium-gold-light)] transition-colors hover:bg-[var(--premium-gold)]/15"
+          >
+            No, ya fui antes
+          </button>
+        </div>
+      </div>
     );
   };
 
@@ -360,10 +437,17 @@ export function BookingPicker({
               </header>
             ) : null}
 
+            {section.id === "tecnico" && showColorTechnicalFirstVisitGate
+              ? renderColorTechnicalFirstVisitGate()
+              : null}
+
             {section.subsections ? (
-              <div className="space-y-4">
-                {section.subsections.map((subsection) => (
-                  <div key={subsection.title}>
+              showColorTechnicalFirstVisitGate &&
+              section.id === "tecnico" &&
+              colorTechnicalFirstVisit !== "no" ? null : (
+                <div className="space-y-4">
+                  {section.subsections.map((subsection) => (
+                    <div key={subsection.title}>
                     <p
                       className={`mb-2 text-[13px] font-medium ${
                         isLight ? "text-[#5f5c5a]" : "text-[var(--soft-gray)]/72"
@@ -371,15 +455,19 @@ export function BookingPicker({
                     >
                       {subsection.title}
                     </p>
-                    <div className="space-y-2">
-                      {subsection.treatmentIds.map((treatmentId) => {
-                        const treatment = visibleTreatmentById.get(treatmentId);
-                        return treatment ? renderTreatmentOption(treatment) : null;
-                      })}
+                    {subsection.subtitle ? (
+                      <p className={`mb-2 text-[11px] leading-snug ${textMuted}`}>{subsection.subtitle}</p>
+                    ) : null}
+                      <div className="space-y-2">
+                        {subsection.treatmentIds.map((treatmentId) => {
+                          const treatment = visibleTreatmentById.get(treatmentId);
+                          return treatment ? renderTreatmentOption(treatment) : null;
+                        })}
+                      </div>
                     </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )
             ) : (
               <div className="space-y-2">
                 {(section.treatmentIds ?? []).map((treatmentId) => {
