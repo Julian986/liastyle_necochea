@@ -1,7 +1,7 @@
 ﻿"use client";
 
 import { ChevronLeft } from "lucide-react";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { AppBottomNav } from "@/components/app-bottom-nav";
@@ -10,11 +10,14 @@ import { BookingPicker } from "@/components/booking/booking-picker";
 import { event as gaEvent } from "@/lib/gtag";
 import { BOOKING_STEP_HINTS } from "@/lib/booking/category-cards";
 import {
+  bookingFlowBackAriaLabel,
+  resolveBookingFlowBackAction,
+} from "@/lib/booking/booking-flow-back";
+import {
   SALON_TREATMENT_OPTIONS,
   formatSalonDisplayDate,
   isLikelyWhatsappNumber,
 } from "@/lib/booking/salon-availability";
-import { treatmentRequiresPublicDeposit } from "@/lib/reservations/public-deposit";
 import { findSalonTreatmentById } from "@/lib/treatments/catalog";
 import type { TreatmentCategory } from "@/lib/treatments/catalog";
 
@@ -32,6 +35,7 @@ type MeReservationsResponse = {
 const CUSTOMER_PROFILE_CACHE_KEY = "mp_customer_profile_cache";
 
 export default function TurnosClient({ initialTreatment = "" }: TurnosClientProps) {
+  const router = useRouter();
   const treatmentParam = (() => {
     try {
       return decodeURIComponent(initialTreatment.trim());
@@ -64,6 +68,8 @@ export default function TurnosClient({ initialTreatment = "" }: TurnosClientProp
   const scrollPaymentTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const prevDatosCompleteRef = useRef(false);
   const [openModalCategory, setOpenModalCategory] = useState<TreatmentCategory | null>(null);
+  const [serviceModalOpen, setServiceModalOpen] = useState(false);
+  const [serviceModalDismissNonce, setServiceModalDismissNonce] = useState(0);
   const [serviceSelectionConfirmed, setServiceSelectionConfirmed] = useState(Boolean(initialMatch));
   const [dateStepConfirmed, setDateStepConfirmed] = useState(false);
 
@@ -106,8 +112,6 @@ export default function TurnosClient({ initialTreatment = "" }: TurnosClientProp
   }, [totalSelectedDurationMinutes]);
   const primaryService = selectedServices[0];
 
-  const requiresDeposit = selectedServices.some((s) => treatmentRequiresPublicDeposit(s.id));
-
   const hasSlot = Boolean(selectedServices.length > 0 && selectedDate && selectedTime);
   const datosComplete = Boolean(
     customerName.trim().length >= 2 &&
@@ -132,6 +136,49 @@ export default function TurnosClient({ initialTreatment = "" }: TurnosClientProp
     : !dateStepConfirmed
       ? BOOKING_STEP_HINTS[2]
       : BOOKING_STEP_HINTS[3];
+
+  const bookingBackAction = useMemo(
+    () =>
+      resolveBookingFlowBackAction({
+        serviceSelectionConfirmed,
+        dateStepConfirmed,
+        selectedTime,
+        serviceModalOpen,
+      }),
+    [serviceSelectionConfirmed, dateStepConfirmed, selectedTime, serviceModalOpen],
+  );
+
+  const scrollBookingTop = useCallback(() => {
+    requestAnimationFrame(() => {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+  }, []);
+
+  const handleBookingBack = useCallback(() => {
+    switch (bookingBackAction.type) {
+      case "exit":
+        router.push("/");
+        return;
+      case "close_service_modal":
+        setOpenModalCategory(null);
+        setServiceModalDismissNonce((n) => n + 1);
+        return;
+      case "to_service_selection":
+        setServiceSelectionConfirmed(false);
+        setDateStepConfirmed(false);
+        scrollBookingTop();
+        return;
+      case "to_date_selection":
+        setDateStepConfirmed(false);
+        setSelectedTime("");
+        scrollBookingTop();
+        return;
+      case "to_time_selection":
+        setSelectedTime("");
+        scrollBookingTop();
+        return;
+    }
+  }, [bookingBackAction, router, scrollBookingTop]);
 
 
   const activeStep = selectedServices.length === 0
@@ -341,7 +388,7 @@ export default function TurnosClient({ initialTreatment = "" }: TurnosClientProp
     return () => cancelAnimationFrame(id);
   }, [hasSlot, selectedTime]);
 
-  const handleMercadoPagoCheckout = async () => {
+  const handleConfirmReservation = async () => {
     if (!primaryService || selectedServices.length === 0 || !selectedDate || !selectedTime || !datosComplete) {
       return;
     }
@@ -381,17 +428,12 @@ export default function TurnosClient({ initialTreatment = "" }: TurnosClientProp
         return;
       }
 
-      gaEvent(
-        dataPending.bookingMode === "confirmed"
-          ? "reservation_confirmed_no_deposit"
-          : "reservation_checkout_start",
-        {
-          treatment_id: primaryService.id,
-          treatment_name: selectedServicesSummary,
-          date_key: selectedDate,
-          time_local: selectedTime,
-        },
-      );
+      gaEvent("reservation_confirmed_no_deposit", {
+        treatment_id: primaryService.id,
+        treatment_name: selectedServicesSummary,
+        date_key: selectedDate,
+        time_local: selectedTime,
+      });
       const qs = new URLSearchParams({
         treatment: selectedServicesSummary,
         subtitle: `${selectedServices.length} servicio${selectedServices.length === 1 ? "" : "s"} combinados`,
@@ -471,6 +513,8 @@ export default function TurnosClient({ initialTreatment = "" }: TurnosClientProp
     hideServiceSelector: true,
     openModalCategory,
     onOpenModalCategoryHandled: () => setOpenModalCategory(null),
+    onServiceModalOpenChange: setServiceModalOpen,
+    serviceModalDismissNonce,
     onConfirmServiceSelection: () => {
       setServiceSelectionConfirmed(true);
       setDateStepConfirmed(false);
@@ -485,13 +529,14 @@ export default function TurnosClient({ initialTreatment = "" }: TurnosClientProp
     <div className="min-h-screen overflow-x-hidden bg-[#f8f6f2] pb-32 text-[#1c1b1b]">
       <header className="sticky top-0 z-40 flex w-full flex-col items-center justify-center bg-[#f8f6f2]/90 px-6 pt-8 backdrop-blur-md">
         <div className="flex w-full max-w-md items-center justify-between">
-          <Link
-            href="/"
-            aria-label="Volver a inicio"
-            className="-ml-2 p-2 text-[#1c1b1b] transition-transform active:scale-95"
+          <button
+            type="button"
+            onClick={handleBookingBack}
+            aria-label={bookingFlowBackAriaLabel(bookingBackAction)}
+            className="-ml-2 cursor-pointer p-2 text-[#1c1b1b] transition-transform active:scale-95"
           >
             <ChevronLeft className="h-6 w-6" strokeWidth={1.8} />
-          </Link>
+          </button>
           <h1 className="font-heading text-[28px] leading-9 font-semibold tracking-widest uppercase">
             Reservar turno
           </h1>
@@ -523,7 +568,25 @@ export default function TurnosClient({ initialTreatment = "" }: TurnosClientProp
       </header>
 
       <main className="mx-auto mt-8 w-full max-w-md px-6">
-        {showCategoryStep ? <BookingCategoryStep onSelectCategory={handleSelectCategory} /> : null}
+        {showCategoryStep ? (
+          <BookingCategoryStep
+            onSelectCategory={handleSelectCategory}
+            selectedServiceIds={selectedServiceIds}
+            selectedDurationLabel={totalSelectedDurationLabel}
+            onClearSelection={() => {
+              setSelectedServiceIds([]);
+              setSelectedTreatmentId("");
+              setSelectedTime("");
+              setServiceSelectionConfirmed(false);
+              setDateStepConfirmed(false);
+            }}
+            onContinue={() => {
+              if (selectedServiceIds.length === 0) return;
+              setServiceSelectionConfirmed(true);
+              setDateStepConfirmed(false);
+            }}
+          />
+        ) : null}
 
         <BookingPicker
           {...bookingPickerProps}
@@ -625,20 +688,16 @@ export default function TurnosClient({ initialTreatment = "" }: TurnosClientProp
                   className={`${lightCard} px-4 py-4 transition-all ${activeStep === 5 ? lightCardActive : ""}`}
                 >
                   <p className="text-[11px] tracking-[0.14em] text-[#7f7c7a]">Paso 5</p>
-                  <p className="mt-1 font-heading text-[18px] text-[#1c1b1b]">
-                    {requiresDeposit ? "Seña con Mercado Pago" : "Confirmar turno"}
-                  </p>
+                  <p className="mt-1 font-heading text-[18px] text-[#1c1b1b]">Confirmar turno</p>
                   <p className="mt-1 text-[12px] text-[#7f7c7a]">
-                    {requiresDeposit
-                      ? "Reservá el horario abonando la seña. Monto y política la define la clínica."
-                      : "Este servicio se reserva sin seña. Te enviamos recordatorio por WhatsApp antes del turno."}
+                    Te enviamos recordatorio por WhatsApp antes del turno.
                   </p>
-                  {activeStep === 5 && datosComplete && requiresDeposit && (
+                  {activeStep === 5 && datosComplete ? (
                     <div className="mt-2 flex items-center gap-2 text-[11px] text-[var(--premium-gold-light)]">
                       <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[var(--premium-gold-light)]" />
                       <span>Confirmá para agendar tu turno</span>
                     </div>
-                  )}
+                  ) : null}
                   <p className="mt-3 text-[11px] leading-snug text-[#7f7c7a]">
                     Al confirmar, el turno queda agendado. Podés cambiar fecha u horario arriba si necesitás otro
                     servicio.
@@ -647,33 +706,15 @@ export default function TurnosClient({ initialTreatment = "" }: TurnosClientProp
                     <button
                       type="button"
                       disabled={!datosComplete || checkoutLoading}
-                      onClick={() => void handleMercadoPagoCheckout()}
-                      className={`flex h-[52px] w-full items-center justify-center gap-2.5 rounded-xl text-[16px] font-semibold transition-all ${
+                      onClick={() => void handleConfirmReservation()}
+                      className={`flex h-[52px] w-full items-center justify-center rounded-xl text-[16px] font-semibold transition-all ${
                         datosComplete && !checkoutLoading
-                          ? requiresDeposit
-                            ? "cursor-pointer bg-[#009EE3] text-white shadow-[0_8px_24px_rgba(0,158,227,0.35)]"
-                            : "cursor-pointer bg-[var(--premium-gold-light)] text-[var(--on-accent)] shadow-[0_8px_24px_rgba(125,163,196,0.28)]"
+                          ? "cursor-pointer bg-[var(--premium-gold-light)] text-[var(--on-accent)] shadow-[0_8px_24px_rgba(125,163,196,0.28)]"
                           : "cursor-not-allowed bg-[#e5e2e1] text-[#7f7c7a]"
                       } ${checkoutLoading ? "cursor-wait" : ""}`}
                     >
-                      {requiresDeposit ? (
-                        <img
-                          src="/Mercado_Pago_idp_LvMgpe_1.svg"
-                          alt=""
-                          className={`h-8 w-auto shrink-0 object-contain sm:h-9 ${
-                            datosComplete && !checkoutLoading ? "opacity-100" : "opacity-45"
-                          }`}
-                          width={39}
-                          height={28}
-                          decoding="async"
-                        />
-                      ) : null}
                       <span className="text-[13px] font-medium opacity-95">
-                        {checkoutLoading
-                          ? "Confirmando…"
-                          : requiresDeposit
-                            ? "Pagar seña con Mercado Pago"
-                            : "Confirmar reserva"}
+                        {checkoutLoading ? "Confirmando…" : "Confirmar reserva"}
                       </span>
                     </button>
                   </div>

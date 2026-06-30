@@ -57,6 +57,10 @@ export type BookingPickerProps = {
   /** Abre el modal de servicios en la categoría indicada (flujo paso 1 externo). */
   openModalCategory?: TreatmentCategory | null;
   onOpenModalCategoryHandled?: () => void;
+  /** Notifica al padre si el modal de servicios está abierto. */
+  onServiceModalOpenChange?: (open: boolean) => void;
+  /** Incrementar para cerrar el modal desde el padre (flecha atrás en paso 1). */
+  serviceModalDismissNonce?: number;
   /** Llamado al confirmar servicios con el botón Continuar del modal. */
   onConfirmServiceSelection?: () => void;
   /** Paso 2 (fecha): false hasta que el usuario confirma con Continuar. */
@@ -94,6 +98,8 @@ export function BookingPicker({
   hideServiceSelector = false,
   openModalCategory = null,
   onOpenModalCategoryHandled,
+  onServiceModalOpenChange,
+  serviceModalDismissNonce = 0,
   onConfirmServiceSelection,
   dateStepConfirmed = true,
   onConfirmDateStep,
@@ -229,6 +235,18 @@ export function BookingPicker({
     setActiveTreatmentCategory(openModalCategory);
     setIsTreatmentModalOpen(true);
   }, [openModalCategory]);
+
+  useEffect(() => {
+    onServiceModalOpenChange?.(isTreatmentModalOpen);
+  }, [isTreatmentModalOpen, onServiceModalOpenChange]);
+
+  useEffect(() => {
+    if (!serviceModalDismissNonce) return;
+    setIsTreatmentModalOpen(false);
+    setActiveTreatmentCategory(null);
+    setColorTechnicalFirstVisit(null);
+    onOpenModalCategoryHandled?.();
+  }, [serviceModalDismissNonce, onOpenModalCategoryHandled]);
 
   useEffect(() => {
     if (!isTreatmentModalOpen || activeTreatmentCategory !== "Color") {

@@ -4,17 +4,28 @@ import { formatInTimeZone } from "date-fns-tz";
 import { RESERVATION_TZ } from "@/lib/booking/public-slot-lead";
 import { findSalonTreatmentById } from "@/lib/treatments/catalog";
 
-const COLLECTION = "reservations";
-const ACTIVE_STATUSES = ["confirmed"] as const;
-
-/** Inicio/fin (minutos desde medianoche ART) con hasta 3 turnos simultáneos. Inclusive 11:30. */
-const DOUBLE_CAPACITY_START_MIN = 9 * 60;
-const DOUBLE_CAPACITY_END_MIN = 11 * 60 + 30;
-
 export type IntervalMs = { startMs: number; endMs: number };
 
 export function intervalsOverlap(a: IntervalMs, b: IntervalMs): boolean {
   return a.startMs < b.endMs && a.endMs > b.startMs;
+}
+
+/** Día de semana local (0=dom … 6=sáb) para `yyyy-MM-dd`. */
+function salonWeekdayFromDateKey(dateKey: string): number | undefined {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(dateKey)) return undefined;
+  const [y, m, d] = dateKey.split("-").map(Number);
+  if (!y || !m || !d) return undefined;
+  return new Date(y, m - 1, d).getDay();
+}
+
+/**
+ * Cupo base de turnos simultáneos (sillas operativas).
+ * Jueves y sábados: 2 (Analia + ayudante). Resto de días abiertos: 1.
+ */
+export function salonBaseConcurrentCapForDateKey(dateKey: string): number {
+  const wd = salonWeekdayFromDateKey(dateKey);
+  if (wd === 4 || wd === 6) return 2;
+  return 1;
 }
 
 /** Inicio/fin del turno en epoch ms (misma convención que `computeStartsAtUtc`, ART -03:00). */
@@ -33,16 +44,15 @@ export function slotIntervalMs(
   return { startMs, endMs };
 }
 
-/** Capacidad del salón en ese instante: 3 entre 9:00 y 11:30 (ART, mismo dateKey), 2 fuera. */
+/** Capacidad del salón en ese instante (mismo día ART). */
 export function salonConcurrentCapAtInstant(dateKey: string, instantMs: number): number {
   const dayKey = formatInTimeZone(new Date(instantMs), RESERVATION_TZ, "yyyy-MM-dd");
   if (dayKey !== dateKey) return 1;
-  const hm = formatInTimeZone(new Date(instantMs), RESERVATION_TZ, "HH:mm");
-  const [h, m] = hm.split(":").map(Number);
-  const mins = h * 60 + m;
-  if (mins >= DOUBLE_CAPACITY_START_MIN && mins <= DOUBLE_CAPACITY_END_MIN) return 3;
-  return 2;
+  return salonBaseConcurrentCapForDateKey(dateKey);
 }
+
+const COLLECTION = "reservations";
+const ACTIVE_STATUSES = ["confirmed"] as const;
 
 export function reservationDurationMinutesFromDoc(r: {
   durationMinutes?: unknown;
@@ -88,16 +98,9 @@ export async function loadBusyIntervalsMs(
   });
 }
 
-function capacityBoundaryInstantsMs(dateKey: string): number[] {
-  return [
-    new Date(`${dateKey}T09:00:00-03:00`).getTime(),
-    new Date(`${dateKey}T11:31:00-03:00`).getTime(),
-  ];
-}
-
 /**
  * ¿Se puede agregar este intervalo sin superar la capacidad por franja?
- * Entre 9:00 y 11:30 ART pueden convivir hasta 3 turnos que se solapen; fuera, 2.
+ * Jueves y sábados: hasta 2 turnos simultáneos; resto de días abiertos: 1.
  * `getEffectiveCap` permite reducir cupos por bloqueos de agenda (silla / salón).
  */
 export function canPlaceReservationSlot(
@@ -114,11 +117,6 @@ export function canPlaceReservationSlot(
     if (s < e) {
       points.add(s);
       points.add(e);
-    }
-  }
-  for (const bt of capacityBoundaryInstantsMs(dateKey)) {
-    if (bt > candidate.startMs && bt < candidate.endMs) {
-      points.add(bt);
     }
   }
 

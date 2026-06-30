@@ -1,7 +1,6 @@
 "use client";
 
 import { ChevronLeft } from "lucide-react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
@@ -9,6 +8,10 @@ import { BookingCategoryStep } from "@/components/booking/booking-category-step"
 import { BookingPicker } from "@/components/booking/booking-picker";
 import { panelInput, panelLabel, panelPrimaryBtn } from "@/components/panel/panel-ui";
 import { BOOKING_STEP_HINTS } from "@/lib/booking/category-cards";
+import {
+  bookingFlowBackAriaLabel,
+  resolveBookingFlowBackAction,
+} from "@/lib/booking/booking-flow-back";
 import {
   SALON_TREATMENT_OPTIONS,
   formatSalonDisplayDate,
@@ -34,6 +37,8 @@ export function PanelNuevoTurnoClient() {
   const [confirmError, setConfirmError] = useState<string | null>(null);
   const [remoteSlots, setRemoteSlots] = useState<string[] | null | undefined>(undefined);
   const [openModalCategory, setOpenModalCategory] = useState<TreatmentCategory | null>(null);
+  const [serviceModalOpen, setServiceModalOpen] = useState(false);
+  const [serviceModalDismissNonce, setServiceModalDismissNonce] = useState(0);
   const [serviceSelectionConfirmed, setServiceSelectionConfirmed] = useState(false);
   const [dateStepConfirmed, setDateStepConfirmed] = useState(false);
 
@@ -101,6 +106,49 @@ export function PanelNuevoTurnoClient() {
     : !dateStepConfirmed
       ? BOOKING_STEP_HINTS[2]
       : BOOKING_STEP_HINTS[3];
+
+  const bookingBackAction = useMemo(
+    () =>
+      resolveBookingFlowBackAction({
+        serviceSelectionConfirmed,
+        dateStepConfirmed,
+        selectedTime,
+        serviceModalOpen,
+      }),
+    [serviceSelectionConfirmed, dateStepConfirmed, selectedTime, serviceModalOpen],
+  );
+
+  const scrollBookingTop = useCallback(() => {
+    requestAnimationFrame(() => {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+  }, []);
+
+  const handleBookingBack = useCallback(() => {
+    switch (bookingBackAction.type) {
+      case "exit":
+        router.push("/panel-turnos");
+        return;
+      case "close_service_modal":
+        setOpenModalCategory(null);
+        setServiceModalDismissNonce((n) => n + 1);
+        return;
+      case "to_service_selection":
+        setServiceSelectionConfirmed(false);
+        setDateStepConfirmed(false);
+        scrollBookingTop();
+        return;
+      case "to_date_selection":
+        setDateStepConfirmed(false);
+        setSelectedTime("");
+        scrollBookingTop();
+        return;
+      case "to_time_selection":
+        setSelectedTime("");
+        scrollBookingTop();
+        return;
+    }
+  }, [bookingBackAction, router, scrollBookingTop]);
 
   const activeStep = selectedServices.length === 0
     ? 1
@@ -321,6 +369,8 @@ export function PanelNuevoTurnoClient() {
     hideServiceSelector: true,
     openModalCategory,
     onOpenModalCategoryHandled: () => setOpenModalCategory(null),
+    onServiceModalOpenChange: setServiceModalOpen,
+    serviceModalDismissNonce,
     onConfirmServiceSelection: () => {
       setServiceSelectionConfirmed(true);
       setDateStepConfirmed(false);
@@ -335,13 +385,14 @@ export function PanelNuevoTurnoClient() {
     <div className="min-h-screen overflow-x-hidden bg-[#f8f6f2] pb-24 text-[#1c1b1b]">
       <header className="sticky top-0 z-40 flex w-full flex-col items-center justify-center bg-[#f8f6f2]/90 px-6 pt-8 backdrop-blur-md">
         <div className="flex w-full max-w-md items-center justify-between">
-          <Link
-            href="/panel-turnos"
-            aria-label="Volver al panel"
-            className="-ml-2 p-2 text-[#1c1b1b] transition-transform active:scale-95"
+          <button
+            type="button"
+            onClick={handleBookingBack}
+            aria-label={bookingFlowBackAriaLabel(bookingBackAction, { exitLabel: "Volver al panel" })}
+            className="-ml-2 cursor-pointer p-2 text-[#1c1b1b] transition-transform active:scale-95"
           >
             <ChevronLeft className="h-6 w-6" strokeWidth={1.8} />
-          </Link>
+          </button>
           <h1 className="font-heading text-[28px] leading-9 font-semibold tracking-widest uppercase">
             Nuevo turno
           </h1>
@@ -368,7 +419,25 @@ export function PanelNuevoTurnoClient() {
       </header>
 
       <main className="mx-auto mt-8 w-full max-w-md px-6">
-        {showCategoryStep ? <BookingCategoryStep onSelectCategory={handleSelectCategory} /> : null}
+        {showCategoryStep ? (
+          <BookingCategoryStep
+            onSelectCategory={handleSelectCategory}
+            selectedServiceIds={selectedServiceIds}
+            selectedDurationLabel={totalSelectedDurationLabel}
+            onClearSelection={() => {
+              setSelectedServiceIds([]);
+              setSelectedTreatmentId("");
+              setSelectedTime("");
+              setServiceSelectionConfirmed(false);
+              setDateStepConfirmed(false);
+            }}
+            onContinue={() => {
+              if (selectedServiceIds.length === 0) return;
+              setServiceSelectionConfirmed(true);
+              setDateStepConfirmed(false);
+            }}
+          />
+        ) : null}
 
         <BookingPicker
           {...bookingPickerProps}
