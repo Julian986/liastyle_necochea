@@ -21,6 +21,11 @@ const nextConfig: NextConfig = {
         destination: "/favicon-64.png?v=4",
         permanent: false,
       },
+      {
+        source: "/tratamientos",
+        destination: "/servicios",
+        permanent: true,
+      },
     ];
   },
 };

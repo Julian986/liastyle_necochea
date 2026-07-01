@@ -1,8 +1,10 @@
 /** Fondo de la home (`public/`). */
 //export const HOME_HERO_IMAGE_URL = "/fondo_inicio2.jpeg";
-export const HOME_HERO_IMAGE_URL = "/fondo_inicio5.webp";
 //export const HOME_HERO_IMAGE_URL = "/fondo_inicio3.jpeg";
 //export const HOME_HERO_IMAGE_URL = "/fondo_inicio4.jpeg";
+//export const HOME_HERO_IMAGE_URL = "/fondo_inicio5.webp";
+export const HOME_HERO_IMAGE_URL = "/fondo_inicio6.webp";
+
 
 /**
  * Encuadre fino para fotos verticales con `object-cover`.

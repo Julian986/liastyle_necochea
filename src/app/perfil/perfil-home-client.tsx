@@ -89,7 +89,7 @@ export function PerfilHomeClient() {
       Icon: Clock3,
     },
     {
-      href: "/tratamientos?from=perfil",
+      href: "/servicios?from=perfil",
       title: "Servicios",
       subtitle: "Catálogo completo",
       Icon: Sparkles,

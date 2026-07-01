@@ -101,7 +101,7 @@ function HomeContent() {
           >
             Reservar turno
           </Link>
-          <Link href="/tratamientos" className={`${ctaClass} home-glass-button text-[#e5e2e1]`}>
+          <Link href="/servicios" className={`${ctaClass} home-glass-button text-[#e5e2e1]`}>
             Servicios
           </Link>
           <Link href="/promociones" className={`${ctaClass} home-glass-button text-[#e5e2e1]`}>

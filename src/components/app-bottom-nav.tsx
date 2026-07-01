@@ -4,7 +4,7 @@ import { CalendarDays, Home as HomeIcon, Percent, Scissors, User } from "lucide-
 import Link from "next/link";
 import type { LucideIcon } from "lucide-react";
 
-export type AppBottomNavTab = "inicio" | "tratamientos" | "turnos" | "promos" | "perfil";
+export type AppBottomNavTab = "inicio" | "servicios" | "turnos" | "promos" | "perfil";
 
 type AppBottomNavProps = {
   active?: AppBottomNavTab;
@@ -20,7 +20,7 @@ type NavItem = {
 
 const NAV_ITEMS: NavItem[] = [
   { id: "inicio", href: "/", label: "Inicio", Icon: HomeIcon, filledWhenActive: true },
-  { id: "tratamientos", href: "/tratamientos", label: "Servicios", Icon: Scissors },
+  { id: "servicios", href: "/servicios", label: "Servicios", Icon: Scissors },
   { id: "turnos", href: "/turnos", label: "Turnos", Icon: CalendarDays, filledWhenActive: true },
   { id: "promos", href: "/promociones", label: "Promos", Icon: Percent },
   { id: "perfil", href: "/perfil", label: "Perfil", Icon: User },
