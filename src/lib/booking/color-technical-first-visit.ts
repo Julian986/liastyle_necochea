@@ -1,4 +1,4 @@
-/** Servicios de color técnico sujetos a cita previa en la primera visita. */
+/** Servicios de color técnico reservados por WhatsApp en el flujo público. */
 const COLOR_TECHNICAL_PREFIXES = ["mechas-papel-", "balayage-", "air-touch-", "reflejos-gorra-"] as const;
 
 export function isColorTechnicalTreatmentId(id: string): boolean {

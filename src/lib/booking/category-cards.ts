@@ -21,8 +21,8 @@ export const BOOKING_CATEGORY_CARDS: BookingCategoryCard[] = [
     category: "Color",
     title: "Color",
     subtitle: "Balayage, reflejos y color global",
-    imageUrl:
-      "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&w=900&q=80",
+    imageUrl: "/color_image.webp",
+    imageObjectPosition: "50% 35%",
   },
   {
     category: "Tratamiento",

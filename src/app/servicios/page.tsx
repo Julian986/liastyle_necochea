@@ -13,6 +13,7 @@ import {
   type TreatmentCategory,
 } from "@/lib/treatments/catalog";
 import { CORTES_PEINADO_DISPLAY_SECTIONS } from "@/lib/treatments/cortes-peinado-sections";
+import { serviceCategoryImage } from "@/lib/treatments/service-category-images";
 
 function CategoryIcon({ category }: { category: TreatmentCategory }) {
   const cls = "h-7 w-7 text-[var(--premium-gold-light)]";
@@ -24,28 +25,32 @@ function CategoryIcon({ category }: { category: TreatmentCategory }) {
 function ServiceCard({
   service,
   showImage,
+  compact,
 }: {
   service: SalonTreatment;
   showImage: boolean;
+  compact?: boolean;
 }) {
   return (
     <article className="flex h-full min-h-0 flex-col overflow-hidden rounded-2xl border border-[var(--outline)]/10 bg-white shadow-[0_4px_20px_rgba(0,0,0,0.05)]">
-      <div className="relative h-28 shrink-0 overflow-hidden bg-white">
-        {showImage ? (
-          <>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={service.imageUrl} alt="" className="h-full w-full object-cover" />
-            <div className="absolute inset-0 bg-gradient-to-t from-white/90 via-white/20 to-transparent" aria-hidden />
-          </>
-        ) : (
-          <div className="flex h-full items-center justify-center border-b border-dashed border-[var(--outline)]/25 bg-white">
-            <span className="text-[13px] font-medium tracking-wide text-[#7f7c7a]">Imagen</span>
+      {!compact ? (
+        <div className="relative h-28 shrink-0 overflow-hidden bg-white">
+          {showImage ? (
+            <>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={service.imageUrl} alt="" className="h-full w-full object-cover" />
+              <div className="absolute inset-0 bg-gradient-to-t from-white/90 via-white/20 to-transparent" aria-hidden />
+            </>
+          ) : (
+            <div className="flex h-full items-center justify-center border-b border-dashed border-[var(--outline)]/25 bg-white">
+              <span className="text-[13px] font-medium tracking-wide text-[#7f7c7a]">Imagen</span>
+            </div>
+          )}
+          <div className="absolute right-2 bottom-2 flex h-9 w-9 items-center justify-center rounded-full bg-white/90 shadow-sm backdrop-blur-sm">
+            <CategoryIcon category={service.category} />
           </div>
-        )}
-        <div className="absolute right-2 bottom-2 flex h-9 w-9 items-center justify-center rounded-full bg-white/90 shadow-sm backdrop-blur-sm">
-          <CategoryIcon category={service.category} />
         </div>
-      </div>
+      ) : null}
 
       <div className="flex min-h-0 flex-1 flex-col px-3 py-3">
         <h2 className="text-[16px] leading-tight font-heading font-semibold text-[#1c1b1b]">
@@ -67,6 +72,23 @@ function ServiceCard({
         </div>
       </div>
     </article>
+  );
+}
+
+function CategoryHero({ category }: { category: TreatmentCategory }) {
+  const image = serviceCategoryImage(category);
+  if (!image) return null;
+
+  return (
+    <div className="mb-4 overflow-hidden rounded-2xl">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={image.imageUrl}
+        alt=""
+        className="h-44 w-full object-cover"
+        style={image.imageObjectPosition ? { objectPosition: image.imageObjectPosition } : undefined}
+      />
+    </div>
   );
 }
 
@@ -93,6 +115,9 @@ export default function ServicesPage() {
       }),
     })).filter((section) => section.services.length > 0);
   }, [activeCategory, servicesById]);
+
+  const categoryImage = serviceCategoryImage(activeCategory);
+  const compactCards = Boolean(categoryImage);
 
   const featuredServiceId =
     activeCategory === "Cortes y peinado"
@@ -131,6 +156,8 @@ export default function ServicesPage() {
           })}
         </section>
 
+        <CategoryHero category={activeCategory} />
+
         {cortesSections ? (
           <div className="space-y-6">
             {cortesSections.map((section) => (
@@ -143,7 +170,8 @@ export default function ServicesPage() {
                     <ServiceCard
                       key={service.id}
                       service={service}
-                      showImage={service.id === featuredServiceId}
+                      showImage={!compactCards && service.id === featuredServiceId}
+                      compact={compactCards}
                     />
                   ))}
                 </div>
@@ -156,7 +184,8 @@ export default function ServicesPage() {
               <ServiceCard
                 key={service.id}
                 service={service}
-                showImage={service.id === featuredServiceId}
+                showImage={!compactCards && service.id === featuredServiceId}
+                compact={compactCards}
               />
             ))}
           </section>

@@ -5,10 +5,10 @@ export function salonWhatsAppUrl(message: string): string {
   return `${SALON_WHATSAPP_HREF}?text=${encodeURIComponent(message)}`;
 }
 
-/** Mensaje prearmado para cita previa de color técnico (primera visita). */
+/** Mensaje prearmado para coordinar color técnico por WhatsApp. */
 export function colorTechnicalPriorAppointmentWhatsAppUrl(treatmentName?: string): string {
   const text = treatmentName?.trim()
-    ? `Hola Lia Style! Es mi primera vez en el salón y me gustaría coordinar cita previa para ${treatmentName.trim()}.`
-    : "Hola Lia Style! Es mi primera vez en el salón y me gustaría coordinar cita previa para color técnico (diseño mechas con papel, Balayage, Air Touch o reflejos).";
+    ? `Hola Analia! Me gustaría coordinar turno para ${treatmentName.trim()}.`
+    : "Hola Analia! Me gustaría coordinar turno para color técnico (diseño mechas con papel, Balayage, Air Touch o reflejos).";
   return salonWhatsAppUrl(text);
 }

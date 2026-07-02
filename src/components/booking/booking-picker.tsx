@@ -4,7 +4,7 @@ import { ChevronLeft, ChevronRight, Info, MessageCircle, Trash2 } from "lucide-r
 import { useEffect, useMemo, useState } from "react";
 
 import type { TreatmentCategory } from "@/lib/treatments/catalog";
-import { COLOR_BOOKING_SECTIONS } from "@/lib/booking/color-booking-sections";
+import { COLOR_BOOKING_SECTIONS, type ColorBookingSection } from "@/lib/booking/color-booking-sections";
 import { isColorTechnicalTreatmentId } from "@/lib/booking/color-technical-first-visit";
 import { bookingCategoryTitle } from "@/lib/booking/category-cards";
 import { colorTechnicalPriorAppointmentWhatsAppUrl } from "@/lib/salon-contact";
@@ -126,8 +126,7 @@ export function BookingPicker({
   const [monthAvailability, setMonthAvailability] = useState<Record<string, boolean> | null | undefined>(undefined);
   const [isTreatmentModalOpen, setIsTreatmentModalOpen] = useState(false);
   const [activeTreatmentCategory, setActiveTreatmentCategory] = useState<TreatmentCategory | null>(null);
-  const [colorTechnicalFirstVisit, setColorTechnicalFirstVisit] = useState<"yes" | "no" | null>(null);
-  const showColorTechnicalFirstVisitGate =
+  const showColorTechnicalWhatsAppGate =
     bookingContext === "public" && activeTreatmentCategory === "Color";
 
   const selectedTreatment = useMemo(
@@ -244,15 +243,8 @@ export function BookingPicker({
     if (!serviceModalDismissNonce) return;
     setIsTreatmentModalOpen(false);
     setActiveTreatmentCategory(null);
-    setColorTechnicalFirstVisit(null);
     onOpenModalCategoryHandled?.();
   }, [serviceModalDismissNonce, onOpenModalCategoryHandled]);
-
-  useEffect(() => {
-    if (!isTreatmentModalOpen || activeTreatmentCategory !== "Color") {
-      setColorTechnicalFirstVisit(null);
-    }
-  }, [isTreatmentModalOpen, activeTreatmentCategory]);
 
   useEffect(() => {
     if (!isTreatmentModalOpen) return;
@@ -289,11 +281,7 @@ export function BookingPicker({
   };
 
   const selectTreatment = (treatmentId: string) => {
-    if (
-      bookingContext === "public" &&
-      isColorTechnicalTreatmentId(treatmentId) &&
-      colorTechnicalFirstVisit !== "no"
-    ) {
+    if (bookingContext === "public" && isColorTechnicalTreatmentId(treatmentId)) {
       return;
     }
     onTreatmentIdChange(treatmentId);
@@ -345,68 +333,121 @@ export function BookingPicker({
     );
   };
 
-  const renderColorTechnicalFirstVisitGate = () => {
-    if (colorTechnicalFirstVisit === "yes") {
-      return (
-        <div className="mb-1 space-y-3">
-          <p className={`text-[13px] leading-snug ${isLight ? "text-[#5f5c5a]" : "text-[var(--soft-gray)]/82"}`}>
-            Para tu primera visita, coordinemos una cita previa por WhatsApp antes de reservar color técnico online.
-          </p>
-          <a
-            href={colorTechnicalPriorAppointmentWhatsAppUrl()}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex w-full items-center justify-center gap-2 rounded-full bg-[#25D366] py-3.5 text-[14px] font-semibold tracking-wide text-white uppercase transition-all hover:opacity-95 active:scale-[0.98]"
-          >
-            <MessageCircle className="h-4 w-4" strokeWidth={2} aria-hidden />
-            Escribinos por WhatsApp
-          </a>
-          <button
-            type="button"
-            onClick={() => setColorTechnicalFirstVisit(null)}
-            className={`w-full cursor-pointer py-1 text-center text-[12px] underline-offset-2 hover:underline ${textMuted}`}
-          >
-            Volver a responder
-          </button>
-        </div>
-      );
-    }
-
-    return (
-      <div className="mb-1 space-y-3">
-        <p className={`text-[13px] font-medium ${isLight ? "text-[#5f5c5a]" : "text-[var(--soft-gray)]/82"}`}>
-          ¿Es tu primera vez en Lia Style?
-        </p>
-        <p className={`text-[12px] leading-snug ${textMuted}`}>
-          Para diseño mechas con papel, Balayage, Air Touch o reflejos, la primera visita requiere cita previa.
-        </p>
-        <div className="grid grid-cols-2 gap-2">
-          <button
-            type="button"
-            onClick={() => setColorTechnicalFirstVisit("yes")}
-            className={`cursor-pointer rounded-xl border px-3 py-3 text-[13px] font-semibold transition-colors ${
-              isLight
-                ? "border-[var(--outline)]/12 bg-white text-[#1c1b1b] hover:border-[var(--premium-gold-light)]/40"
-                : "border-white/10 bg-[#222] text-[var(--soft-gray)] hover:border-[var(--premium-gold-light)]/40"
+  const renderDisabledColorTechnicalTreatment = (treatment: (typeof visibleTreatments)[number]) => (
+    <div
+      key={treatment.id}
+      className={`rounded-2xl border px-4 py-3.5 ${
+        isLight ? "border-[var(--outline)]/10 bg-white/70" : "border-white/6 bg-[#222]/80"
+      }`}
+    >
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0 flex-1">
+          <p
+            className={`text-[16px] leading-snug font-semibold tracking-tight ${
+              isLight ? "text-[#1c1b1b]/75" : "text-[var(--soft-gray)]/70"
             }`}
           >
-            Sí, es mi primera vez
-          </button>
-          <button
-            type="button"
-            onClick={() => setColorTechnicalFirstVisit("no")}
-            className="cursor-pointer rounded-xl border border-[var(--premium-gold-light)]/35 bg-[var(--premium-gold)]/10 px-3 py-3 text-[13px] font-semibold text-[var(--premium-gold-light)] transition-colors hover:bg-[var(--premium-gold)]/15"
-          >
-            No, ya fui antes
-          </button>
+            {treatment.name}
+          </p>
+          <p className={`mt-1 text-[14px] font-medium ${isLight ? "text-[#5f5c5a]/80" : "text-[var(--soft-gray)]/55"}`}>
+            {treatment.subtitle}
+          </p>
+          {treatment.bookingNote ? (
+            <p className={`mt-1 text-[12px] leading-snug ${textMuted}`}>{treatment.bookingNote}</p>
+          ) : null}
         </div>
+        <a
+          href={colorTechnicalPriorAppointmentWhatsAppUrl(treatment.name)}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex shrink-0 items-center gap-1 rounded-full bg-[#25D366] px-2.5 py-1.5 text-[10px] font-semibold tracking-wide text-white uppercase shadow-sm transition hover:opacity-95 active:scale-[0.98]"
+          aria-label={`Coordinar ${treatment.name} por WhatsApp`}
+        >
+          <MessageCircle className="h-3 w-3" strokeWidth={2} aria-hidden />
+          WhatsApp
+        </a>
       </div>
-    );
-  };
+    </div>
+  );
+
+  const renderColorTechnicalPublicBlock = (section: ColorBookingSection) => (
+    <div
+      className={`space-y-4 rounded-[24px] border px-4 py-4 ${
+        isLight
+          ? "border-[var(--premium-gold-light)]/35 bg-[#f8f6f2] shadow-[0_4px_24px_rgba(125,163,196,0.12)]"
+          : "border-[var(--premium-gold-light)]/40 bg-[#1a1a1a]"
+      }`}
+    >
+      <div
+        className={`rounded-xl border px-3 py-2.5 ${
+          isLight ? "border-[var(--outline)]/10 bg-white/80" : "border-white/8 bg-[#222]"
+        }`}
+      >
+        <p className={`text-[13px] leading-snug ${isLight ? "text-[#5f5c5a]" : "text-[var(--soft-gray)]/82"}`}>
+          <span className="font-semibold text-[#1c1b1b]">Color global y crecimiento:</span> reservá online arriba.
+        </p>
+        <p className={`mt-1 text-[13px] leading-snug ${isLight ? "text-[#5f5c5a]" : "text-[var(--soft-gray)]/82"}`}>
+          <span className="font-semibold text-[#1c1b1b]">Color técnico:</span> coordinación por WhatsApp.
+        </p>
+      </div>
+
+      <header className="space-y-2">
+        <p className="text-[11px] font-semibold tracking-[0.14em] text-[var(--premium-gold-light)] uppercase">
+          Solo por WhatsApp
+        </p>
+        <h3 className={`font-heading text-[22px] leading-tight font-semibold ${textPrimary}`}>{section.title}</h3>
+        <p className={`text-[15px] leading-snug ${isLight ? "text-[#4f4c4a]" : "text-[var(--soft-gray)]/82"}`}>
+          Estos servicios se coordinan con Analia por WhatsApp antes de reservar online.
+        </p>
+      </header>
+
+      <a
+        href={colorTechnicalPriorAppointmentWhatsAppUrl()}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="flex w-full items-center justify-center gap-2.5 rounded-full bg-[#25D366] py-4 text-[15px] font-semibold tracking-wide text-white uppercase shadow-[0_4px_16px_rgba(37,211,102,0.35)] transition-all hover:opacity-95 active:scale-[0.98]"
+      >
+        <MessageCircle className="h-5 w-5" strokeWidth={2} aria-hidden />
+        Coordinar color técnico
+      </a>
+      <p className={`text-center text-[12px] leading-snug ${textMuted}`}>
+        Analia te responde por WhatsApp para elegir servicio, día y duración.
+      </p>
+
+      {section.subtitle ? (
+        <p className={`text-[13px] leading-snug ${textMuted}`}>{section.subtitle}</p>
+      ) : null}
+
+      <div className="space-y-4 pt-1">
+        {(section.subsections ?? []).map((subsection) => (
+          <div key={subsection.title}>
+            <p
+              className={`mb-2 text-[15px] font-semibold ${isLight ? "text-[#1c1b1b]" : "text-[var(--soft-gray)]/85"}`}
+            >
+              {subsection.title}
+            </p>
+            {subsection.subtitle ? (
+              <p className={`mb-2.5 text-[12px] leading-snug ${textMuted}`}>{subsection.subtitle}</p>
+            ) : null}
+            <div className="space-y-2">
+              {subsection.treatmentIds.map((treatmentId) => {
+                const treatment = visibleTreatmentById.get(treatmentId);
+                return treatment ? renderDisabledColorTechnicalTreatment(treatment) : null;
+              })}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 
   const renderColorBookingSections = () => (
     <div className="space-y-4">
       {COLOR_BOOKING_SECTIONS.map((section) => {
+        if (section.id === "tecnico" && showColorTechnicalWhatsAppGate) {
+          return <div key={section.id}>{renderColorTechnicalPublicBlock(section)}</div>;
+        }
+
         const showSectionShell = Boolean(section.title);
 
         return (
@@ -455,15 +496,8 @@ export function BookingPicker({
               </header>
             ) : null}
 
-            {section.id === "tecnico" && showColorTechnicalFirstVisitGate
-              ? renderColorTechnicalFirstVisitGate()
-              : null}
-
             {section.subsections ? (
-              showColorTechnicalFirstVisitGate &&
-              section.id === "tecnico" &&
-              colorTechnicalFirstVisit !== "no" ? null : (
-                <div className="space-y-4">
+              <div className="space-y-4">
                   {section.subsections.map((subsection) => (
                     <div key={subsection.title}>
                     <p
@@ -485,7 +519,6 @@ export function BookingPicker({
                     </div>
                   ))}
                 </div>
-              )
             ) : (
               <div className="space-y-2">
                 {(section.treatmentIds ?? []).map((treatmentId) => {
