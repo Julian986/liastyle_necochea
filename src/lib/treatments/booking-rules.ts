@@ -4,6 +4,9 @@ export const SOLO_COMBO_TREATMENT_IDS = new Set([
   "alisado-vegano-corto",
   "alisado-vegano-medio",
   "alisado-vegano-largo",
+  "permanente-corto",
+  "permanente-medio",
+  "permanente-largo",
   "balayage-corto",
   "balayage-medio",
   "balayage-largo",
@@ -33,6 +36,9 @@ export function validateServiceCombo(serviceIds: string[]): string | null {
     const id = soloIds[0];
     if (id.startsWith("alisado-vegano")) {
       return "El alisado vegano no se puede combinar con otros servicios en el mismo turno.";
+    }
+    if (id.startsWith("permanente-")) {
+      return "El permanente no se puede combinar con otros servicios en el mismo turno.";
     }
     if (id.startsWith("balayage") || id.startsWith("air-touch") || id.startsWith("mechas-papel")) {
       return "Diseño mechas con papel, Balayage y Air Touch no se pueden combinar con otros servicios en el mismo turno.";

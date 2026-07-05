@@ -11,6 +11,7 @@ import {
   Sparkles,
   Trash2,
   User,
+  Waves,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -35,6 +36,7 @@ function ServiceLineIcon({ category, muted }: { category: string; muted?: boolea
   if (category === "Cortes y peinado") return <Scissors className={cls} strokeWidth={1.85} />;
   if (category === "Color") return <Palette className={cls} strokeWidth={1.85} />;
   if (category === "Tratamiento") return <Sparkles className={cls} strokeWidth={1.85} />;
+  if (category === "Cambio de estructura") return <Waves className={cls} strokeWidth={1.85} />;
   if (category === "Láser" || category === "Facial" || category === "Corporal") {
     return <Hand className={cls} strokeWidth={1.85} />;
   }

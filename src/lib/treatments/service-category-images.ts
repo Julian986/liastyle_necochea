@@ -7,6 +7,10 @@ export type ServiceCategoryImage = {
 
 /** Imagen representativa por categoría en /servicios (Analia puede ir completando). */
 export const SERVICE_CATEGORY_IMAGES: Partial<Record<TreatmentCategory, ServiceCategoryImage>> = {
+  "Cortes y peinado": {
+    imageUrl: "/fondo_cortes.webp",
+    imageObjectPosition: "50% 20%",
+  },
   Color: {
     imageUrl: "/color_image.webp",
     imageObjectPosition: "50% 35%",

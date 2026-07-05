@@ -1,5 +1,10 @@
 /** Categorías para filtrar en la app de turnos y en la lista de servicios. */
-export const TREATMENT_CATEGORIES = ["Cortes y peinado", "Color", "Tratamiento"] as const;
+export const TREATMENT_CATEGORIES = [
+  "Cortes y peinado",
+  "Color",
+  "Tratamiento",
+  "Cambio de estructura",
+] as const;
 
 export type TreatmentCategory = (typeof TREATMENT_CATEGORIES)[number];
 
@@ -9,6 +14,7 @@ const IMG = {
   color: "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&w=900&q=80",
   mechas: "https://images.unsplash.com/photo-1633681926022-84c122e8b9d3?auto=format&fit=crop&w=900&q=80",
   trat: "https://images.unsplash.com/photo-1519699047748-de8e457a634e?auto=format&fit=crop&w=900&q=80",
+  alisado: "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?auto=format&fit=crop&w=900&q=80",
 } as const;
 
 export type SalonTreatment = {
@@ -392,6 +398,40 @@ export const SALON_TREATMENTS: SalonTreatment[] = [
     durationMinutes: 60,
     imageUrl: IMG.trat,
   },
+  // ── Cambio de estructura ────────────────────────────────────────────────────
+  {
+    id: "permanente-corto",
+    name: "Rulos permanente · corto (hombro)",
+    subtitle: "4 h 30 min · desde $85.000",
+    description:
+      "Rulos permanente en cabello corto hasta hombro (4 h 30 min). Desde $85.000. El valor depende de lo procesado que esté el cabello.",
+    category: "Cambio de estructura",
+    durationLabel: "4 h 30 min",
+    durationMinutes: 270,
+    imageUrl: IMG.alisado,
+  },
+  {
+    id: "permanente-medio",
+    name: "Rulos permanente · medios",
+    subtitle: "4 h 30 min · desde $140.000",
+    description:
+      "Rulos permanente en cabello de largo medio (4 h 30 min). Desde $140.000. El valor depende de lo procesado que esté el cabello.",
+    category: "Cambio de estructura",
+    durationLabel: "4 h 30 min",
+    durationMinutes: 270,
+    imageUrl: IMG.alisado,
+  },
+  {
+    id: "permanente-largo",
+    name: "Rulos permanente · largos",
+    subtitle: "4 h 30 min · desde $180.000",
+    description:
+      "Rulos permanente en cabello largo (4 h 30 min). Desde $180.000. El valor depende de lo procesado que esté el cabello.",
+    category: "Cambio de estructura",
+    durationLabel: "4 h 30 min",
+    durationMinutes: 270,
+    imageUrl: IMG.alisado,
+  },
   {
     id: "alisado-vegano-corto",
     name: "Alisado vegano sin formol · corto (hombro)",
@@ -399,10 +439,10 @@ export const SALON_TREATMENTS: SalonTreatment[] = [
     // bookingNote: "El valor depende de lo procesado que esté el cabello",
     description:
       "Alisado vegano sin formol en cabello corto hasta hombro (4 h 30 min). Desde $100.000. El valor depende de lo procesado que esté el cabello.",
-    category: "Tratamiento",
+    category: "Cambio de estructura",
     durationLabel: "4 h 30 min",
     durationMinutes: 270,
-    imageUrl: IMG.trat,
+    imageUrl: IMG.alisado,
   },
   {
     id: "alisado-vegano-medio",
@@ -411,10 +451,10 @@ export const SALON_TREATMENTS: SalonTreatment[] = [
     // bookingNote: "El valor depende de lo procesado que esté el cabello",
     description:
       "Alisado vegano sin formol en cabello de largo medio (4 h 30 min). Desde $140.000. El valor depende de lo procesado que esté el cabello.",
-    category: "Tratamiento",
+    category: "Cambio de estructura",
     durationLabel: "4 h 30 min",
     durationMinutes: 270,
-    imageUrl: IMG.trat,
+    imageUrl: IMG.alisado,
   },
   {
     id: "alisado-vegano-largo",
@@ -423,10 +463,10 @@ export const SALON_TREATMENTS: SalonTreatment[] = [
     // bookingNote: "El valor depende de lo procesado que esté el cabello",
     description:
       "Alisado vegano sin formol en cabello largo (4 h 30 min). Desde $180.000. El valor depende de lo procesado que esté el cabello.",
-    category: "Tratamiento",
+    category: "Cambio de estructura",
     durationLabel: "4 h 30 min",
     durationMinutes: 270,
-    imageUrl: IMG.trat,
+    imageUrl: IMG.alisado,
   },
 ];
 

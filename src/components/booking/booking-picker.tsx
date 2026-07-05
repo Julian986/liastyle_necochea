@@ -1,9 +1,15 @@
 "use client";
 
 import { ChevronLeft, ChevronRight, Info, MessageCircle, Trash2 } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 
 import type { TreatmentCategory } from "@/lib/treatments/catalog";
+import {
+  CAMBIO_ESTRUCTURA_BOOKING_GROUPS,
+  CAMBIO_ESTRUCTURA_BOOKING_LABELS,
+  CAMBIO_ESTRUCTURA_INTRO,
+  CAMBIO_ESTRUCTURA_PRICE_NOTICE,
+} from "@/lib/booking/cambio-estructura-booking-sections";
 import { COLOR_BOOKING_SECTIONS, type ColorBookingSection } from "@/lib/booking/color-booking-sections";
 import { isColorTechnicalTreatmentId } from "@/lib/booking/color-technical-first-visit";
 import { bookingCategoryTitle } from "@/lib/booking/category-cards";
@@ -292,7 +298,10 @@ export function BookingPicker({
     closeTreatmentModal();
   };
 
-  const renderTreatmentOption = (treatment: (typeof visibleTreatments)[number]) => {
+  const renderTreatmentOption = (
+    treatment: (typeof visibleTreatments)[number],
+    displayName?: string,
+  ) => {
     const isSelected = multiSelect
       ? selectedTreatmentIds.includes(treatment.id)
       : treatment.id === selectedTreatmentId;
@@ -315,7 +324,7 @@ export function BookingPicker({
             isLight ? "text-[#1c1b1b]" : "text-[var(--soft-gray)]"
           }`}
         >
-          {treatment.name}
+          {displayName ?? treatment.name}
         </p>
         <p className={`mt-1.5 text-[15px] font-medium ${isLight ? "text-[#5f5c5a]" : "text-[var(--soft-gray)]/65"}`}>
           {treatment.subtitle}
@@ -441,11 +450,58 @@ export function BookingPicker({
     </div>
   );
 
-  const renderColorBookingSections = () => (
+  const renderCambioEstructuraBookingSections = () => (
+    <div className="space-y-5">
+      <p
+        className={`text-center font-heading text-[20px] leading-snug font-semibold ${
+          isLight ? "text-[#1c1b1b]" : "text-[var(--soft-gray)]"
+        }`}
+      >
+        {CAMBIO_ESTRUCTURA_INTRO}
+      </p>
+
+      <div
+        className={`flex gap-2 rounded-xl border px-3 py-2.5 ${
+          isLight
+            ? "border-[var(--premium-gold)]/25 bg-[var(--premium-gold)]/8"
+            : "border-[var(--premium-gold)]/30 bg-[var(--premium-gold)]/10"
+        }`}
+      >
+        <Info className="mt-0.5 h-4 w-4 shrink-0 text-[var(--premium-gold-light)]" strokeWidth={2} aria-hidden />
+        <p className={`text-[12px] leading-snug ${isLight ? "text-[#4f5f6f]" : "text-[var(--soft-gray)]/82"}`}>
+          {CAMBIO_ESTRUCTURA_PRICE_NOTICE}
+        </p>
+      </div>
+
+      <div className="space-y-5">
+        {CAMBIO_ESTRUCTURA_BOOKING_GROUPS.map((group) => (
+          <section key={group.id}>
+            <p className="mb-2.5 text-[11px] font-semibold tracking-[0.14em] text-[var(--premium-gold-light)] uppercase">
+              {group.title}
+            </p>
+            <div className="space-y-2">
+              {group.treatmentIds.map((treatmentId) => {
+                const treatment = visibleTreatmentById.get(treatmentId);
+                return treatment
+                  ? renderTreatmentOption(treatment, CAMBIO_ESTRUCTURA_BOOKING_LABELS[treatmentId])
+                  : null;
+              })}
+            </div>
+          </section>
+        ))}
+      </div>
+    </div>
+  );
+
+  const renderCatalogBookingSections = (
+    sections: ColorBookingSection[],
+    options?: { renderSection?: (section: ColorBookingSection) => ReactNode | null },
+  ) => (
     <div className="space-y-4">
-      {COLOR_BOOKING_SECTIONS.map((section) => {
-        if (section.id === "tecnico" && showColorTechnicalWhatsAppGate) {
-          return <div key={section.id}>{renderColorTechnicalPublicBlock(section)}</div>;
+      {sections.map((section) => {
+        const override = options?.renderSection?.(section);
+        if (override) {
+          return <div key={section.id}>{override}</div>;
         }
 
         const showSectionShell = Boolean(section.title);
@@ -498,8 +554,8 @@ export function BookingPicker({
 
             {section.subsections ? (
               <div className="space-y-4">
-                  {section.subsections.map((subsection) => (
-                    <div key={subsection.title}>
+                {section.subsections.map((subsection) => (
+                  <div key={subsection.title}>
                     <p
                       className={`mb-2 text-[13px] font-medium ${
                         isLight ? "text-[#5f5c5a]" : "text-[var(--soft-gray)]/72"
@@ -510,15 +566,15 @@ export function BookingPicker({
                     {subsection.subtitle ? (
                       <p className={`mb-2 text-[11px] leading-snug ${textMuted}`}>{subsection.subtitle}</p>
                     ) : null}
-                      <div className="space-y-2">
-                        {subsection.treatmentIds.map((treatmentId) => {
-                          const treatment = visibleTreatmentById.get(treatmentId);
-                          return treatment ? renderTreatmentOption(treatment) : null;
-                        })}
-                      </div>
+                    <div className="space-y-2">
+                      {subsection.treatmentIds.map((treatmentId) => {
+                        const treatment = visibleTreatmentById.get(treatmentId);
+                        return treatment ? renderTreatmentOption(treatment) : null;
+                      })}
                     </div>
-                  ))}
-                </div>
+                  </div>
+                ))}
+              </div>
             ) : (
               <div className="space-y-2">
                 {(section.treatmentIds ?? []).map((treatmentId) => {
@@ -532,6 +588,14 @@ export function BookingPicker({
       })}
     </div>
   );
+
+  const renderColorBookingSections = () =>
+    renderCatalogBookingSections(COLOR_BOOKING_SECTIONS, {
+      renderSection: (section) =>
+        section.id === "tecnico" && showColorTechnicalWhatsAppGate
+          ? renderColorTechnicalPublicBlock(section)
+          : null,
+    });
 
   return (
     <>
@@ -1040,6 +1104,8 @@ export function BookingPicker({
               {activeTreatmentCategory ? (
                 activeTreatmentCategory === "Color" ? (
                   renderColorBookingSections()
+                ) : activeTreatmentCategory === "Cambio de estructura" ? (
+                  renderCambioEstructuraBookingSections()
                 ) : (
                   <div className="space-y-2">
                     {visibleTreatments.map((treatment) => renderTreatmentOption(treatment))}

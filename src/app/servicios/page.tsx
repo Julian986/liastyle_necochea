@@ -1,6 +1,6 @@
 "use client";
 
-import { Palette, Scissors, Sparkles } from "lucide-react";
+import { Palette, Scissors, Sparkles, Waves } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 
@@ -13,12 +13,18 @@ import {
   type TreatmentCategory,
 } from "@/lib/treatments/catalog";
 import { CORTES_PEINADO_DISPLAY_SECTIONS } from "@/lib/treatments/cortes-peinado-sections";
+import {
+  CAMBIO_ESTRUCTURA_DISPLAY_GROUPS,
+  CAMBIO_ESTRUCTURA_INTRO,
+  CAMBIO_ESTRUCTURA_PRICE_NOTICE,
+} from "@/lib/treatments/cambio-estructura-display-sections";
 import { serviceCategoryImage } from "@/lib/treatments/service-category-images";
 
 function CategoryIcon({ category }: { category: TreatmentCategory }) {
   const cls = "h-7 w-7 text-[var(--premium-gold-light)]";
   if (category === "Cortes y peinado") return <Scissors className={cls} strokeWidth={1.9} />;
   if (category === "Color") return <Palette className={cls} strokeWidth={1.9} />;
+  if (category === "Cambio de estructura") return <Waves className={cls} strokeWidth={1.9} />;
   return <Sparkles className={cls} strokeWidth={1.9} />;
 }
 
@@ -85,7 +91,7 @@ function CategoryHero({ category }: { category: TreatmentCategory }) {
       <img
         src={image.imageUrl}
         alt=""
-        className="h-44 w-full object-cover"
+        className="aspect-[4/5] w-full object-cover"
         style={image.imageObjectPosition ? { objectPosition: image.imageObjectPosition } : undefined}
       />
     </div>
@@ -116,12 +122,25 @@ export default function ServicesPage() {
     })).filter((section) => section.services.length > 0);
   }, [activeCategory, servicesById]);
 
+  const cambioEstructuraSections = useMemo(() => {
+    if (activeCategory !== "Cambio de estructura") return null;
+    return CAMBIO_ESTRUCTURA_DISPLAY_GROUPS.map((group) => ({
+      ...group,
+      services: group.treatmentIds.flatMap((id) => {
+        const service = servicesById.get(id);
+        return service ? [service] : [];
+      }),
+    })).filter((group) => group.services.length > 0);
+  }, [activeCategory, servicesById]);
+
+  const groupedSections = cortesSections ?? cambioEstructuraSections;
+
   const categoryImage = serviceCategoryImage(activeCategory);
   const compactCards = Boolean(categoryImage);
 
   const featuredServiceId =
-    activeCategory === "Cortes y peinado"
-      ? (cortesSections?.[0]?.services[0]?.id ?? null)
+    groupedSections
+      ? (groupedSections[0]?.services[0]?.id ?? null)
       : (filteredServices[0]?.id ?? null);
 
   return (
@@ -158,11 +177,23 @@ export default function ServicesPage() {
 
         <CategoryHero category={activeCategory} />
 
-        {cortesSections ? (
+        {groupedSections ? (
           <div className="space-y-6">
-            {cortesSections.map((section) => (
+            {activeCategory === "Cambio de estructura" ? (
+              <div className="space-y-3 px-0.5 text-center">
+                <p className="font-heading text-[20px] font-semibold text-[#1c1b1b]">{CAMBIO_ESTRUCTURA_INTRO}</p>
+                <p className="text-[13px] leading-snug text-[#7f7c7a]">{CAMBIO_ESTRUCTURA_PRICE_NOTICE}</p>
+              </div>
+            ) : null}
+            {groupedSections.map((section) => (
               <section key={section.id}>
-                <h2 className="mb-3 px-0.5 text-[11px] font-semibold tracking-[0.14em] text-[var(--premium-gold-light)] uppercase">
+                <h2
+                  className={`mb-3 px-0.5 font-semibold ${
+                    activeCategory === "Cambio de estructura"
+                      ? "text-[11px] tracking-[0.14em] text-[var(--premium-gold-light)] uppercase"
+                      : "text-[16px] text-[#1c1b1b]"
+                  }`}
+                >
                   {section.title}
                 </h2>
                 <div className="grid grid-cols-2 gap-3">

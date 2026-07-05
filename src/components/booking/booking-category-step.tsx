@@ -50,12 +50,12 @@ export function BookingCategoryStep({
     cardRefs.current.forEach((card, index) => {
       if (!card) return;
       card.style.opacity = "0";
-      card.style.transform = "translateY(20px)";
-      card.style.transition = "all 0.6s cubic-bezier(0.16, 1, 0.3, 1)";
+      card.style.transform = "translateY(16px)";
+      card.style.transition = "all 0.5s cubic-bezier(0.16, 1, 0.3, 1)";
       window.setTimeout(() => {
         card.style.opacity = "1";
         card.style.transform = "translateY(0)";
-      }, 100 * (index + 1));
+      }, 80 * (index + 1));
     });
   }, []);
 
@@ -98,7 +98,7 @@ export function BookingCategoryStep({
         </div>
       ) : null}
 
-      <div className="space-y-8">
+      <div className="grid grid-cols-2 gap-2.5">
         {BOOKING_CATEGORY_CARDS.map((card, index) => {
           const categoryCount = selectedCountByCategory.get(card.category) ?? 0;
           const hasSelection = categoryCount > 0;
@@ -111,13 +111,13 @@ export function BookingCategoryStep({
               }}
               type="button"
               onClick={() => onSelectCategory(card.category)}
-              className={`group relative w-full cursor-pointer overflow-hidden rounded-[28px] border bg-white text-left shadow-sm transition-all hover:shadow-md active:scale-[0.98] ${
+              className={`group relative w-full cursor-pointer overflow-hidden rounded-[18px] border bg-white text-left shadow-sm transition-all hover:shadow-md active:scale-[0.98] ${
                 hasSelection
                   ? "border-[var(--premium-gold-light)]/55 shadow-[0_0_0_1px_rgba(125,163,196,0.15)]"
                   : "border-[var(--outline)]/10 hover:border-[var(--premium-gold-light)]/40"
               }`}
             >
-              <div className="relative h-56 w-full">
+              <div className="relative aspect-[3/4] w-full">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={card.imageUrl}
@@ -125,24 +125,43 @@ export function BookingCategoryStep({
                   className="h-full w-full object-cover"
                   style={card.imageObjectPosition ? { objectPosition: card.imageObjectPosition } : undefined}
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" aria-hidden />
                 {hasSelection ? (
-                  <span className="absolute top-4 right-4 rounded-full bg-[var(--premium-gold-light)] px-2.5 py-1 text-[11px] font-semibold tracking-wide text-white shadow-md">
-                    {categoryCount} seleccionado{categoryCount === 1 ? "" : "s"}
+                  <span className="absolute top-2 right-2 z-10 rounded-full bg-[var(--premium-gold-light)] px-2 py-0.5 text-[10px] font-semibold tracking-wide text-white shadow-md">
+                    {categoryCount}
                   </span>
                 ) : null}
-                <div className="absolute bottom-6 left-6 text-white">
-                  <h2 className="font-heading text-[32px] leading-10 font-semibold">{card.title}</h2>
-                  <p className="text-sm leading-5 opacity-90">{card.subtitle}</p>
-                </div>
                 <div
-                  className={`absolute right-6 bottom-6 flex h-10 w-10 items-center justify-center rounded-full border backdrop-blur-md transition-transform group-hover:rotate-90 ${
+                  className={`absolute inset-x-0 bottom-0 z-10 bg-gradient-to-t px-3 pt-14 pb-3 ${
                     hasSelection
-                      ? "border-white/50 bg-[var(--premium-gold-light)]/90"
-                      : "border-white/30 bg-white/20"
+                      ? "from-[#1c2834]/95 via-[#1c2834]/75 to-transparent"
+                      : "from-black/92 via-black/65 to-transparent"
                   }`}
                 >
-                  <Plus className="h-5 w-5 text-white" strokeWidth={2} />
+                  {hasSelection ? (
+                    <span
+                      className="absolute inset-x-0 top-0 h-[2px] bg-[var(--premium-gold-light)]"
+                      aria-hidden
+                    />
+                  ) : null}
+                  {!hasSelection ? (
+                    <span
+                      className="mb-2 block h-[2px] w-9 rounded-full bg-gradient-to-r from-[var(--premium-gold-light)] to-white/25"
+                      aria-hidden
+                    />
+                  ) : null}
+                  <h2 className="font-heading text-[23px] leading-[1.12] font-semibold tracking-[-0.01em] text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.45)] pr-10">
+                    {card.title}
+                  </h2>
+                  <p className="mt-1.5 line-clamp-2 text-[11px] leading-snug text-white/78 pr-10">{card.subtitle}</p>
+                  <div
+                    className={`absolute right-2 bottom-3 flex h-8 w-8 items-center justify-center rounded-full border backdrop-blur-md transition-transform group-hover:rotate-90 ${
+                      hasSelection
+                        ? "border-white/50 bg-[var(--premium-gold-light)] shadow-[0_0_12px_rgba(125,163,196,0.5)]"
+                        : "border-white/25 bg-white/15"
+                    }`}
+                  >
+                    <Plus className="h-4 w-4 text-white" strokeWidth={2.2} />
+                  </div>
                 </div>
               </div>
             </button>

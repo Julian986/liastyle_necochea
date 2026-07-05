@@ -46,6 +46,9 @@ const TECHNICAL_TREATMENTS = new Map<string, number>([
   ["alisado-vegano-corto", 270],
   ["alisado-vegano-medio", 270],
   ["alisado-vegano-largo", 270],
+  ["permanente-corto", 270],
+  ["permanente-medio", 270],
+  ["permanente-largo", 270],
   // Reservas antiguas (catálogo previo)
   ["servicio-completo", 90],
   ["color", 60],
