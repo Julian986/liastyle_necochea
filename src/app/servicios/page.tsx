@@ -1,101 +1,89 @@
 "use client";
 
-import { Palette, Scissors, Sparkles, Waves } from "lucide-react";
-import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { AppBottomNav } from "@/components/app-bottom-nav";
-
-import {
-  SALON_TREATMENTS,
-  TREATMENT_CATEGORIES,
-  type SalonTreatment,
-  type TreatmentCategory,
-} from "@/lib/treatments/catalog";
-import { CORTES_PEINADO_DISPLAY_SECTIONS } from "@/lib/treatments/cortes-peinado-sections";
+import { ServiceCategorySection, type ServiceDisplayGroup } from "@/components/servicios/service-category-section";
+import { ServicesCategoryGrid } from "@/components/servicios/services-category-grid";
+import { ServicesStickyNav } from "@/components/servicios/services-sticky-nav";
+import { BOOKING_CATEGORY_CARDS } from "@/lib/booking/category-cards";
+import { COLOR_BOOKING_SECTIONS } from "@/lib/booking/color-booking-sections";
 import {
   CAMBIO_ESTRUCTURA_DISPLAY_GROUPS,
   CAMBIO_ESTRUCTURA_INTRO,
   CAMBIO_ESTRUCTURA_PRICE_NOTICE,
 } from "@/lib/treatments/cambio-estructura-display-sections";
-import { serviceCategoryImage } from "@/lib/treatments/service-category-images";
+import { CORTES_PEINADO_DISPLAY_SECTIONS } from "@/lib/treatments/cortes-peinado-sections";
+import { SALON_TREATMENTS, type SalonTreatment, type TreatmentCategory } from "@/lib/treatments/catalog";
+import { categoryAnchorId, SERVICE_PAGE_INTRO } from "@/lib/treatments/service-page-config";
 
-function CategoryIcon({ category }: { category: TreatmentCategory }) {
-  const cls = "h-7 w-7 text-[var(--premium-gold-light)]";
-  if (category === "Cortes y peinado") return <Scissors className={cls} strokeWidth={1.9} />;
-  if (category === "Color") return <Palette className={cls} strokeWidth={1.9} />;
-  if (category === "Cambio de estructura") return <Waves className={cls} strokeWidth={1.9} />;
-  return <Sparkles className={cls} strokeWidth={1.9} />;
-}
+function buildGroupsForCategory(
+  category: TreatmentCategory,
+  servicesById: Map<string, SalonTreatment>,
+): ServiceDisplayGroup[] {
+  if (category === "Cortes y peinado") {
+    return CORTES_PEINADO_DISPLAY_SECTIONS.map((section) => ({
+      id: section.id,
+      title: section.title,
+      services: section.treatmentIds.flatMap((id) => {
+        const service = servicesById.get(id);
+        return service ? [service] : [];
+      }),
+    })).filter((group) => group.services.length > 0);
+  }
 
-function ServiceCard({
-  service,
-  showImage,
-  compact,
-}: {
-  service: SalonTreatment;
-  showImage: boolean;
-  compact?: boolean;
-}) {
-  return (
-    <article className="flex h-full min-h-0 flex-col overflow-hidden rounded-2xl border border-[var(--outline)]/10 bg-white shadow-[0_4px_20px_rgba(0,0,0,0.05)]">
-      {!compact ? (
-        <div className="relative h-28 shrink-0 overflow-hidden bg-white">
-          {showImage ? (
-            <>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={service.imageUrl} alt="" className="h-full w-full object-cover" />
-              <div className="absolute inset-0 bg-gradient-to-t from-white/90 via-white/20 to-transparent" aria-hidden />
-            </>
-          ) : (
-            <div className="flex h-full items-center justify-center border-b border-dashed border-[var(--outline)]/25 bg-white">
-              <span className="text-[13px] font-medium tracking-wide text-[#7f7c7a]">Imagen</span>
-            </div>
-          )}
-          <div className="absolute right-2 bottom-2 flex h-9 w-9 items-center justify-center rounded-full bg-white/90 shadow-sm backdrop-blur-sm">
-            <CategoryIcon category={service.category} />
-          </div>
-        </div>
-      ) : null}
+  if (category === "Color") {
+    return COLOR_BOOKING_SECTIONS.flatMap((section) => {
+      if (section.subsections) {
+        return section.subsections.map((subsection) => ({
+          id: `${section.id}-${subsection.title}`,
+          title: subsection.title,
+          titleClassName: `${
+            subsection.subtitle ? "mb-1" : "mb-3"
+          } text-[11px] font-semibold tracking-[0.14em] text-[var(--premium-gold-light)] uppercase`,
+          note: subsection.subtitle,
+          services: subsection.treatmentIds.flatMap((id) => {
+            const service = servicesById.get(id);
+            return service ? [service] : [];
+          }),
+        }));
+      }
 
-      <div className="flex min-h-0 flex-1 flex-col px-3 py-3">
-        <h2 className="text-[16px] leading-tight font-heading font-semibold text-[#1c1b1b]">
-          {service.name}
-        </h2>
-        <p className="mt-1 text-[12px] font-semibold text-[var(--premium-gold-light)]">{service.subtitle}</p>
-        <p className="mt-1 line-clamp-2 text-[11px] leading-snug text-[#7f7c7a]">{service.description}</p>
-        <p className="mt-1 text-[10px] tracking-[0.06em] text-[#7f7c7a]/80 uppercase">
-          {service.durationLabel}
-        </p>
+      const services = (section.treatmentIds ?? []).flatMap((id) => {
+        const service = servicesById.get(id);
+        return service ? [service] : [];
+      });
 
-        <div className="mt-auto pt-3">
-          <Link
-            href={`/turnos?treatment=${encodeURIComponent(service.id)}`}
-            className="flex h-9 w-full items-center justify-center rounded-full bg-[var(--premium-gold-light)] text-[13px] font-semibold text-white shadow-sm transition active:scale-[0.98]"
-          >
-            Reservar
-          </Link>
-        </div>
-      </div>
-    </article>
-  );
-}
+      if (services.length === 0) return [];
 
-function CategoryHero({ category }: { category: TreatmentCategory }) {
-  const image = serviceCategoryImage(category);
-  if (!image) return null;
+      return [
+        {
+          id: section.id,
+          title: section.title || undefined,
+          titleClassName: section.title
+            ? "mb-3 text-[11px] font-semibold tracking-[0.14em] text-[var(--premium-gold-light)] uppercase"
+            : undefined,
+          services,
+        },
+      ];
+    }).filter((group) => group.services.length > 0);
+  }
 
-  return (
-    <div className="mb-4 overflow-hidden rounded-2xl">
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src={image.imageUrl}
-        alt=""
-        className="aspect-[4/5] w-full object-cover"
-        style={image.imageObjectPosition ? { objectPosition: image.imageObjectPosition } : undefined}
-      />
-    </div>
-  );
+  if (category === "Cambio de estructura") {
+    return CAMBIO_ESTRUCTURA_DISPLAY_GROUPS.map((group) => ({
+      id: group.id,
+      title: group.title,
+      titleClassName:
+        "mb-3 text-[11px] font-semibold tracking-[0.14em] text-[var(--premium-gold-light)] uppercase",
+      services: group.treatmentIds.flatMap((id) => {
+        const service = servicesById.get(id);
+        return service ? [service] : [];
+      }),
+    })).filter((group) => group.services.length > 0);
+  }
+
+  const services = SALON_TREATMENTS.filter((service) => service.category === category);
+  return services.length > 0 ? [{ id: category, services }] : [];
 }
 
 export default function ServicesPage() {
@@ -106,121 +94,110 @@ export default function ServicesPage() {
     [],
   );
 
-  const filteredServices = useMemo(
-    () => SALON_TREATMENTS.filter((service) => service.category === activeCategory),
-    [activeCategory],
+  const categoryGroups = useMemo(
+    () =>
+      Object.fromEntries(
+        BOOKING_CATEGORY_CARDS.map(({ category }) => [
+          category,
+          buildGroupsForCategory(category, servicesById),
+        ]),
+      ) as Record<TreatmentCategory, ServiceDisplayGroup[]>,
+    [servicesById],
   );
 
-  const cortesSections = useMemo(() => {
-    if (activeCategory !== "Cortes y peinado") return null;
-    return CORTES_PEINADO_DISPLAY_SECTIONS.map((section) => ({
-      ...section,
-      services: section.treatmentIds.flatMap((id) => {
-        const service = servicesById.get(id);
-        return service ? [service] : [];
-      }),
-    })).filter((section) => section.services.length > 0);
-  }, [activeCategory, servicesById]);
+  const cardsSentinelRef = useRef<HTMLDivElement | null>(null);
+  const [stickyNavVisible, setStickyNavVisible] = useState(false);
+  /** Evita que el scrollspy pise la categoría mientras hacemos scroll programático. */
+  const programmaticScrollUntil = useRef(0);
 
-  const cambioEstructuraSections = useMemo(() => {
-    if (activeCategory !== "Cambio de estructura") return null;
-    return CAMBIO_ESTRUCTURA_DISPLAY_GROUPS.map((group) => ({
-      ...group,
-      services: group.treatmentIds.flatMap((id) => {
-        const service = servicesById.get(id);
-        return service ? [service] : [];
-      }),
-    })).filter((group) => group.services.length > 0);
-  }, [activeCategory, servicesById]);
+  const handleSelectCategory = useCallback((category: TreatmentCategory) => {
+    setActiveCategory(category);
+    programmaticScrollUntil.current = Date.now() + 800;
+    document.getElementById(categoryAnchorId(category))?.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
+  }, []);
 
-  const groupedSections = cortesSections ?? cambioEstructuraSections;
+  useEffect(() => {
+    const sentinel = cardsSentinelRef.current;
+    if (!sentinel) return;
 
-  const categoryImage = serviceCategoryImage(activeCategory);
-  const compactCards = Boolean(categoryImage);
+    const observer = new IntersectionObserver(
+      ([entry]) => setStickyNavVisible(!entry.isIntersecting),
+      { threshold: 0 },
+    );
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, []);
 
-  const featuredServiceId =
-    groupedSections
-      ? (groupedSections[0]?.services[0]?.id ?? null)
-      : (filteredServices[0]?.id ?? null);
+  useEffect(() => {
+    const sections = BOOKING_CATEGORY_CARDS.map(({ category }) =>
+      document.getElementById(categoryAnchorId(category)),
+    ).filter((el): el is HTMLElement => el !== null);
+
+    if (sections.length === 0) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (Date.now() < programmaticScrollUntil.current) return;
+        const visible = entries
+          .filter((entry) => entry.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio);
+        const top = visible[0];
+        if (!top) return;
+        const match = BOOKING_CATEGORY_CARDS.find(
+          ({ category }) => categoryAnchorId(category) === top.target.id,
+        );
+        if (match) setActiveCategory(match.category);
+      },
+      { rootMargin: "-45% 0px -50% 0px", threshold: 0 },
+    );
+    sections.forEach((section) => observer.observe(section));
+    return () => observer.disconnect();
+  }, []);
 
   return (
-    <div className="min-h-screen overflow-x-hidden bg-[#f8f6f2] pb-32 text-[#1c1b1b]">
-      <main className="mx-auto w-full max-w-md px-4 pt-8 pb-24">
-        <header className="mb-4 text-center">
-          <h1 className="font-heading text-[34px] leading-none font-semibold">Servicios</h1>
+    <div className="min-h-screen overflow-x-hidden bg-[#fbf9f5] pb-32 text-[#1b1c1a]">
+      <ServicesStickyNav
+        visible={stickyNavVisible}
+        activeCategory={activeCategory}
+        onSelectCategory={handleSelectCategory}
+      />
+
+      <main className="mx-auto w-full max-w-md px-4 pb-24">
+        <header className="pb-6 pt-8 text-center">
+          <h1 className="font-heading text-[34px] leading-tight font-semibold text-[#1c1b1b]">Servicios</h1>
+          <p className="mx-auto mt-3 max-w-sm text-[13px] leading-relaxed text-[#7f7c7a]">{SERVICE_PAGE_INTRO}</p>
         </header>
 
-        <p className="mb-4 text-center text-[13px] leading-relaxed text-[#7f7c7a]">
-          Precios orientativos; algunos servicios varían según largo del cabello o diagnóstico en salón.
-        </p>
+        <div className="mb-10">
+          <p className="mb-3 text-center text-[11px] font-semibold tracking-[0.12em] text-[var(--premium-gold-light)] uppercase">
+            Elegí un área
+          </p>
+          <ServicesCategoryGrid activeCategory={activeCategory} onSelectCategory={handleSelectCategory} />
+          <div ref={cardsSentinelRef} aria-hidden />
+        </div>
 
-        <section className="mb-4 flex items-center gap-2 overflow-x-auto pb-1">
-          {TREATMENT_CATEGORIES.map((category) => {
-            const isActive = category === activeCategory;
-
-            return (
-              <button
-                key={category}
-                type="button"
-                onClick={() => setActiveCategory(category)}
-                className={`shrink-0 rounded-full px-4 py-1.5 text-sm transition-colors ${
-                  isActive
-                    ? "bg-white text-[var(--premium-gold-light)] shadow-sm ring-1 ring-[var(--premium-gold)]/25"
-                    : "bg-transparent text-[#7f7c7a] hover:text-[#1c1b1b]"
-                }`}
-              >
-                {category}
-              </button>
-            );
-          })}
-        </section>
-
-        <CategoryHero category={activeCategory} />
-
-        {groupedSections ? (
-          <div className="space-y-6">
-            {activeCategory === "Cambio de estructura" ? (
-              <div className="space-y-3 px-0.5 text-center">
-                <p className="font-heading text-[20px] font-semibold text-[#1c1b1b]">{CAMBIO_ESTRUCTURA_INTRO}</p>
-                <p className="text-[13px] leading-snug text-[#7f7c7a]">{CAMBIO_ESTRUCTURA_PRICE_NOTICE}</p>
-              </div>
-            ) : null}
-            {groupedSections.map((section) => (
-              <section key={section.id}>
-                <h2
-                  className={`mb-3 px-0.5 font-semibold ${
-                    activeCategory === "Cambio de estructura"
-                      ? "text-[11px] tracking-[0.14em] text-[var(--premium-gold-light)] uppercase"
-                      : "text-[16px] text-[#1c1b1b]"
-                  }`}
-                >
-                  {section.title}
-                </h2>
-                <div className="grid grid-cols-2 gap-3">
-                  {section.services.map((service) => (
-                    <ServiceCard
-                      key={service.id}
-                      service={service}
-                      showImage={!compactCards && service.id === featuredServiceId}
-                      compact={compactCards}
-                    />
-                  ))}
-                </div>
-              </section>
-            ))}
-          </div>
-        ) : (
-          <section className="grid grid-cols-2 gap-3">
-            {filteredServices.map((service) => (
-              <ServiceCard
-                key={service.id}
-                service={service}
-                showImage={!compactCards && service.id === featuredServiceId}
-                compact={compactCards}
-              />
-            ))}
-          </section>
-        )}
+        <div className="space-y-2">
+          {BOOKING_CATEGORY_CARDS.map((card) => (
+            <ServiceCategorySection
+              key={card.category}
+              anchorId={categoryAnchorId(card.category)}
+              sectionTitle={card.title}
+              sectionSubtitle={card.subtitle}
+              groups={categoryGroups[card.category]}
+              intro={
+                card.category === "Cambio de estructura" ? (
+                  <div className="space-y-2 rounded-xl border border-[var(--outline)]/10 bg-white px-4 py-3 text-center">
+                    <p className="font-heading text-lg font-semibold text-[#1c1b1b]">{CAMBIO_ESTRUCTURA_INTRO}</p>
+                    <p className="text-[13px] leading-snug text-[#7f7c7a]">{CAMBIO_ESTRUCTURA_PRICE_NOTICE}</p>
+                  </div>
+                ) : undefined
+              }
+            />
+          ))}
+        </div>
       </main>
 
       <AppBottomNav active="servicios" />
