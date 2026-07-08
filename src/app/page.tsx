@@ -29,7 +29,7 @@ function SplashScreen({ onLogoReady }: { onLogoReady: () => void }) {
               onError={onLogoReady}
             />
             <div className="text-center font-heading text-2xl font-semibold leading-tight tracking-[0.12em] uppercase">
-              <span className="block">Lia Style</span>
+              <span className="block">LiaStyle</span>
               <span className="mt-1 block text-lg tracking-[0.2em]">Necochea</span>
             </div>
             <div className="text-xs font-bold tracking-[0.3em] text-[var(--soft-gray)] uppercase">
@@ -81,9 +81,9 @@ function HomeContent() {
         <header className="flex w-full flex-col items-center justify-center px-6 pt-8">
           <BrandLogo size="compact" className="mb-6 transition-transform duration-500 hover:scale-105" />
           <div className="text-center">
-            <h1 className="sr-only">Lia Style Necochea</h1>
-            <p className="font-heading text-[28px] leading-9 font-semibold tracking-widest uppercase">
-              Lia Style
+            <h1 className="sr-only">LiaStyle Necochea</h1>
+            <p className="font-heading text-[28px] leading-9 font-semibold tracking-[0.12em] uppercase">
+              LiaStyle
             </p>
             <p className="font-heading text-[28px] leading-9 font-semibold tracking-widest uppercase">
               Necochea

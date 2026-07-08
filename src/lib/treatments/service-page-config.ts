@@ -3,7 +3,7 @@ import type { TreatmentCategory } from "@/lib/treatments/catalog";
 const CATEGORY_ANCHOR_IDS: Record<TreatmentCategory, string> = {
   "Cortes y peinado": "cortes",
   Color: "color",
-  Tratamiento: "tratamiento",
+  Tratamientos: "tratamientos",
   "Cambio de estructura": "cambio-estructura",
 };
 

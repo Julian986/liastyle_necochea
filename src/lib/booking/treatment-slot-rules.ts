@@ -6,7 +6,7 @@
  *
  * Trabajos técnicos (sábados):
  *   → Deben TERMINAR a las 13:00 o antes (después trabaja solo peinados).
- *   → El último inicio permitido = 13:00 − duración del servicio (alineado a grilla de 30 min).
+ *   → El último inicio permitido = 13:00 − duración del servicio.
  */
 
 // ─── Horarios de corte ────────────────────────────────────────────────────────
@@ -78,11 +78,10 @@ function isSaturday(dateKey: string): boolean {
 /**
  * Último inicio permitido para un trabajo técnico el sábado,
  * de modo que el servicio termine exactamente a las 13:00 o antes.
- * Devuelve un string "HH:MM" alineado a la grilla de 30 min.
  */
 function saturdayTechLastStart(durationMinutes: number): string {
-  const lastStartMins = Math.floor((SAT_TECH_END_MINUTES - durationMinutes) / 30) * 30;
-  if (lastStartMins <= 0) return "00:00"; // no hay slot disponible
+  const lastStartMins = SAT_TECH_END_MINUTES - durationMinutes;
+  if (lastStartMins < 0) return "00:00";
   return `${pad2(Math.floor(lastStartMins / 60))}:${pad2(lastStartMins % 60)}`;
 }
 

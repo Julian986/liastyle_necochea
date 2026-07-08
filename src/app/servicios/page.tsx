@@ -75,6 +75,8 @@ function buildGroupsForCategory(
       title: group.title,
       titleClassName:
         "mb-3 text-[11px] font-semibold tracking-[0.14em] text-[var(--premium-gold-light)] uppercase",
+      imageUrl: group.imageUrl,
+      imageObjectPosition: group.imageObjectPosition,
       services: group.treatmentIds.flatMap((id) => {
         const service = servicesById.get(id);
         return service ? [service] : [];

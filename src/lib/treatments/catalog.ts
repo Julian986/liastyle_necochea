@@ -2,7 +2,7 @@
 export const TREATMENT_CATEGORIES = [
   "Cortes y peinado",
   "Color",
-  "Tratamiento",
+  "Tratamientos",
   "Cambio de estructura",
 ] as const;
 
@@ -14,7 +14,8 @@ const IMG = {
   color: "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&w=900&q=80",
   mechas: "https://images.unsplash.com/photo-1633681926022-84c122e8b9d3?auto=format&fit=crop&w=900&q=80",
   trat: "https://images.unsplash.com/photo-1519699047748-de8e457a634e?auto=format&fit=crop&w=900&q=80",
-  alisado: "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?auto=format&fit=crop&w=900&q=80",
+  permanente: "/alisadoypermanente1.webp",
+  alisadoVegano: "/alisadoypermanente2.webp",
 } as const;
 
 export type SalonTreatment = {
@@ -201,7 +202,7 @@ export const SALON_TREATMENTS: SalonTreatment[] = [
   {
     id: "color-crecimiento-mascara",
     name: "Color en crecimiento + máscara",
-    subtitle: "2 h · $85.000",
+    subtitle: "2 h · $75.000",
     // bookingNote: "Incluye cierre técnico y modelado",
     description: "Retoque de raíz con máscara de color. Incluye cierre técnico y modelado.",
     category: "Color",
@@ -211,10 +212,10 @@ export const SALON_TREATMENTS: SalonTreatment[] = [
   },
   {
     id: "color-crecimiento-tratamiento",
-    name: "Color en crecimiento + tratamiento",
-    subtitle: "2 h 30 min · $120.000",
+    name: "Color en crecimiento + lifting",
+    subtitle: "2 h 30 min · $95.000",
     // bookingNote: "Incluye cierre técnico y modelado",
-    description: "Retoque de raíz con tratamiento. Incluye cierre técnico y modelado.",
+    description: "Retoque de raíz con lifting capilar. Incluye cierre técnico y modelado.",
     category: "Color",
     durationLabel: "2 h 30 min",
     durationMinutes: 150,
@@ -347,14 +348,14 @@ export const SALON_TREATMENTS: SalonTreatment[] = [
     imageUrl: IMG.mechas,
   },
 
-  // ── Tratamiento ───────────────────────────────────────────────────────────
+  // ── Tratamientos ──────────────────────────────────────────────────────────
   {
     id: "botox-cauterizado",
     name: "Botox / Cauterizado",
     subtitle: "1 h · $85.000",
     // bookingNote: "Incluye modelado",
     description: "Nutre y sella la fibra capilar. Incluye modelado.",
-    category: "Tratamiento",
+    category: "Tratamientos",
     durationLabel: "1 h",
     durationMinutes: 60,
     imageUrl: IMG.trat,
@@ -365,7 +366,7 @@ export const SALON_TREATMENTS: SalonTreatment[] = [
     subtitle: "1 h · $85.000",
     // bookingNote: "Incluye lavado y modelado",
     description: "Tratamiento regenerador con células madre. Incluye lavado y modelado.",
-    category: "Tratamiento",
+    category: "Tratamientos",
     durationLabel: "1 h",
     durationMinutes: 60,
     imageUrl: IMG.trat,
@@ -376,7 +377,7 @@ export const SALON_TREATMENTS: SalonTreatment[] = [
     subtitle: "1 h · $85.000",
     // bookingNote: "Incluye modelado · cabellos muy largos: consultar",
     description: "Alisa y da brillo de forma temporal. Incluye modelado. Cabellos muy largos: consultar.",
-    category: "Tratamiento",
+    category: "Tratamientos",
     durationLabel: "1 h",
     durationMinutes: 60,
     imageUrl: IMG.trat,
@@ -390,7 +391,7 @@ export const SALON_TREATMENTS: SalonTreatment[] = [
     category: "Cambio de estructura",
     durationLabel: "4 h 30 min",
     durationMinutes: 270,
-    imageUrl: IMG.alisado,
+    imageUrl: IMG.permanente,
   },
   {
     id: "permanente-medio",
@@ -400,7 +401,7 @@ export const SALON_TREATMENTS: SalonTreatment[] = [
     category: "Cambio de estructura",
     durationLabel: "4 h 30 min",
     durationMinutes: 270,
-    imageUrl: IMG.alisado,
+    imageUrl: IMG.permanente,
   },
   {
     id: "permanente-largo",
@@ -410,7 +411,7 @@ export const SALON_TREATMENTS: SalonTreatment[] = [
     category: "Cambio de estructura",
     durationLabel: "4 h 30 min",
     durationMinutes: 270,
-    imageUrl: IMG.alisado,
+    imageUrl: IMG.permanente,
   },
   {
     id: "alisado-vegano-corto",
@@ -421,7 +422,7 @@ export const SALON_TREATMENTS: SalonTreatment[] = [
     category: "Cambio de estructura",
     durationLabel: "4 h 30 min",
     durationMinutes: 270,
-    imageUrl: IMG.alisado,
+    imageUrl: IMG.alisadoVegano,
   },
   {
     id: "alisado-vegano-medio",
@@ -432,7 +433,7 @@ export const SALON_TREATMENTS: SalonTreatment[] = [
     category: "Cambio de estructura",
     durationLabel: "4 h 30 min",
     durationMinutes: 270,
-    imageUrl: IMG.alisado,
+    imageUrl: IMG.alisadoVegano,
   },
   {
     id: "alisado-vegano-largo",
@@ -443,7 +444,7 @@ export const SALON_TREATMENTS: SalonTreatment[] = [
     category: "Cambio de estructura",
     durationLabel: "4 h 30 min",
     durationMinutes: 270,
-    imageUrl: IMG.alisado,
+    imageUrl: IMG.alisadoVegano,
   },
 ];
 

@@ -35,7 +35,7 @@ function ServiceLineIcon({ category, muted }: { category: string; muted?: boolea
   const cls = `h-4 w-4 shrink-0 ${muted ? "text-gray-500" : "text-[#7da3c4]"}`;
   if (category === "Cortes y peinado") return <Scissors className={cls} strokeWidth={1.85} />;
   if (category === "Color") return <Palette className={cls} strokeWidth={1.85} />;
-  if (category === "Tratamiento") return <Sparkles className={cls} strokeWidth={1.85} />;
+  if (category === "Tratamientos") return <Sparkles className={cls} strokeWidth={1.85} />;
   if (category === "Cambio de estructura") return <Waves className={cls} strokeWidth={1.85} />;
   if (category === "Láser" || category === "Facial" || category === "Corporal") {
     return <Hand className={cls} strokeWidth={1.85} />;

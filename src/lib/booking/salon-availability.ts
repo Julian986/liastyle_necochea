@@ -32,7 +32,8 @@ export const SALON_LAST_SERVICE_END_MINUTES_SAT = 17 * 60 + 30;
 /** @deprecated Preferí `getSalonLastServiceEndMinutes(dateKey)`. */
 export const SALON_LAST_SERVICE_END_MINUTES = SALON_LAST_SERVICE_END_MINUTES_TUE_FRI;
 
-const SLOT_STEP_MINUTES = 30;
+/** Intervalo entre inicios de turno (Analia: cada 1 h 30, todos los días abiertos). */
+export const SALON_SLOT_STEP_MINUTES = 90;
 
 function pad2(n: number) {
   return String(n).padStart(2, "0");
@@ -49,21 +50,22 @@ function hhmmToMinutes(hhmm: string): number {
   return h * 60 + m;
 }
 
-/** Inicios de turno cada `SLOT_STEP_MINUTES`, con `open` inclusive y `close` exclusive (ej. 9:00–16:00). */
+/** Inicios de turno cada `SALON_SLOT_STEP_MINUTES`, con `open` inclusive y `close` exclusive (ej. 9:00–16:00). */
 function buildStepSlots(openH: number, openM: number, closeH: number, closeM: number): string[] {
   let t = openH * 60 + openM;
   const end = closeH * 60 + closeM;
   const out: string[] = [];
   while (t < end) {
     out.push(minutesToHhmm(t));
-    t += SLOT_STEP_MINUTES;
+    t += SALON_SLOT_STEP_MINUTES;
   }
   return out;
 }
 
 /**
- * Horario corrido (Analia, jun 2026): lun y dom cerrados;
- * mar–vie 10:00–16:30; sáb 11:00–17:30. Grilla cada 30 min.
+ * Horario corrido (Analia, jul 2026): lun y dom cerrados;
+ * mar–vie 10:00–16:30; sáb 11:00–17:30. Grilla cada 1 h 30.
+ * Mar/mié/vie: trabaja sola (1 turno a la vez). Jue/sáb: con ayudante (hasta 2 simultáneos).
  */
 const SLOTS_TUE_FRI = buildStepSlots(10, 0, 16, 30);
 const SLOTS_SAT = buildStepSlots(11, 0, 17, 30);

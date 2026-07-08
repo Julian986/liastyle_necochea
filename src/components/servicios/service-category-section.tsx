@@ -9,6 +9,8 @@ export type ServiceDisplayGroup = {
   titleClassName?: string;
   /** Aclaración breve bajo el título del subgrupo (ej: "varía según procesos previos"). */
   note?: string;
+  imageUrl?: string;
+  imageObjectPosition?: string;
   services: SalonTreatment[];
 };
 
@@ -43,6 +45,21 @@ export function ServiceCategorySection({
       <div className="space-y-8">
         {groups.map((group) => (
           <div key={group.id}>
+            {group.imageUrl ? (
+              <div className="mx-auto mb-4 aspect-[3/4] w-full max-w-[200px] overflow-hidden rounded-xl">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={group.imageUrl}
+                  alt=""
+                  className="h-full w-full object-cover"
+                  style={
+                    group.imageObjectPosition
+                      ? { objectPosition: group.imageObjectPosition }
+                      : undefined
+                  }
+                />
+              </div>
+            ) : null}
             {group.title ? (
               <h3
                 className={
