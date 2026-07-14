@@ -3,7 +3,8 @@
 import { ChevronLeft, ChevronRight, Info, MessageCircle, Trash2 } from "lucide-react";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 
-import type { TreatmentCategory } from "@/lib/treatments/catalog";
+import { findSalonTreatmentById, type TreatmentCategory } from "@/lib/treatments/catalog";
+import { formatArs, summarizeDepositForTreatments } from "@/lib/treatments/deposit";
 import {
   CAMBIO_ESTRUCTURA_BOOKING_GROUPS,
   CAMBIO_ESTRUCTURA_BOOKING_LABELS,
@@ -139,6 +140,19 @@ export function BookingPicker({
     () => SALON_TREATMENT_OPTIONS.find((option) => option.id === selectedTreatmentId),
     [selectedTreatmentId],
   );
+  const depositSummary = useMemo(() => {
+    const ids =
+      multiSelect && selectedTreatmentIds.length > 0
+        ? selectedTreatmentIds
+        : selectedTreatmentId
+          ? [selectedTreatmentId]
+          : [];
+    const treatments = ids
+      .map((id) => findSalonTreatmentById(id))
+      .filter((t): t is NonNullable<typeof t> => Boolean(t));
+    if (treatments.length === 0) return null;
+    return summarizeDepositForTreatments(treatments);
+  }, [multiSelect, selectedTreatmentIds, selectedTreatmentId]);
   const visibleTreatments = useMemo(
     () =>
       activeTreatmentCategory
@@ -722,6 +736,12 @@ export function BookingPicker({
                   </span>
                 </div>
               ) : null}
+              {bookingContext === "public" && depositSummary && depositSummary.depositAmountArs > 0 ? (
+                <p className={`mt-1.5 text-[11px] font-medium ${textPrimary}`}>
+                  Seña 20%: {depositSummary.priceIsFrom ? "desde " : ""}
+                  {formatArs(depositSummary.depositAmountArs)}
+                </p>
+              ) : null}
               {activeStep === 1 && (
                 <div className="mt-2 flex items-center gap-2 text-[11px] text-[var(--premium-gold-light)]">
                   <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[var(--premium-gold-light)]" />
@@ -748,6 +768,12 @@ export function BookingPicker({
               {selectedDurationLabel ? (
                 <p className={`mt-1 text-[11px] font-semibold text-[var(--premium-gold-light)]`}>
                   {selectedDurationLabel}
+                </p>
+              ) : null}
+              {bookingContext === "public" && depositSummary && depositSummary.depositAmountArs > 0 ? (
+                <p className={`mt-1 text-[11px] font-medium ${textPrimary}`}>
+                  Seña 20%: {depositSummary.priceIsFrom ? "desde " : ""}
+                  {formatArs(depositSummary.depositAmountArs)}
                 </p>
               ) : null}
             </div>
@@ -1090,6 +1116,15 @@ export function BookingPicker({
                       </button>
                     ) : null}
                   </div>
+                  {bookingContext === "public" &&
+                  depositSummary &&
+                  depositSummary.depositAmountArs > 0 &&
+                  selectedTreatmentIds.length > 0 ? (
+                    <p className={`mt-1.5 text-[11px] font-medium ${textPrimary}`}>
+                      Seña 20%: {depositSummary.priceIsFrom ? "desde " : ""}
+                      {formatArs(depositSummary.depositAmountArs)}
+                    </p>
+                  ) : null}
                 </div>
               ) : null}
 

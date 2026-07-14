@@ -39,6 +39,8 @@ export async function POST(request: Request) {
         id: result.id,
         externalReference: result.externalReference,
         bookingMode: "confirmed" as const,
+        depositAmountArs: result.depositAmountArs,
+        depositPriceIsFrom: result.depositPriceIsFrom,
       },
       { status: 201 },
     );

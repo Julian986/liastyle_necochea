@@ -6,7 +6,8 @@ import { useEffect, useMemo, useRef } from "react";
 import { CategoryPhotoCard } from "@/components/category-photo-card";
 import { BOOKING_CATEGORY_CARDS } from "@/lib/booking/category-cards";
 import { SALON_TREATMENT_OPTIONS } from "@/lib/booking/salon-availability";
-import type { TreatmentCategory } from "@/lib/treatments/catalog";
+import { findSalonTreatmentById, type TreatmentCategory } from "@/lib/treatments/catalog";
+import { formatArs, summarizeDepositForTreatments } from "@/lib/treatments/deposit";
 
 type BookingCategoryStepProps = {
   onSelectCategory: (category: TreatmentCategory) => void;
@@ -47,6 +48,14 @@ export function BookingCategoryStep({
     [selectedServices],
   );
 
+  const depositSummary = useMemo(() => {
+    const treatments = selectedServiceIds
+      .map((id) => findSalonTreatmentById(id))
+      .filter((t): t is NonNullable<typeof t> => Boolean(t));
+    if (treatments.length === 0) return null;
+    return summarizeDepositForTreatments(treatments);
+  }, [selectedServiceIds]);
+
   useEffect(() => {
     cardRefs.current.forEach((card, index) => {
       if (!card) return;
@@ -71,6 +80,12 @@ export function BookingCategoryStep({
           <p className="mt-1.5 text-[14px] leading-snug font-medium text-[#1c1b1b]">{selectedSummary}</p>
           {selectedDurationLabel ? (
             <p className="mt-1 text-[12px] text-[#7f7c7a]">{selectedDurationLabel}</p>
+          ) : null}
+          {depositSummary && depositSummary.depositAmountArs > 0 ? (
+            <p className="mt-1.5 text-[12px] font-medium text-[#1c1b1b]">
+              Seña 20%: {depositSummary.priceIsFrom ? "desde " : ""}
+              {formatArs(depositSummary.depositAmountArs)}
+            </p>
           ) : null}
           <p className="mt-1.5 text-[11px] leading-snug text-[#7f7c7a]">
             Tocá una categoría para agregar o cambiar servicios.
@@ -97,7 +112,11 @@ export function BookingCategoryStep({
             ) : null}
           </div>
         </div>
-      ) : null}
+      ) : (
+        <p className="px-0.5 text-[12px] leading-snug text-[#7f7c7a]">
+          Para reservar se solicita una seña del 20% del valor del servicio.
+        </p>
+      )}
 
       <div className="grid grid-cols-2 gap-2.5">
         {BOOKING_CATEGORY_CARDS.map((card, index) => (

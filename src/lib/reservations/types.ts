@@ -56,6 +56,8 @@ export type ReservationDoc = {
   createdBy?: string | null;
   /** Notas internas solo para reservas cargadas desde el panel. */
   panelNotes?: string | null;
+  /** Ficha técnica de la visita (panel): fórmulas, detalles del servicio, etc. */
+  technicalNote?: string | null;
   createdAt: Date;
   updatedAt: Date;
   /** Secreto de un solo uso para crear la preferencia Checkout Pro (no es password del usuario). */
@@ -69,6 +71,11 @@ export type ReservationDoc = {
   mpPaymentStatusLast?: string | null;
   mpPaymentApprovedAt?: Date | null;
   paymentDeadlineAt?: Date | null;
+  /** Seña informativa (20% del precio base); cobro online aún no activo. */
+  depositAmountArs?: number;
+  depositRate?: number;
+  /** True si el precio base del servicio/combo es “desde”. */
+  depositPriceIsFrom?: boolean;
   cancelReason?: string | null;
   cancelledBy?: ReservationCancelledBy | null;
   /** Marca de envío del recordatorio WhatsApp ~24h antes (cron). */

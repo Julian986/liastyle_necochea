@@ -1,6 +1,6 @@
 "use client";
 
-import { CalendarDays, ChevronLeft, ChevronRight, Lock, Plus } from "lucide-react";
+import { CalendarDays, ChevronLeft, ChevronRight, Lock, Plus, Users } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -300,6 +300,14 @@ export function PanelTurnosDashboard() {
               Bloquear horario
             </Link>
           </div>
+
+          <Link
+            href="/panel-turnos/clientes"
+            className="mt-3 flex h-12 cursor-pointer items-center justify-center gap-2 rounded-2xl border border-gray-200 bg-white text-[14px] font-semibold text-gray-800 shadow-sm transition hover:border-[#7da3c4]/30 hover:bg-gray-50"
+          >
+            <Users className="h-5 w-5 text-[#7da3c4]" strokeWidth={2.2} />
+            Clientes
+          </Link>
         </header>
 
         <section className={`mt-5 ${panelCard} p-4`}>

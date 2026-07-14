@@ -1,6 +1,7 @@
 import { AppBottomNav } from "@/components/app-bottom-nav";
 import { BrandLogo } from "@/components/brand-logo";
 import { ConfirmadoIrPerfilButton } from "@/components/confirmado-ir-perfil-button";
+import { formatArs } from "@/lib/treatments/deposit";
 import { CalendarDays, CheckCircle2, Clock3, User } from "lucide-react";
 import Link from "next/link";
 
@@ -13,6 +14,9 @@ type ConfirmPageProps = {
     name?: string;
     phone?: string;
     id?: string;
+    deposit?: string;
+    depositFrom?: string;
+    price?: string;
   }>;
 };
 
@@ -25,6 +29,10 @@ export default async function TurnoConfirmadoPage({ searchParams }: ConfirmPageP
   const clientName = params.name ?? "";
   const clientPhone = params.phone ?? "";
   const reservationId = params.id ?? "";
+  const depositAmount = Number(params.deposit ?? "");
+  const priceFrom = Number(params.price ?? "");
+  const depositPriceIsFrom = params.depositFrom === "1";
+  const hasDeposit = Number.isFinite(depositAmount) && depositAmount > 0;
 
   return (
     <div className="flex min-h-screen flex-col overflow-x-hidden bg-[#f8f6f2] text-[#1c1b1b]">
@@ -80,6 +88,27 @@ export default async function TurnoConfirmadoPage({ searchParams }: ConfirmPageP
               </div>
             </div>
           )}
+
+          {hasDeposit ? (
+            <div className="mt-3 rounded-xl border border-[var(--premium-gold-light)]/25 bg-[var(--premium-gold-light)]/8 px-3 py-3">
+              <p className="text-[10px] font-bold tracking-[0.12em] text-[var(--premium-gold-light)] uppercase">
+                Seña para reservar
+              </p>
+              <p className="mt-1 font-heading text-[20px] font-semibold text-[#1c1b1b]">
+                {depositPriceIsFrom ? "Desde " : ""}
+                {formatArs(depositAmount)}
+              </p>
+              <p className="mt-1 text-[11px] leading-snug text-[#7f7c7a]">
+                20% del valor
+                {Number.isFinite(priceFrom) && priceFrom > 0
+                  ? ` (${depositPriceIsFrom ? "desde " : ""}${formatArs(priceFrom)}${
+                      depositPriceIsFrom ? " orientativo" : ""
+                    })`
+                  : ""}
+                . La seña se abona por fuera de la app.
+              </p>
+            </div>
+          ) : null}
 
           {reservationId ? (
             <p className="mt-4 text-center text-[11px] tracking-[0.04em] text-[#7f7c7a]">

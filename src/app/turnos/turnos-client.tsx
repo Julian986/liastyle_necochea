@@ -20,6 +20,7 @@ import {
 } from "@/lib/booking/salon-availability";
 import { findSalonTreatmentById } from "@/lib/treatments/catalog";
 import type { TreatmentCategory } from "@/lib/treatments/catalog";
+import { formatArs, summarizeDepositForTreatments } from "@/lib/treatments/deposit";
 
 type TurnosClientProps = {
   initialTreatment?: string;
@@ -110,6 +111,13 @@ export default function TurnosClient({ initialTreatment = "" }: TurnosClientProp
     if (h > 0) return `Duración ${h} h`;
     return `Duración ${m} min`;
   }, [totalSelectedDurationMinutes]);
+  const depositSummary = useMemo(() => {
+    const treatments = selectedServiceIds
+      .map((id) => findSalonTreatmentById(id))
+      .filter((t): t is NonNullable<typeof t> => Boolean(t));
+    if (treatments.length === 0) return null;
+    return summarizeDepositForTreatments(treatments);
+  }, [selectedServiceIds]);
   const primaryService = selectedServices[0];
 
   const hasSlot = Boolean(selectedServices.length > 0 && selectedDate && selectedTime);
@@ -443,6 +451,11 @@ export default function TurnosClient({ initialTreatment = "" }: TurnosClientProp
         phone: customerPhone.trim(),
         id: dataPending.id,
       });
+      if (depositSummary) {
+        qs.set("deposit", String(depositSummary.depositAmountArs));
+        qs.set("depositFrom", depositSummary.priceIsFrom ? "1" : "0");
+        qs.set("price", String(depositSummary.priceFromArs));
+      }
       window.location.href = `/turnos/confirmado?${qs.toString()}`;
     } catch {
       setConfirmError("Sin conexión o error de red. Probá de nuevo.");
@@ -692,6 +705,25 @@ export default function TurnosClient({ initialTreatment = "" }: TurnosClientProp
                   <p className="mt-1 text-[12px] text-[#7f7c7a]">
                     Te enviamos recordatorio por WhatsApp antes del turno.
                   </p>
+                  {depositSummary && depositSummary.depositAmountArs > 0 ? (
+                    <div className="mt-3 rounded-xl border border-[var(--premium-gold-light)]/25 bg-[var(--premium-gold-light)]/8 px-3 py-3">
+                      <p className="text-[10px] font-bold tracking-[0.12em] text-[var(--premium-gold-light)] uppercase">
+                        Seña para reservar
+                      </p>
+                      <p className="mt-1 font-heading text-[22px] font-semibold text-[#1c1b1b]">
+                        {depositSummary.priceIsFrom ? "Desde " : ""}
+                        {formatArs(depositSummary.depositAmountArs)}
+                      </p>
+                      <p className="mt-1 text-[11px] leading-snug text-[#7f7c7a]">
+                        20%
+                        {depositSummary.priceIsFrom
+                          ? ` sobre el valor desde ${formatArs(depositSummary.priceFromArs)}`
+                          : ` de ${formatArs(depositSummary.priceFromArs)}`}
+                        . Para reservar se solicita una seña del 20%. El turno queda agendado; la seña se abona por
+                        fuera de la app.
+                      </p>
+                    </div>
+                  ) : null}
                   {activeStep === 5 && datosComplete ? (
                     <div className="mt-2 flex items-center gap-2 text-[11px] text-[var(--premium-gold-light)]">
                       <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[var(--premium-gold-light)]" />

@@ -28,6 +28,10 @@ export type SalonTreatment = {
   category: TreatmentCategory;
   durationLabel: string;
   durationMinutes: number;
+  /** Precio base en ARS (si es “desde”, el monto mínimo publicado). */
+  priceFromArs: number;
+  /** True cuando el subtitle dice “desde $…”. */
+  priceIsFrom?: boolean;
   imageUrl: string;
 };
 
@@ -43,6 +47,7 @@ export const SALON_TREATMENTS: SalonTreatment[] = [
     category: "Cortes y peinado",
     durationLabel: "45 min",
     durationMinutes: 45,
+    priceFromArs: 35000,
     imageUrl: IMG.corte,
   },
   {
@@ -54,6 +59,7 @@ export const SALON_TREATMENTS: SalonTreatment[] = [
     category: "Cortes y peinado",
     durationLabel: "1 h 30 min",
     durationMinutes: 90,
+    priceFromArs: 50000,
     imageUrl: IMG.corte,
   },
   {
@@ -65,6 +71,7 @@ export const SALON_TREATMENTS: SalonTreatment[] = [
     category: "Cortes y peinado",
     durationLabel: "1 h 30 min",
     durationMinutes: 90,
+    priceFromArs: 65000,
     imageUrl: IMG.corte,
   },
   {
@@ -76,6 +83,7 @@ export const SALON_TREATMENTS: SalonTreatment[] = [
     category: "Cortes y peinado",
     durationLabel: "45 min",
     durationMinutes: 45,
+    priceFromArs: 30000,
     imageUrl: IMG.corte,
   },
   {
@@ -87,6 +95,7 @@ export const SALON_TREATMENTS: SalonTreatment[] = [
     category: "Cortes y peinado",
     durationLabel: "1 h 30 min",
     durationMinutes: 90,
+    priceFromArs: 45000,
     imageUrl: IMG.corte,
   },
   {
@@ -98,6 +107,7 @@ export const SALON_TREATMENTS: SalonTreatment[] = [
     category: "Cortes y peinado",
     durationLabel: "1 h 30 min",
     durationMinutes: 90,
+    priceFromArs: 65000,
     imageUrl: IMG.corte,
   },
   {
@@ -109,6 +119,8 @@ export const SALON_TREATMENTS: SalonTreatment[] = [
     category: "Cortes y peinado",
     durationLabel: "1 h 30 min",
     durationMinutes: 90,
+    priceFromArs: 90000,
+    priceIsFrom: true,
     imageUrl: IMG.peinado,
   },
   {
@@ -120,6 +132,8 @@ export const SALON_TREATMENTS: SalonTreatment[] = [
     category: "Cortes y peinado",
     durationLabel: "1 h 30 min",
     durationMinutes: 90,
+    priceFromArs: 60000,
+    priceIsFrom: true,
     imageUrl: IMG.peinado,
   },
   {
@@ -130,6 +144,7 @@ export const SALON_TREATMENTS: SalonTreatment[] = [
     category: "Cortes y peinado",
     durationLabel: "1 h",
     durationMinutes: 60,
+    priceFromArs: 45000,
     imageUrl: IMG.peinado,
   },
   {
@@ -140,6 +155,7 @@ export const SALON_TREATMENTS: SalonTreatment[] = [
     category: "Cortes y peinado",
     durationLabel: "1 h",
     durationMinutes: 60,
+    priceFromArs: 45000,
     imageUrl: IMG.peinado,
   },
 
@@ -153,6 +169,8 @@ export const SALON_TREATMENTS: SalonTreatment[] = [
     category: "Color",
     durationLabel: "1 h 30 min",
     durationMinutes: 90,
+    priceFromArs: 150000,
+    priceIsFrom: true,
     imageUrl: IMG.color,
   },
   {
@@ -164,6 +182,7 @@ export const SALON_TREATMENTS: SalonTreatment[] = [
     category: "Color",
     durationLabel: "2 h",
     durationMinutes: 120,
+    priceFromArs: 95000,
     imageUrl: IMG.color,
   },
   {
@@ -175,6 +194,7 @@ export const SALON_TREATMENTS: SalonTreatment[] = [
     category: "Color",
     durationLabel: "2 h",
     durationMinutes: 120,
+    priceFromArs: 115000,
     imageUrl: IMG.color,
   },
   {
@@ -186,6 +206,8 @@ export const SALON_TREATMENTS: SalonTreatment[] = [
     category: "Color",
     durationLabel: "2 h",
     durationMinutes: 120,
+    priceFromArs: 135000,
+    priceIsFrom: true,
     imageUrl: IMG.color,
   },
   {
@@ -197,6 +219,8 @@ export const SALON_TREATMENTS: SalonTreatment[] = [
     category: "Color",
     durationLabel: "1 h 30 min",
     durationMinutes: 90,
+    priceFromArs: 65000,
+    priceIsFrom: true,
     imageUrl: IMG.color,
   },
   {
@@ -208,6 +232,7 @@ export const SALON_TREATMENTS: SalonTreatment[] = [
     category: "Color",
     durationLabel: "2 h",
     durationMinutes: 120,
+    priceFromArs: 75000,
     imageUrl: IMG.color,
   },
   {
@@ -219,6 +244,7 @@ export const SALON_TREATMENTS: SalonTreatment[] = [
     category: "Color",
     durationLabel: "2 h 30 min",
     durationMinutes: 150,
+    priceFromArs: 95000,
     imageUrl: IMG.color,
   },
   {
@@ -229,6 +255,7 @@ export const SALON_TREATMENTS: SalonTreatment[] = [
     category: "Color",
     durationLabel: "5 h+",
     durationMinutes: 300,
+    priceFromArs: 150000,
     imageUrl: IMG.mechas,
   },
   {
@@ -239,6 +266,7 @@ export const SALON_TREATMENTS: SalonTreatment[] = [
     category: "Color",
     durationLabel: "5 h+",
     durationMinutes: 300,
+    priceFromArs: 200000,
     imageUrl: IMG.mechas,
   },
   {
@@ -249,6 +277,8 @@ export const SALON_TREATMENTS: SalonTreatment[] = [
     category: "Color",
     durationLabel: "5 h+",
     durationMinutes: 300,
+    priceFromArs: 250000,
+    priceIsFrom: true,
     imageUrl: IMG.mechas,
   },
   {
@@ -260,6 +290,7 @@ export const SALON_TREATMENTS: SalonTreatment[] = [
     category: "Color",
     durationLabel: "5 h+",
     durationMinutes: 300,
+    priceFromArs: 150000,
     imageUrl: IMG.mechas,
   },
   {
@@ -271,6 +302,7 @@ export const SALON_TREATMENTS: SalonTreatment[] = [
     category: "Color",
     durationLabel: "5 h+",
     durationMinutes: 300,
+    priceFromArs: 200000,
     imageUrl: IMG.mechas,
   },
   {
@@ -282,6 +314,8 @@ export const SALON_TREATMENTS: SalonTreatment[] = [
     category: "Color",
     durationLabel: "5 h+",
     durationMinutes: 300,
+    priceFromArs: 250000,
+    priceIsFrom: true,
     imageUrl: IMG.mechas,
   },
   {
@@ -292,6 +326,7 @@ export const SALON_TREATMENTS: SalonTreatment[] = [
     category: "Color",
     durationLabel: "5 h+",
     durationMinutes: 300,
+    priceFromArs: 150000,
     imageUrl: IMG.mechas,
   },
   {
@@ -302,6 +337,7 @@ export const SALON_TREATMENTS: SalonTreatment[] = [
     category: "Color",
     durationLabel: "5 h+",
     durationMinutes: 300,
+    priceFromArs: 200000,
     imageUrl: IMG.mechas,
   },
   {
@@ -312,6 +348,8 @@ export const SALON_TREATMENTS: SalonTreatment[] = [
     category: "Color",
     durationLabel: "5 h+",
     durationMinutes: 300,
+    priceFromArs: 250000,
+    priceIsFrom: true,
     imageUrl: IMG.mechas,
   },
   {
@@ -323,6 +361,7 @@ export const SALON_TREATMENTS: SalonTreatment[] = [
     category: "Color",
     durationLabel: "3 h",
     durationMinutes: 180,
+    priceFromArs: 120000,
     imageUrl: IMG.mechas,
   },
   {
@@ -334,6 +373,7 @@ export const SALON_TREATMENTS: SalonTreatment[] = [
     category: "Color",
     durationLabel: "3 h",
     durationMinutes: 180,
+    priceFromArs: 160000,
     imageUrl: IMG.mechas,
   },
   {
@@ -345,6 +385,8 @@ export const SALON_TREATMENTS: SalonTreatment[] = [
     category: "Color",
     durationLabel: "3 h",
     durationMinutes: 180,
+    priceFromArs: 200000,
+    priceIsFrom: true,
     imageUrl: IMG.mechas,
   },
 
@@ -358,6 +400,7 @@ export const SALON_TREATMENTS: SalonTreatment[] = [
     category: "Tratamientos",
     durationLabel: "1 h",
     durationMinutes: 60,
+    priceFromArs: 85000,
     imageUrl: IMG.trat,
   },
   {
@@ -369,6 +412,7 @@ export const SALON_TREATMENTS: SalonTreatment[] = [
     category: "Tratamientos",
     durationLabel: "1 h",
     durationMinutes: 60,
+    priceFromArs: 85000,
     imageUrl: IMG.trat,
   },
   {
@@ -380,6 +424,7 @@ export const SALON_TREATMENTS: SalonTreatment[] = [
     category: "Tratamientos",
     durationLabel: "1 h",
     durationMinutes: 60,
+    priceFromArs: 85000,
     imageUrl: IMG.trat,
   },
   // ── Cambio de estructura ────────────────────────────────────────────────────
@@ -391,6 +436,8 @@ export const SALON_TREATMENTS: SalonTreatment[] = [
     category: "Cambio de estructura",
     durationLabel: "4 h 30 min",
     durationMinutes: 270,
+    priceFromArs: 85000,
+    priceIsFrom: true,
     imageUrl: IMG.permanente,
   },
   {
@@ -401,6 +448,8 @@ export const SALON_TREATMENTS: SalonTreatment[] = [
     category: "Cambio de estructura",
     durationLabel: "4 h 30 min",
     durationMinutes: 270,
+    priceFromArs: 140000,
+    priceIsFrom: true,
     imageUrl: IMG.permanente,
   },
   {
@@ -411,6 +460,8 @@ export const SALON_TREATMENTS: SalonTreatment[] = [
     category: "Cambio de estructura",
     durationLabel: "4 h 30 min",
     durationMinutes: 270,
+    priceFromArs: 180000,
+    priceIsFrom: true,
     imageUrl: IMG.permanente,
   },
   {
@@ -422,6 +473,8 @@ export const SALON_TREATMENTS: SalonTreatment[] = [
     category: "Cambio de estructura",
     durationLabel: "4 h 30 min",
     durationMinutes: 270,
+    priceFromArs: 100000,
+    priceIsFrom: true,
     imageUrl: IMG.alisadoVegano,
   },
   {
@@ -433,6 +486,8 @@ export const SALON_TREATMENTS: SalonTreatment[] = [
     category: "Cambio de estructura",
     durationLabel: "4 h 30 min",
     durationMinutes: 270,
+    priceFromArs: 140000,
+    priceIsFrom: true,
     imageUrl: IMG.alisadoVegano,
   },
   {
@@ -444,6 +499,8 @@ export const SALON_TREATMENTS: SalonTreatment[] = [
     category: "Cambio de estructura",
     durationLabel: "4 h 30 min",
     durationMinutes: 270,
+    priceFromArs: 180000,
+    priceIsFrom: true,
     imageUrl: IMG.alisadoVegano,
   },
 ];

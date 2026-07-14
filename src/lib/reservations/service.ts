@@ -14,6 +14,7 @@ import { isPublicLeadTimeViolated } from "@/lib/booking/public-slot-lead";
 import { reservationWouldExceedSalonCapacity, slotIntervalMs } from "@/lib/booking/slot-overlap";
 import { validateServiceCombo } from "@/lib/treatments/booking-rules";
 import { SALON_TREATMENTS, findSalonTreatmentById, type SalonTreatment } from "@/lib/treatments/catalog";
+import { PUBLIC_DEPOSIT_RATE, summarizeDepositForTreatments } from "@/lib/treatments/deposit";
 
 import { backfillCustomerPhoneDigitsBatch, renormalizeCustomerPhoneDigitsBatch } from "@/lib/reservations/customer-queries";
 
@@ -274,12 +275,22 @@ export async function insertPendingReservation(
 }
 
 /**
- * Reserva desde la app pública sin seña: confirmada de inmediato (recordatorios vía cron igual que panel).
+ * Reserva desde la app pública: confirmada de inmediato.
+ * Guarda seña informativa (20%); el cobro online (MP) aún no está activo.
  */
 export async function insertPublicConfirmedReservationWithoutPayment(
   db: Db,
   input: CreateReservationInput,
-): Promise<{ ok: true; id: string; externalReference: string } | { error: string; code?: string }> {
+): Promise<
+  | {
+      ok: true;
+      id: string;
+      externalReference: string;
+      depositAmountArs: number;
+      depositPriceIsFrom: boolean;
+    }
+  | { error: string; code?: string }
+> {
   const v = await validatePublicTurnosReservation(db, input);
   if (!v.ok) return { error: v.error, code: v.code };
   const { primaryTreatment, serviceItems, totalDurationMinutes, isCombo, startsAt, now } = v;
@@ -289,6 +300,13 @@ export async function insertPublicConfirmedReservationWithoutPayment(
   const displayDate = formatSalonDisplayDate(dateKey);
   const treatmentNameCombo = serviceItems.map((s) => s.treatmentName).join(" + ");
   const subtitleCombo = `${serviceItems.length} servicios · ${totalDurationMinutes} min`;
+
+  const depositTreatments = serviceItems
+    .map((s) => findSalonTreatmentById(s.treatmentId))
+    .filter((t): t is SalonTreatment => Boolean(t));
+  const deposit = summarizeDepositForTreatments(
+    depositTreatments.length > 0 ? depositTreatments : [primaryTreatment],
+  );
 
   const doc = {
     treatmentId: primaryTreatment.id,
@@ -309,6 +327,9 @@ export async function insertPublicConfirmedReservationWithoutPayment(
     whatsappOptIn: input.whatsappOptIn === true,
     reservationStatus: "confirmed" as const,
     paymentStatus: "not_required" as const,
+    depositAmountArs: deposit.depositAmountArs,
+    depositRate: PUBLIC_DEPOSIT_RATE,
+    depositPriceIsFrom: deposit.priceIsFrom,
     source: "app_turnos" as const,
     createdAt: now,
     updatedAt: now,
@@ -335,7 +356,13 @@ export async function insertPublicConfirmedReservationWithoutPayment(
       { _id: result.insertedId },
       { $set: { externalReference: id, updatedAt: new Date() } },
     );
-    return { ok: true, id, externalReference: id };
+    return {
+      ok: true,
+      id,
+      externalReference: id,
+      depositAmountArs: deposit.depositAmountArs,
+      depositPriceIsFrom: deposit.priceIsFrom,
+    };
   } catch (e) {
     if (e instanceof MongoServerError && e.code === 11000) {
       return {
@@ -825,4 +852,37 @@ export async function expirePendingReservations(db: Db): Promise<number> {
     },
   );
   return r.modifiedCount;
+}
+
+const TECHNICAL_NOTE_MAX = 4000;
+
+/** Guarda o borra la ficha técnica de una visita (solo panel). */
+export async function setReservationTechnicalNote(
+  db: Db,
+  reservationHexId: string,
+  note: string,
+): Promise<{ ok: true } | { error: string; code?: string }> {
+  const hex = reservationHexId.trim();
+  const doc = await findReservationByHexId(db, hex);
+  if (!doc) {
+    return { error: "Turno no encontrado.", code: "NOT_FOUND" };
+  }
+
+  const trimmed = note.trim();
+  if (trimmed.length > TECHNICAL_NOTE_MAX) {
+    return { error: `La nota no puede superar ${TECHNICAL_NOTE_MAX} caracteres.`, code: "TOO_LONG" };
+  }
+
+  const now = new Date();
+  await db.collection<ReservationDoc>(COLLECTION).updateOne(
+    { _id: doc._id },
+    {
+      $set: {
+        technicalNote: trimmed.length > 0 ? trimmed : null,
+        updatedAt: now,
+      },
+    },
+  );
+
+  return { ok: true };
 }
