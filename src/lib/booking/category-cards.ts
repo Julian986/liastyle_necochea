@@ -28,7 +28,7 @@ export const BOOKING_CATEGORY_CARDS: BookingCategoryCard[] = [
   },
   {
     category: "Tratamientos",
-    title: "Tratamientos",
+    title: "Terapia Capilar & Mask Bar",
     subtitle: "Nutrición, brillo y restauración",
     imageUrl: "/liastyle_tratamientos.webp",
     imageObjectPosition: "50% 30%",

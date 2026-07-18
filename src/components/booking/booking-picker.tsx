@@ -12,6 +12,10 @@ import {
   CAMBIO_ESTRUCTURA_PRICE_NOTICE,
 } from "@/lib/booking/cambio-estructura-booking-sections";
 import { COLOR_BOOKING_SECTIONS, type ColorBookingSection } from "@/lib/booking/color-booking-sections";
+import {
+  MASCARA_BOOKING_LABELS,
+  TRATAMIENTOS_BOOKING_SECTIONS,
+} from "@/lib/booking/tratamientos-booking-sections";
 import { isColorTechnicalTreatmentId } from "@/lib/booking/color-technical-first-visit";
 import { bookingCategoryTitle } from "@/lib/booking/category-cards";
 import { colorTechnicalPriorAppointmentWhatsAppUrl } from "@/lib/salon-contact";
@@ -611,6 +615,47 @@ export function BookingPicker({
           : null,
     });
 
+  const renderTratamientosBookingSections = () => (
+    <div className="space-y-4">
+      {TRATAMIENTOS_BOOKING_SECTIONS.map((section) => {
+        const showSectionShell = Boolean(section.title);
+
+        return (
+          <div
+            key={section.id}
+            className={
+              showSectionShell
+                ? `rounded-[20px] border px-3 py-3 ${
+                    isLight
+                      ? "border-[var(--outline)]/8 bg-[#f8f6f2]/90"
+                      : "border-white/8 bg-[#1a1a1a]"
+                  }`
+                : undefined
+            }
+          >
+            {section.title ? (
+              <header className="mb-2.5">
+                <p className="text-[11px] font-semibold tracking-[0.14em] text-[var(--premium-gold-light)] uppercase">
+                  {section.title}
+                </p>
+              </header>
+            ) : null}
+            <div className="space-y-2">
+              {(section.treatmentIds ?? []).map((treatmentId) => {
+                const treatment = visibleTreatmentById.get(treatmentId);
+                if (!treatment) return null;
+                return renderTreatmentOption(
+                  treatment,
+                  MASCARA_BOOKING_LABELS[treatmentId],
+                );
+              })}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+
   return (
     <>
       {displayMode === "full" ? (
@@ -1141,6 +1186,8 @@ export function BookingPicker({
                   renderColorBookingSections()
                 ) : activeTreatmentCategory === "Cambio de estructura" ? (
                   renderCambioEstructuraBookingSections()
+                ) : activeTreatmentCategory === "Tratamientos" ? (
+                  renderTratamientosBookingSections()
                 ) : (
                   <div className="space-y-2">
                     {visibleTreatments.map((treatment) => renderTreatmentOption(treatment))}

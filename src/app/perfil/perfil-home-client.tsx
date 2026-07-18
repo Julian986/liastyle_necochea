@@ -96,8 +96,8 @@ export function PerfilHomeClient() {
     },
     {
       href: "/promociones?from=perfil",
-      title: "Promociones",
-      subtitle: "Beneficios del mes",
+      title: "Beneficios cliente VIP",
+      subtitle: "Combos y beneficios del mes",
       Icon: Percent,
     },
   ];

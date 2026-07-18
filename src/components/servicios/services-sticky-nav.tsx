@@ -13,7 +13,7 @@ type ServicesStickyNavProps = {
 const SHORT_LABEL: Record<TreatmentCategory, string> = {
   "Cortes y peinado": "Cortes",
   Color: "Color",
-  Tratamientos: "Tratamientos",
+  Tratamientos: "Mask Bar",
   "Cambio de estructura": "Estructura",
 };
 

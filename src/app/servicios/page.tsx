@@ -9,6 +9,10 @@ import { ServicesStickyNav } from "@/components/servicios/services-sticky-nav";
 import { BOOKING_CATEGORY_CARDS } from "@/lib/booking/category-cards";
 import { COLOR_BOOKING_SECTIONS } from "@/lib/booking/color-booking-sections";
 import {
+  MASCARA_BOOKING_LABELS,
+  TRATAMIENTOS_BOOKING_SECTIONS,
+} from "@/lib/booking/tratamientos-booking-sections";
+import {
   CAMBIO_ESTRUCTURA_DISPLAY_GROUPS,
   CAMBIO_ESTRUCTURA_INTRO,
   CAMBIO_ESTRUCTURA_PRICE_NOTICE,
@@ -52,6 +56,33 @@ function buildGroupsForCategory(
       const services = (section.treatmentIds ?? []).flatMap((id) => {
         const service = servicesById.get(id);
         return service ? [service] : [];
+      });
+
+      if (services.length === 0) return [];
+
+      return [
+        {
+          id: section.id,
+          title: section.title || undefined,
+          titleClassName: section.title
+            ? `${
+                section.subtitle || section.notice ? "mb-1" : "mb-3"
+              } text-[11px] font-semibold tracking-[0.14em] text-[var(--premium-gold-light)] uppercase`
+            : undefined,
+          note: [section.notice, section.subtitle].filter(Boolean).join(" · ") || undefined,
+          services,
+        },
+      ];
+    }).filter((group) => group.services.length > 0);
+  }
+
+  if (category === "Tratamientos") {
+    return TRATAMIENTOS_BOOKING_SECTIONS.flatMap((section) => {
+      const services = (section.treatmentIds ?? []).flatMap((id) => {
+        const service = servicesById.get(id);
+        if (!service) return [];
+        const shortName = MASCARA_BOOKING_LABELS[id];
+        return shortName ? [{ ...service, name: shortName }] : [service];
       });
 
       if (services.length === 0) return [];

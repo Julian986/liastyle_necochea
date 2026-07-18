@@ -105,7 +105,7 @@ function HomeContent() {
             Servicios
           </Link>
           <Link href="/promociones" className={`${ctaClass} home-glass-button text-[#e5e2e1]`}>
-            Promociones
+            Beneficios cliente VIP
           </Link>
           <Link
             href="/contacto"

@@ -20,7 +20,8 @@ export type ColorBookingSection = {
 export const COLOR_BOOKING_SECTIONS: ColorBookingSection[] = [
   {
     id: "correccion",
-    title: "",
+    title: "Corrección de color",
+    notice: "Disponible para quien quiera sacar un tono indeseado.",
     treatmentIds: ["correccion-color"],
   },
   {
@@ -32,11 +33,7 @@ export const COLOR_BOOKING_SECTIONS: ColorBookingSection[] = [
     id: "crecimiento",
     title: "Color en crecimiento",
     subtitle: "Incluye cierre técnico y modelado",
-    treatmentIds: [
-      "color-crecimiento",
-      "color-crecimiento-mascara",
-      "color-crecimiento-tratamiento",
-    ],
+    treatmentIds: ["color-crecimiento", "color-crecimiento-corte-nutricion"],
   },
   {
     id: "tecnico",

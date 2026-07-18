@@ -9,13 +9,13 @@ export type CortesPeinadoDisplaySection = {
 export const CORTES_PEINADO_DISPLAY_SECTIONS: CortesPeinadoDisplaySection[] = [
   {
     id: "diseno",
-    title: "Diseño & Tendencias",
+    title: "Corte Diseño & Tendencias",
     treatmentIds: ["diseno-tendencias", "diseno-tendencias-nutricion", "diseno-tendencias-tratamiento"],
   },
   {
     id: "puntas",
-    title: "Puntas",
-    treatmentIds: ["puntas", "puntas-nutricion", "puntas-tratamiento"],
+    title: "Corte de puntas",
+    treatmentIds: ["puntas", "puntas-nutricion", "puntas-tratamiento", "puntas-mascara"],
   },
   {
     id: "peinados",

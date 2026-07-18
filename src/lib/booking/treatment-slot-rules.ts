@@ -34,6 +34,7 @@ const TECHNICAL_TREATMENTS = new Map<string, number>([
   ["color-crecimiento", 90],
   ["color-crecimiento-mascara", 120],
   ["color-crecimiento-tratamiento", 150],
+  ["color-crecimiento-corte-nutricion", 180],
   ["balayage-corto", 300],
   ["balayage-medio", 300],
   ["balayage-largo", 300],
