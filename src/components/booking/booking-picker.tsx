@@ -16,6 +16,7 @@ import {
   MASCARA_BOOKING_LABELS,
   TRATAMIENTOS_BOOKING_SECTIONS,
 } from "@/lib/booking/tratamientos-booking-sections";
+import { CORTES_PEINADO_BOOKING_SECTIONS } from "@/lib/treatments/cortes-peinado-sections";
 import { isColorTechnicalTreatmentId } from "@/lib/booking/color-technical-first-visit";
 import { bookingCategoryTitle } from "@/lib/booking/category-cards";
 import { colorTechnicalPriorAppointmentWhatsAppUrl } from "@/lib/salon-contact";
@@ -656,6 +657,31 @@ export function BookingPicker({
     </div>
   );
 
+  const renderCortesPeinadoBookingSections = () => (
+    <div className="space-y-4">
+      {CORTES_PEINADO_BOOKING_SECTIONS.map((section) => (
+        <div
+          key={section.id}
+          className={`rounded-[20px] border px-3 py-3 ${
+            isLight ? "border-[var(--outline)]/8 bg-[#f8f6f2]/90" : "border-white/8 bg-[#1a1a1a]"
+          }`}
+        >
+          <header className="mb-2.5">
+            <p className="text-[11px] font-semibold tracking-[0.14em] text-[var(--premium-gold-light)] uppercase">
+              {section.title}
+            </p>
+          </header>
+          <div className="space-y-2">
+            {section.treatmentIds.map((treatmentId) => {
+              const treatment = visibleTreatmentById.get(treatmentId);
+              return treatment ? renderTreatmentOption(treatment) : null;
+            })}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+
   return (
     <>
       {displayMode === "full" ? (
@@ -1188,6 +1214,8 @@ export function BookingPicker({
                   renderCambioEstructuraBookingSections()
                 ) : activeTreatmentCategory === "Tratamientos" ? (
                   renderTratamientosBookingSections()
+                ) : activeTreatmentCategory === "Cortes y peinado" ? (
+                  renderCortesPeinadoBookingSections()
                 ) : (
                   <div className="space-y-2">
                     {visibleTreatments.map((treatment) => renderTreatmentOption(treatment))}

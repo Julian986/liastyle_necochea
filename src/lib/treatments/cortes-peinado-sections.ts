@@ -1,4 +1,4 @@
-/** Bloques visuales en /servicios para la categoría Cortes y peinado. */
+/** Bloques de Cortes y peinado en /turnos y /servicios. */
 
 export type CortesPeinadoDisplaySection = {
   id: string;
@@ -6,16 +6,20 @@ export type CortesPeinadoDisplaySection = {
   treatmentIds: string[];
 };
 
+/**
+ * Solo cortes base + peinados.
+ * Los combos (+ nutrición / + tratamiento / + máscara) quedaron fuera del menú (Analia, jul 2026).
+ *
+ * // Antes:
+ * // treatmentIds diseño: ["diseno-tendencias", "diseno-tendencias-nutricion", "diseno-tendencias-tratamiento"]
+ * // treatmentIds puntas: ["puntas", "puntas-nutricion", "puntas-tratamiento", "puntas-mascara"]
+ * // Data completa: ARCHIVED_CORTE_COMBO_TREATMENTS en catalog.ts
+ */
 export const CORTES_PEINADO_DISPLAY_SECTIONS: CortesPeinadoDisplaySection[] = [
   {
     id: "diseno",
-    title: "Corte Diseño & Tendencias",
-    treatmentIds: ["diseno-tendencias", "diseno-tendencias-nutricion", "diseno-tendencias-tratamiento"],
-  },
-  {
-    id: "puntas",
-    title: "Corte de puntas",
-    treatmentIds: ["puntas", "puntas-nutricion", "puntas-tratamiento", "puntas-mascara"],
+    title: "Cortes",
+    treatmentIds: ["diseno-tendencias", "puntas"],
   },
   {
     id: "peinados",
@@ -28,3 +32,10 @@ export const CORTES_PEINADO_DISPLAY_SECTIONS: CortesPeinadoDisplaySection[] = [
     ],
   },
 ];
+
+/** Alias para el modal de reserva (misma estructura que Color/Tratamientos). */
+export const CORTES_PEINADO_BOOKING_SECTIONS = CORTES_PEINADO_DISPLAY_SECTIONS.map((section) => ({
+  id: section.id,
+  title: section.title,
+  treatmentIds: section.treatmentIds,
+}));

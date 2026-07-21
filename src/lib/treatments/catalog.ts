@@ -51,30 +51,6 @@ export const SALON_TREATMENTS: SalonTreatment[] = [
     imageUrl: IMG.corte,
   },
   {
-    id: "diseno-tendencias-nutricion",
-    name: "Nutrición + Corte Diseño & Tendencias",
-    subtitle: "1 h 30 min · $50.000",
-    // bookingNote: "Incluye modelado",
-    description: "Corte Diseño & Tendencias con nutrición capilar. Incluye modelado.",
-    category: "Cortes y peinado",
-    durationLabel: "1 h 30 min",
-    durationMinutes: 90,
-    priceFromArs: 50000,
-    imageUrl: IMG.corte,
-  },
-  {
-    id: "diseno-tendencias-tratamiento",
-    name: "Tratamiento + Corte Diseño & Tendencias",
-    subtitle: "1 h 30 min · $80.000",
-    // bookingNote: "Incluye modelado",
-    description: "Corte Diseño & Tendencias con tratamiento capilar. Incluye modelado.",
-    category: "Cortes y peinado",
-    durationLabel: "1 h 30 min",
-    durationMinutes: 90,
-    priceFromArs: 80000,
-    imageUrl: IMG.corte,
-  },
-  {
     id: "puntas",
     name: "Corte de puntas",
     subtitle: "45 min · $30.000",
@@ -86,41 +62,7 @@ export const SALON_TREATMENTS: SalonTreatment[] = [
     priceFromArs: 30000,
     imageUrl: IMG.corte,
   },
-  {
-    id: "puntas-nutricion",
-    name: "Corte de puntas + Nutrición",
-    subtitle: "1 h 30 min · $45.000",
-    // bookingNote: "Incluye modelado",
-    description: "Corte de puntas con nutrición capilar. Incluye modelado.",
-    category: "Cortes y peinado",
-    durationLabel: "1 h 30 min",
-    durationMinutes: 90,
-    priceFromArs: 45000,
-    imageUrl: IMG.corte,
-  },
-  {
-    id: "puntas-tratamiento",
-    name: "Corte de puntas + Tratamiento",
-    subtitle: "1 h 30 min · $65.000",
-    // bookingNote: "Incluye modelado",
-    description: "Corte de puntas con tratamiento capilar. Incluye modelado.",
-    category: "Cortes y peinado",
-    durationLabel: "1 h 30 min",
-    durationMinutes: 90,
-    priceFromArs: 65000,
-    imageUrl: IMG.corte,
-  },
-  {
-    id: "puntas-mascara",
-    name: "Corte de puntas + Máscara",
-    subtitle: "1 h 30 min · $55.000",
-    description: "Corte de puntas con máscara (nutrición, hidratación o reparación a elección). Incluye modelado.",
-    category: "Cortes y peinado",
-    durationLabel: "1 h 30 min",
-    durationMinutes: 90,
-    priceFromArs: 55000,
-    imageUrl: IMG.corte,
-  },
+  // Combos de corte fuera del menú (Analia, jul 2026): ver ARCHIVED_CORTE_COMBO_TREATMENTS abajo.
   {
     id: "peinado-novia-quinceanera",
     name: "Peinado Novia / Quinceañera",
@@ -573,13 +515,94 @@ export const SALON_TREATMENTS: SalonTreatment[] = [
   },
 ];
 
+/**
+ * Combos de corte fuera del menú (Analia, jul 2026).
+ * No se ofrecen en /turnos, /servicios ni VIP.
+ * Conservados para reactivar si hace falta y para resolver reservas antiguas por id.
+ *
+ * // Antes en el menú:
+ * // - Nutrición + Corte Diseño & Tendencias · 1 h 30 · $50.000
+ * // - Tratamiento + Corte Diseño & Tendencias · 1 h 30 · $80.000
+ * // - Corte de puntas + Nutrición · 1 h 30 · $45.000
+ * // - Corte de puntas + Tratamiento · 1 h 30 · $65.000
+ * // - Corte de puntas + Máscara · 1 h 30 · $55.000
+ */
+export const ARCHIVED_CORTE_COMBO_TREATMENTS: SalonTreatment[] = [
+  {
+    id: "diseno-tendencias-nutricion",
+    name: "Nutrición + Corte Diseño & Tendencias",
+    subtitle: "1 h 30 min · $50.000",
+    // bookingNote: "Incluye modelado",
+    description: "Corte Diseño & Tendencias con nutrición capilar. Incluye modelado.",
+    category: "Cortes y peinado",
+    durationLabel: "1 h 30 min",
+    durationMinutes: 90,
+    priceFromArs: 50000,
+    imageUrl: IMG.corte,
+  },
+  {
+    id: "diseno-tendencias-tratamiento",
+    name: "Tratamiento + Corte Diseño & Tendencias",
+    subtitle: "1 h 30 min · $80.000",
+    // bookingNote: "Incluye modelado",
+    description: "Corte Diseño & Tendencias con tratamiento capilar. Incluye modelado.",
+    category: "Cortes y peinado",
+    durationLabel: "1 h 30 min",
+    durationMinutes: 90,
+    priceFromArs: 80000,
+    imageUrl: IMG.corte,
+  },
+  {
+    id: "puntas-nutricion",
+    name: "Corte de puntas + Nutrición",
+    subtitle: "1 h 30 min · $45.000",
+    // bookingNote: "Incluye modelado",
+    description: "Corte de puntas con nutrición capilar. Incluye modelado.",
+    category: "Cortes y peinado",
+    durationLabel: "1 h 30 min",
+    durationMinutes: 90,
+    priceFromArs: 45000,
+    imageUrl: IMG.corte,
+  },
+  {
+    id: "puntas-tratamiento",
+    name: "Corte de puntas + Tratamiento",
+    subtitle: "1 h 30 min · $65.000",
+    // bookingNote: "Incluye modelado",
+    description: "Corte de puntas con tratamiento capilar. Incluye modelado.",
+    category: "Cortes y peinado",
+    durationLabel: "1 h 30 min",
+    durationMinutes: 90,
+    priceFromArs: 65000,
+    imageUrl: IMG.corte,
+  },
+  {
+    id: "puntas-mascara",
+    name: "Corte de puntas + Máscara",
+    subtitle: "1 h 30 min · $55.000",
+    description:
+      "Corte de puntas con máscara (nutrición, hidratación o reparación a elección). Incluye modelado.",
+    category: "Cortes y peinado",
+    durationLabel: "1 h 30 min",
+    durationMinutes: 90,
+    priceFromArs: 55000,
+    imageUrl: IMG.corte,
+  },
+];
+
 export function findSalonTreatmentByName(name: string): SalonTreatment | undefined {
   const t = name.trim();
-  return SALON_TREATMENTS.find((x) => x.name === t);
+  return (
+    SALON_TREATMENTS.find((x) => x.name === t) ??
+    ARCHIVED_CORTE_COMBO_TREATMENTS.find((x) => x.name === t)
+  );
 }
 
 export function findSalonTreatmentById(id: string): SalonTreatment | undefined {
-  return SALON_TREATMENTS.find((x) => x.id === id);
+  return (
+    SALON_TREATMENTS.find((x) => x.id === id) ??
+    ARCHIVED_CORTE_COMBO_TREATMENTS.find((x) => x.id === id)
+  );
 }
 
 /** Duración mostrada en el panel; si es reserva antigua, devuelve un texto genérico. */

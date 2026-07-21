@@ -30,30 +30,31 @@ const promos: Promo[] = [
     category: "Color",
     treatmentId: "color-crecimiento-corte-nutricion",
   },
-  {
-    id: "corte-nutricion-promo",
-    title: "Corte + nutrición",
-    subtitle: "$50.000",
-    details: "1 h 30 min · Corte Diseño & Tendencias con nutrición. Incluye modelado.",
-    category: "Cortes y peinado",
-    treatmentId: "diseno-tendencias-nutricion",
-  },
-  {
-    id: "corte-tratamiento-promo",
-    title: "Corte Diseño & Tendencias + tratamiento",
-    subtitle: "$80.000",
-    details: "1 h 30 min · Incluye modelado.",
-    category: "Cortes y peinado",
-    treatmentId: "diseno-tendencias-tratamiento",
-  },
-  {
-    id: "puntas-mascara-promo",
-    title: "Corte de puntas + máscara",
-    subtitle: "$55.000",
-    details: "1 h 30 min · Máscara a elección (nutrición, hidratación o reparación). Incluye modelado.",
-    category: "Cortes y peinado",
-    treatmentId: "puntas-mascara",
-  },
+  // Fuera de VIP (Analia, jul 2026) — combos de corte:
+  // {
+  //   id: "corte-nutricion-promo",
+  //   title: "Corte + nutrición",
+  //   subtitle: "$50.000",
+  //   details: "1 h 30 min · Corte Diseño & Tendencias con nutrición. Incluye modelado.",
+  //   category: "Cortes y peinado",
+  //   treatmentId: "diseno-tendencias-nutricion",
+  // },
+  // {
+  //   id: "corte-tratamiento-promo",
+  //   title: "Corte Diseño & Tendencias + tratamiento",
+  //   subtitle: "$80.000",
+  //   details: "1 h 30 min · Incluye modelado.",
+  //   category: "Cortes y peinado",
+  //   treatmentId: "diseno-tendencias-tratamiento",
+  // },
+  // {
+  //   id: "puntas-mascara-promo",
+  //   title: "Corte de puntas + máscara",
+  //   subtitle: "$55.000",
+  //   details: "1 h 30 min · Máscara a elección (nutrición, hidratación o reparación). Incluye modelado.",
+  //   category: "Cortes y peinado",
+  //   treatmentId: "puntas-mascara",
+  // },
 ];
 
 function CategoryIcon({ category }: { category: TreatmentCategory }) {
