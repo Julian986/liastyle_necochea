@@ -1,7 +1,6 @@
-import Link from "next/link";
-
 import type { SalonTreatment } from "@/lib/treatments/catalog";
 import { treatmentPriceLabel } from "@/lib/treatments/service-page-config";
+import { serviceInquiryWhatsAppUrl } from "@/lib/salon-contact";
 
 type ServiceListItemProps = {
   service: SalonTreatment;
@@ -28,12 +27,14 @@ export function ServiceListItem({ service, isLast }: ServiceListItemProps) {
         </div>
       </div>
 
-      <Link
-        href={`/turnos?treatment=${encodeURIComponent(service.id)}`}
-        className="mt-4 inline-flex shrink-0 items-center justify-center rounded-full border border-[var(--premium-gold-light)] px-5 py-2 text-xs font-medium tracking-wider text-[var(--premium-gold-light)] uppercase transition-all hover:bg-[var(--premium-gold-light)] hover:text-white active:scale-95 sm:mt-0"
+      <a
+        href={serviceInquiryWhatsAppUrl(service.name)}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="mt-4 inline-flex shrink-0 items-center justify-center rounded-full border border-[#25D366] px-5 py-2 text-xs font-medium tracking-wider text-[#128C7E] uppercase transition-all hover:bg-[#25D366] hover:text-white active:scale-95 sm:mt-0"
       >
-        Reservar
-      </Link>
+        Reservar por WhatsApp
+      </a>
     </article>
   );
 }

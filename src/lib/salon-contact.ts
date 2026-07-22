@@ -5,6 +5,12 @@ export function salonWhatsAppUrl(message: string): string {
   return `${SALON_WHATSAPP_HREF}?text=${encodeURIComponent(message)}`;
 }
 
+/** Consulta de un servicio desde /servicios (la reserva online es solo en /turnos). */
+export function serviceInquiryWhatsAppUrl(treatmentName: string): string {
+  const name = treatmentName.trim() || "un servicio";
+  return salonWhatsAppUrl(`Hola! Consulto por ${name}.`);
+}
+
 /** Mensaje prearmado para coordinar color técnico por WhatsApp. */
 export function colorTechnicalPriorAppointmentWhatsAppUrl(treatmentName?: string): string {
   const text = treatmentName?.trim()
