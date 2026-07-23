@@ -1,4 +1,5 @@
 import type { SalonTreatment } from "@/lib/treatments/catalog";
+import { isColorTechnicalTreatmentId } from "@/lib/booking/color-technical-first-visit";
 import { SERVICE_EDUCATIONAL_DESCRIPTIONS } from "@/lib/treatments/service-page-copy";
 import { serviceInquiryWhatsAppUrl } from "@/lib/salon-contact";
 
@@ -7,9 +8,15 @@ type ServiceListItemProps = {
   isLast?: boolean;
 };
 
+/** En /servicios, WhatsApp solo para color técnico o alisado químico (como en /turnos). */
+function showWhatsAppReserve(serviceId: string): boolean {
+  return isColorTechnicalTreatmentId(serviceId) || serviceId.startsWith("alisado-vegano-");
+}
+
 export function ServiceListItem({ service, isLast }: ServiceListItemProps) {
   const description =
     SERVICE_EDUCATIONAL_DESCRIPTIONS[service.id] ?? service.description;
+  const withWhatsApp = showWhatsAppReserve(service.id);
 
   return (
     <article
@@ -27,14 +34,16 @@ export function ServiceListItem({ service, isLast }: ServiceListItemProps) {
         </div>
       </div>
 
-      <a
-        href={serviceInquiryWhatsAppUrl(service.name)}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="mt-4 inline-flex shrink-0 items-center justify-center rounded-full border border-[#25D366] px-5 py-2 text-xs font-medium tracking-wider text-[#128C7E] uppercase transition-all hover:bg-[#25D366] hover:text-white active:scale-95 sm:mt-0"
-      >
-        Reservar por WhatsApp
-      </a>
+      {withWhatsApp ? (
+        <a
+          href={serviceInquiryWhatsAppUrl(service.name)}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-4 inline-flex shrink-0 items-center justify-center rounded-full border border-[#25D366] px-5 py-2 text-xs font-medium tracking-wider text-[#128C7E] uppercase transition-all hover:bg-[#25D366] hover:text-white active:scale-95 sm:mt-0"
+        >
+          Reservar por WhatsApp
+        </a>
+      ) : null}
     </article>
   );
 }

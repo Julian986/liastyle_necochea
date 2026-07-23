@@ -117,7 +117,7 @@ function HomeContent() {
 
         <section className="mt-20 w-full px-6">
           <h2 className="mb-6 px-1 text-xs font-bold tracking-widest text-[var(--soft-gray)] uppercase">
-            Promoción destacada del mes
+            Programa clienta VIP
           </h2>
           <div className="home-glass-card relative overflow-hidden rounded-2xl p-6">
             <div
@@ -129,23 +129,28 @@ function HomeContent() {
                 Destacado
               </span>
               <h3 className="font-heading text-[32px] leading-10 font-semibold text-[#e5e2e1]">
-                Color global
+                Convertite en VIP
               </h3>
-              <p className="mt-3 max-w-[240px] text-sm leading-5 text-[var(--on-surface-variant)]">
-                Desde $95.000 · 2 h con cierre técnico y modelado incluidos.
+              <p className="mt-3 text-sm leading-relaxed text-[var(--on-surface-variant)]">
+                Después del servicio 10 pasás a ser clienta VIP y desbloqueás beneficios pensados para vos.
               </p>
-              <div className="mt-8 flex items-center justify-between">
+              <ul className="mt-4 space-y-2 text-sm leading-snug text-[#e5e2e1]/90">
+                <li className="flex gap-2">
+                  <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--premium-gold)]" aria-hidden />
+                  Combos exclusivos con precio especial
+                </li>
+                <li className="flex gap-2">
+                  <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--premium-gold)]" aria-hidden />
+                  Promociones pensadas solo para clientas VIP
+                </li>
+              </ul>
+              <div className="mt-8">
                 <Link
-                  href="/turnos?treatment=Color%20global%20%C2%B7%20corto%20(hombro)"
-                  className="rounded-full bg-[var(--premium-gold)] px-6 py-3 text-[13px] font-semibold tracking-wider text-[var(--on-accent)] uppercase transition-all hover:opacity-90 active:scale-95"
+                  href="/promociones"
+                  className="inline-flex rounded-full bg-[var(--premium-gold)] px-6 py-3 text-[13px] font-semibold tracking-wider text-[var(--on-accent)] uppercase transition-all hover:opacity-90 active:scale-95"
                 >
-                  Reservar ahora
+                  Ver beneficios VIP
                 </Link>
-                <p className="text-right text-[10px] leading-tight font-bold tracking-wider text-[var(--soft-gray)] uppercase">
-                  Cupos
-                  <br />
-                  limitados
-                </p>
               </div>
             </div>
           </div>
