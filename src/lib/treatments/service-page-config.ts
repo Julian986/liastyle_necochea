@@ -12,7 +12,7 @@ export function categoryAnchorId(category: TreatmentCategory): string {
 }
 
 export const SERVICE_PAGE_INTRO =
-  "Precios orientativos: varían según el largo del cabello o diagnóstico en salón.";
+  "Todos los productos utilizados en nuestros servicios están testeados y no contienen formol. Trabajamos para la salud capilar y cuidamos el medio ambiente.";
 
 /** Precio visible en la lista (parte después de la duración en `subtitle`). */
 export function treatmentPriceLabel(subtitle: string): string {

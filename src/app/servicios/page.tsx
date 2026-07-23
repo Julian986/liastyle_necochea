@@ -14,21 +14,31 @@ import {
 } from "@/lib/booking/tratamientos-booking-sections";
 import {
   CAMBIO_ESTRUCTURA_DISPLAY_GROUPS,
-  CAMBIO_ESTRUCTURA_INTRO,
-  CAMBIO_ESTRUCTURA_PRICE_NOTICE,
 } from "@/lib/treatments/cambio-estructura-display-sections";
 import { CORTES_PEINADO_DISPLAY_SECTIONS } from "@/lib/treatments/cortes-peinado-sections";
 import { SALON_TREATMENTS, type SalonTreatment, type TreatmentCategory } from "@/lib/treatments/catalog";
-import { categoryAnchorId, SERVICE_PAGE_INTRO } from "@/lib/treatments/service-page-config";
+import { categoryAnchorId } from "@/lib/treatments/service-page-config";
+import {
+  SERVICE_PAGE_CATEGORY_COPY,
+  SERVICE_PAGE_INTRO_LINES,
+  SERVICE_PAGE_VIP_HIGHLIGHT,
+} from "@/lib/treatments/service-page-copy";
+
+const GROUP_TITLE_CLASS =
+  "mb-1 text-[11px] font-semibold tracking-[0.14em] text-[var(--premium-gold-light)] uppercase";
 
 function buildGroupsForCategory(
   category: TreatmentCategory,
   servicesById: Map<string, SalonTreatment>,
 ): ServiceDisplayGroup[] {
+  const copy = SERVICE_PAGE_CATEGORY_COPY[category];
+
   if (category === "Cortes y peinado") {
     return CORTES_PEINADO_DISPLAY_SECTIONS.map((section) => ({
       id: section.id,
       title: section.title,
+      titleClassName: GROUP_TITLE_CLASS,
+      note: copy.groupNotes?.[section.id],
       services: section.treatmentIds.flatMap((id) => {
         const service = servicesById.get(id);
         return service ? [service] : [];
@@ -39,13 +49,12 @@ function buildGroupsForCategory(
   if (category === "Color") {
     return COLOR_BOOKING_SECTIONS.flatMap((section) => {
       if (section.subsections) {
-        return section.subsections.map((subsection) => ({
+        return section.subsections.map((subsection, index) => ({
           id: `${section.id}-${subsection.title}`,
           title: subsection.title,
-          titleClassName: `${
-            subsection.subtitle ? "mb-1" : "mb-3"
-          } text-[11px] font-semibold tracking-[0.14em] text-[var(--premium-gold-light)] uppercase`,
-          note: subsection.subtitle,
+          titleClassName: GROUP_TITLE_CLASS,
+          // El texto educativo de color técnico va una sola vez, al primer subgrupo.
+          note: index === 0 ? copy.groupNotes?.[section.id] : undefined,
           services: subsection.treatmentIds.flatMap((id) => {
             const service = servicesById.get(id);
             return service ? [service] : [];
@@ -64,12 +73,8 @@ function buildGroupsForCategory(
         {
           id: section.id,
           title: section.title || undefined,
-          titleClassName: section.title
-            ? `${
-                section.subtitle || section.notice ? "mb-1" : "mb-3"
-              } text-[11px] font-semibold tracking-[0.14em] text-[var(--premium-gold-light)] uppercase`
-            : undefined,
-          note: [section.notice, section.subtitle].filter(Boolean).join(" · ") || undefined,
+          titleClassName: section.title ? GROUP_TITLE_CLASS : undefined,
+          note: copy.groupNotes?.[section.id],
           services,
         },
       ];
@@ -87,13 +92,15 @@ function buildGroupsForCategory(
 
       if (services.length === 0) return [];
 
+      const title =
+        section.id === "terapias" ? "Tratamiento" : section.title || undefined;
+
       return [
         {
           id: section.id,
-          title: section.title || undefined,
-          titleClassName: section.title
-            ? "mb-3 text-[11px] font-semibold tracking-[0.14em] text-[var(--premium-gold-light)] uppercase"
-            : undefined,
+          title,
+          titleClassName: title ? GROUP_TITLE_CLASS : undefined,
+          note: copy.groupNotes?.[section.id],
           services,
         },
       ];
@@ -104,8 +111,7 @@ function buildGroupsForCategory(
     return CAMBIO_ESTRUCTURA_DISPLAY_GROUPS.map((group) => ({
       id: group.id,
       title: group.title,
-      titleClassName:
-        "mb-3 text-[11px] font-semibold tracking-[0.14em] text-[var(--premium-gold-light)] uppercase",
+      titleClassName: GROUP_TITLE_CLASS,
       imageUrl: group.imageUrl,
       imageObjectPosition: group.imageObjectPosition,
       services: group.treatmentIds.flatMap((id) => {
@@ -138,9 +144,8 @@ export default function ServicesPage() {
     [servicesById],
   );
 
-  const cardsSentinelRef = useRef<HTMLDivElement | null>(null);
+  const categoryPickerRef = useRef<HTMLDivElement | null>(null);
   const [stickyNavVisible, setStickyNavVisible] = useState(false);
-  /** Evita que el scrollspy pise la categoría mientras hacemos scroll programático. */
   const programmaticScrollUntil = useRef(0);
 
   const handleSelectCategory = useCallback((category: TreatmentCategory) => {
@@ -153,14 +158,15 @@ export default function ServicesPage() {
   }, []);
 
   useEffect(() => {
-    const sentinel = cardsSentinelRef.current;
-    if (!sentinel) return;
+    const picker = categoryPickerRef.current;
+    if (!picker) return;
 
+    // Solo mostrar la barra fija cuando la grilla de categorías ya salió de pantalla.
     const observer = new IntersectionObserver(
       ([entry]) => setStickyNavVisible(!entry.isIntersecting),
-      { threshold: 0 },
+      { threshold: 0, rootMargin: "0px 0px 0px 0px" },
     );
-    observer.observe(sentinel);
+    observer.observe(picker);
     return () => observer.disconnect();
   }, []);
 
@@ -201,35 +207,48 @@ export default function ServicesPage() {
       <main className="mx-auto w-full max-w-md px-4 pb-24">
         <header className="pb-6 pt-8 text-center">
           <h1 className="font-heading text-[34px] leading-tight font-semibold text-[#1c1b1b]">Servicios</h1>
-          <p className="mx-auto mt-3 max-w-sm text-[13px] leading-relaxed text-[#7f7c7a]">{SERVICE_PAGE_INTRO}</p>
+          <div className="mx-auto mt-3 max-w-sm space-y-2 text-[15px] leading-relaxed text-[#7f7c7a]">
+            {SERVICE_PAGE_INTRO_LINES.map((line) => (
+              <p key={line}>{line}</p>
+            ))}
+          </div>
         </header>
 
-        <div className="mb-10">
+        <section className="mb-10 rounded-2xl border border-[var(--premium-gold-light)]/30 bg-[var(--premium-gold-light)]/8 px-4 py-4 text-center">
+          <p className="text-[12px] font-bold tracking-[0.16em] text-[var(--premium-gold-light)] uppercase">
+            Destacados
+          </p>
+          <p className="mt-2.5 text-[17px] leading-relaxed font-medium text-[#1c1b1b]">
+            {SERVICE_PAGE_VIP_HIGHLIGHT}
+          </p>
+        </section>
+
+        <div ref={categoryPickerRef} className="mb-10">
           <p className="mb-3 text-center text-[11px] font-semibold tracking-[0.12em] text-[var(--premium-gold-light)] uppercase">
             Elegí un área
           </p>
           <ServicesCategoryGrid activeCategory={activeCategory} onSelectCategory={handleSelectCategory} />
-          <div ref={cardsSentinelRef} aria-hidden />
         </div>
 
         <div className="space-y-2">
-          {BOOKING_CATEGORY_CARDS.map((card) => (
-            <ServiceCategorySection
-              key={card.category}
-              anchorId={categoryAnchorId(card.category)}
-              sectionTitle={card.title}
-              sectionSubtitle={card.subtitle}
-              groups={categoryGroups[card.category]}
-              intro={
-                card.category === "Cambio de estructura" ? (
-                  <div className="space-y-2 rounded-xl border border-[var(--outline)]/10 bg-white px-4 py-3 text-center">
-                    <p className="font-heading text-lg font-semibold text-[#1c1b1b]">{CAMBIO_ESTRUCTURA_INTRO}</p>
-                    <p className="text-[13px] leading-snug text-[#7f7c7a]">{CAMBIO_ESTRUCTURA_PRICE_NOTICE}</p>
-                  </div>
-                ) : undefined
-              }
-            />
-          ))}
+          {BOOKING_CATEGORY_CARDS.map((card) => {
+            const copy = SERVICE_PAGE_CATEGORY_COPY[card.category];
+            return (
+              <ServiceCategorySection
+                key={card.category}
+                anchorId={categoryAnchorId(card.category)}
+                sectionTitle={card.title}
+                groups={categoryGroups[card.category]}
+                intro={
+                  copy.intro ? (
+                    <div className="rounded-xl border border-[var(--outline)]/10 bg-white px-4 py-3">
+                      <p className="text-[15px] leading-relaxed text-[#5f5c5a]">{copy.intro}</p>
+                    </div>
+                  ) : undefined
+                }
+              />
+            );
+          })}
         </div>
       </main>
 

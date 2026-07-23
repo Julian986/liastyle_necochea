@@ -1,5 +1,5 @@
 import type { SalonTreatment } from "@/lib/treatments/catalog";
-import { treatmentPriceLabel } from "@/lib/treatments/service-page-config";
+import { SERVICE_EDUCATIONAL_DESCRIPTIONS } from "@/lib/treatments/service-page-copy";
 import { serviceInquiryWhatsAppUrl } from "@/lib/salon-contact";
 
 type ServiceListItemProps = {
@@ -8,6 +8,9 @@ type ServiceListItemProps = {
 };
 
 export function ServiceListItem({ service, isLast }: ServiceListItemProps) {
+  const description =
+    SERVICE_EDUCATIONAL_DESCRIPTIONS[service.id] ?? service.description;
+
   return (
     <article
       className={`group flex flex-col justify-between rounded-lg px-2 py-4 transition-colors hover:bg-[#efeeea]/80 sm:flex-row sm:items-center ${
@@ -16,13 +19,10 @@ export function ServiceListItem({ service, isLast }: ServiceListItemProps) {
     >
       <div className="min-w-0 flex-grow">
         <h3 className="text-base font-bold text-[#1c1b1b]">{service.name}</h3>
-        <p className="mt-1 line-clamp-2 text-xs leading-snug text-[#4e463a]/90">{service.description}</p>
-        <div className="mt-2 flex flex-wrap items-center gap-3">
-          <span className="rounded bg-[#efeeea] px-2 py-1 text-xs font-medium text-[#4e463a]">
+        <p className="mt-1.5 text-[15px] leading-relaxed text-[#4e463a]/90">{description}</p>
+        <div className="mt-2.5 flex flex-wrap items-center gap-3">
+          <span className="rounded bg-[#efeeea] px-2 py-1 text-sm font-medium text-[#4e463a]">
             {service.durationLabel}
-          </span>
-          <span className="text-base font-semibold text-[var(--premium-gold-light)]">
-            {treatmentPriceLabel(service.subtitle)}
           </span>
         </div>
       </div>

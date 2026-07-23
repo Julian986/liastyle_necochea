@@ -32,7 +32,7 @@ export function ServiceCategorySection({
   const services = groups.flatMap((group) => group.services);
 
   return (
-    <section className="mb-16 scroll-mt-16 border-t border-[#7f7c7a]/15 pt-10 first:border-t-0 first:pt-0" id={anchorId}>
+    <section className="mb-16 scroll-mt-20 border-t border-[#7f7c7a]/15 pt-10 first:border-t-0 first:pt-0" id={anchorId}>
       <header className="mb-6">
         <h2 className="font-heading text-[28px] leading-tight font-semibold text-[#1c1b1b]">{sectionTitle}</h2>
         {sectionSubtitle ? (
@@ -71,7 +71,7 @@ export function ServiceCategorySection({
               </h3>
             ) : null}
             {group.note ? (
-              <p className="mb-3 text-[12px] leading-snug text-[#7f7c7a]">{group.note}</p>
+              <p className="mb-3 text-[15px] leading-relaxed text-[#7f7c7a]">{group.note}</p>
             ) : null}
             <div className="space-y-0">
               {group.services.map((service, index) => (
