@@ -74,23 +74,17 @@ export const SERVICE_EDUCATIONAL_DESCRIPTIONS: Record<string, string> = {
   "correccion-color":
     "Es cuando hay varios colores y queremos lograr un color uniforme. El valor varía según diagnóstico.",
   "color-crecimiento": "",
-  "color-crecimiento-corte-nutricion": "Con corte y nutrición.",
-  /** Concepto único en /servicios (sin corto/medio/largo). */
+  /** Conceptos únicos en /servicios (sin corto/medio/largo). */
   "color-global":
     "Es cuando hacés un tono sobre tu cabello natural, o tu tono artificial está desmerecido. Incluye cierre técnico y modelado.",
-  // Técnico: overview en groupNotes; el nombre ya indica la técnica y el largo
-  "mechas-papel-corto": "",
-  "mechas-papel-medio": "",
-  "mechas-papel-largo": "",
-  "balayage-corto": "",
-  "balayage-medio": "",
-  "balayage-largo": "",
-  "air-touch-corto": "",
-  "air-touch-medio": "",
-  "air-touch-largo": "",
-  "reflejos-gorra-corto": "",
-  "reflejos-gorra-medio": "",
-  "reflejos-gorra-largo": "",
+  "mechas-papel":
+    "Mechas diseñadas con papel. Incluye cierre técnico, Plex y modelado. El valor puede variar según procesos químicos previos.",
+  balayage:
+    "Iluminación con técnica balayage. Incluye cierre técnico, Plex y modelado. El valor puede variar según procesos químicos previos.",
+  "air-touch":
+    "Iluminación con técnica Air Touch. Incluye cierre técnico, Plex y modelado. El valor puede variar según procesos químicos previos.",
+  "reflejos-gorra":
+    "Reflejos con gorra, diseño personalizado. Incluye cierre técnico, Plex y modelado.",
 
   // --- Tratamientos ---
   "botox-cauterizado": "",

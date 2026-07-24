@@ -33,7 +33,7 @@ export const COLOR_BOOKING_SECTIONS: ColorBookingSection[] = [
     id: "crecimiento",
     title: "Color en crecimiento",
     subtitle: "Incluye cierre técnico y modelado",
-    treatmentIds: ["color-crecimiento", "color-crecimiento-corte-nutricion"],
+    treatmentIds: ["color-crecimiento"],
   },
   {
     id: "tecnico",

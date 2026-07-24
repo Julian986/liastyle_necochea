@@ -25,14 +25,6 @@ import {
   resolveServicePageDescription,
 } from "@/lib/treatments/service-page-copy";
 
-const GROUP_TITLE_CLASS =
-  "mb-1 text-[11px] font-semibold tracking-[0.14em] text-[var(--premium-gold-light)] uppercase";
-
-function titlesMatch(a: string | undefined, b: string): boolean {
-  if (!a) return false;
-  return a.trim().toLowerCase() === b.trim().toLowerCase();
-}
-
 /** Unifica variantes corto/medio/largo en un solo ítem de catálogo para /servicios. */
 function asConceptService(
   base: SalonTreatment,
@@ -46,13 +38,20 @@ function asConceptService(
   };
 }
 
+/** Prefijo del id de catálogo (ej. mechas-papel-corto → mechas-papel). */
+function conceptIdFromLengthVariant(treatmentId: string): string {
+  return treatmentId.replace(/-(corto|medio|largo)$/, "");
+}
+
 /**
- * En grupos de un solo servicio: evita título duplicado (grupo = ítem)
- * y deja una sola descripción (la más completa).
+ * En grupos de un solo servicio: deja una sola descripción (la más completa)
+ * y sin título de grupo.
  */
 function dedupeSingleServiceGroups(groups: ServiceDisplayGroup[]): ServiceDisplayGroup[] {
   return groups.map((group) => {
-    if (group.services.length !== 1) return group;
+    if (group.services.length !== 1) {
+      return { ...group, title: undefined, titleClassName: undefined };
+    }
 
     const service = group.services[0];
     const itemDescription = resolveServicePageDescription(service.id, service.description).trim();
@@ -62,8 +61,8 @@ function dedupeSingleServiceGroups(groups: ServiceDisplayGroup[]): ServiceDispla
 
     return {
       ...group,
-      title: titlesMatch(group.title, service.name) ? undefined : group.title,
-      titleClassName: titlesMatch(group.title, service.name) ? undefined : group.titleClassName,
+      title: undefined,
+      titleClassName: undefined,
       note: undefined,
       services: bestDescription
         ? [{ ...service, description: bestDescription }]
@@ -82,8 +81,6 @@ function buildGroupsForCategory(
     return dedupeSingleServiceGroups(
       CORTES_PEINADO_DISPLAY_SECTIONS.map((section) => ({
         id: section.id,
-        title: section.title,
-        titleClassName: GROUP_TITLE_CLASS,
         note: copy.groupNotes?.[section.id],
         services: section.treatmentIds.flatMap((id) => {
           const service = servicesById.get(id);
@@ -97,17 +94,25 @@ function buildGroupsForCategory(
     return dedupeSingleServiceGroups(
       COLOR_BOOKING_SECTIONS.flatMap((section) => {
         if (section.subsections) {
-          return section.subsections.map((subsection, index) => ({
-            id: `${section.id}-${subsection.title}`,
-            title: subsection.title,
-            titleClassName: GROUP_TITLE_CLASS,
-            // El texto educativo de color técnico va una sola vez, al primer subgrupo.
-            note: index === 0 ? copy.groupNotes?.[section.id] : undefined,
-            services: subsection.treatmentIds.flatMap((id) => {
-              const service = servicesById.get(id);
-              return service ? [service] : [];
-            }),
-          }));
+          // Color técnico: un concepto por técnica (sin corto / medio / largo).
+          return section.subsections.map((subsection, index) => {
+            const firstId = subsection.treatmentIds[0];
+            const base = firstId ? servicesById.get(firstId) : undefined;
+            if (!base || !firstId) {
+              return { id: `${section.id}-${index}`, services: [] as SalonTreatment[] };
+            }
+            const conceptId = conceptIdFromLengthVariant(firstId);
+            return {
+              id: `${section.id}-${conceptId}`,
+              note: index === 0 ? copy.groupNotes?.[section.id] : undefined,
+              services: [
+                asConceptService(base, {
+                  id: conceptId,
+                  name: subsection.title,
+                }),
+              ],
+            };
+          });
         }
 
         const services = (section.treatmentIds ?? []).flatMap((id) => {
@@ -130,8 +135,6 @@ function buildGroupsForCategory(
         return [
           {
             id: section.id,
-            title: section.title || undefined,
-            titleClassName: section.title ? GROUP_TITLE_CLASS : undefined,
             note: copy.groupNotes?.[section.id],
             services,
           },
@@ -152,14 +155,9 @@ function buildGroupsForCategory(
 
         if (services.length === 0) return [];
 
-        const title =
-          section.id === "terapias" ? "Tratamiento" : section.title || undefined;
-
         return [
           {
             id: section.id,
-            title,
-            titleClassName: title ? GROUP_TITLE_CLASS : undefined,
             note: copy.groupNotes?.[section.id],
             services,
           },
@@ -177,8 +175,6 @@ function buildGroupsForCategory(
 
         return {
           id: group.id,
-          title: group.title,
-          titleClassName: GROUP_TITLE_CLASS,
           imageUrl: group.imageUrl,
           imageObjectPosition: group.imageObjectPosition,
           services: [asConceptService(base, { id: group.id, name: group.title })],
