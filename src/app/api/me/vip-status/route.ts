@@ -4,7 +4,6 @@ import { NextResponse } from "next/server";
 import { canonicalPhoneDigitsAR } from "@/lib/customer/phone-canonical-ar";
 import { CUSTOMER_PROFILE_COOKIE, readCustomerProfilePhoneDigits } from "@/lib/customer/customer-session";
 import { getDb } from "@/lib/mongodb";
-import { verifyPanelCookie } from "@/lib/panel-turnos-auth";
 import { listReservationsByCustomerPhoneDigits } from "@/lib/reservations/customer-queries";
 import { ensureReservationIndexes } from "@/lib/reservations/service";
 import { getVipManualForPhone } from "@/lib/vip/customer-profiles";
@@ -14,25 +13,10 @@ export const dynamic = "force-dynamic";
 
 export async function GET() {
   const cookieStore = await cookies();
-  const panelPreview = verifyPanelCookie(cookieStore.get("panel_turnos_auth")?.value);
-
-  if (panelPreview) {
-    return NextResponse.json({
-      authenticated: true,
-      panelPreview: true,
-      isVip: true,
-      pastVisitCount: VIP_VISIT_THRESHOLD,
-      threshold: VIP_VISIT_THRESHOLD,
-      source: "panel" as const,
-      visitsRemaining: 0,
-    });
-  }
-
   const fromCookie = readCustomerProfilePhoneDigits(cookieStore.get(CUSTOMER_PROFILE_COOKIE)?.value);
   if (!fromCookie) {
     return NextResponse.json({
       authenticated: false,
-      panelPreview: false,
       isVip: false,
       pastVisitCount: 0,
       threshold: VIP_VISIT_THRESHOLD,
@@ -45,7 +29,6 @@ export async function GET() {
   if (!digits) {
     return NextResponse.json({
       authenticated: false,
-      panelPreview: false,
       isVip: false,
       pastVisitCount: 0,
       threshold: VIP_VISIT_THRESHOLD,
@@ -64,7 +47,6 @@ export async function GET() {
 
     return NextResponse.json({
       authenticated: true,
-      panelPreview: false,
       ...status,
     });
   } catch (e) {

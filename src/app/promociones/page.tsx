@@ -11,7 +11,6 @@ import { VIP_VISIT_THRESHOLD } from "@/lib/vip/eligibility";
 
 type VipStatusResponse = {
   authenticated?: boolean;
-  panelPreview?: boolean;
   isVip?: boolean;
   pastVisitCount?: number;
   threshold?: number;
@@ -84,7 +83,7 @@ export default function PromotionsPage() {
   const threshold = status?.threshold ?? VIP_VISIT_THRESHOLD;
   const pastVisitCount = status?.pastVisitCount ?? 0;
   const visitsRemaining = status?.visitsRemaining ?? Math.max(0, threshold - pastVisitCount);
-  const canSeePromos = Boolean(status?.isVip || status?.panelPreview);
+  const canSeePromos = Boolean(status?.isVip);
 
   return (
     <div className="min-h-screen overflow-x-hidden bg-[#f8f6f2] pb-32 text-[#1c1b1b]">
@@ -95,21 +94,6 @@ export default function PromotionsPage() {
             {canSeePromos ? "Combos destacados del mes" : "Acceso exclusivo para clientas VIP"}
           </p>
         </header>
-
-        {status?.panelPreview ? (
-          <div className="mb-5 rounded-2xl border border-[var(--premium-gold-light)]/40 bg-[var(--premium-gold-light)]/10 px-4 py-3 text-center">
-            <p className="text-[12px] font-bold tracking-[0.14em] text-[var(--premium-gold-light)] uppercase">
-              Vista panel
-            </p>
-            <p className="mt-1 text-[13px] text-[#4e463a]">
-              Para previsualizar sin salir del panel usá{" "}
-              <Link href="/panel-turnos/vip" className="font-semibold underline underline-offset-2">
-                Panel → Página VIP
-              </Link>
-              .
-            </p>
-          </div>
-        ) : null}
 
         {loading ? (
           <p className="py-10 text-center text-[15px] text-[#7f7c7a]">Comprobando acceso…</p>
