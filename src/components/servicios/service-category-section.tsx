@@ -71,7 +71,7 @@ export function ServiceCategorySection({
               </h3>
             ) : null}
             {group.note ? (
-              <p className="mb-3 text-[15px] leading-relaxed text-[#7f7c7a]">{group.note}</p>
+              <p className="mb-3 text-[17px] leading-relaxed text-[#7f7c7a]">{group.note}</p>
             ) : null}
             <div className="space-y-0">
               {group.services.map((service, index) => (

@@ -17,7 +17,7 @@ export function ServiceListItem({ service, isLast }: ServiceListItemProps) {
     >
       <h3 className="text-base font-bold text-[#1c1b1b]">{service.name}</h3>
       {description ? (
-        <p className="mt-1.5 text-[15px] leading-relaxed text-[#4e463a]/90">{description}</p>
+        <p className="mt-1.5 text-[17px] leading-relaxed text-[#4e463a]/90">{description}</p>
       ) : null}
       <div className="mt-2.5 flex flex-wrap items-center gap-3">
         <span className="rounded bg-[#efeeea] px-2 py-1 text-sm font-medium text-[#4e463a]">
