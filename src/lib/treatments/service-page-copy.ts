@@ -23,22 +23,16 @@ export const SERVICE_PAGE_CATEGORY_COPY: Record<
 > = {
   "Cortes y peinado": {
     groupNotes: {
-      puntas:
-        "Es cuando mantenemos la línea de corte y solo cortamos las puntas del cabello para oxigenarlo y que crezca.",
-      diseno:
-        "Es cuando cambiamos la línea de corte y hacemos otro diseño. Entre estos diseños podés elegir: Mariposa o Butterfly, Bob, Pixie, entre otros.",
+      // puntas / diseno: texto va en el ítem (grupo de 1 servicio).
       peinados:
         "Novia, quinceañera, egresadas, alisado temporal (plancha) y ondas con buclera o quebradas con plancha.",
     },
   },
   Color: {
     groupNotes: {
-      correccion:
-        "Es cuando hay varios colores y queremos lograr un color uniforme.",
+      // correccion / global: texto va en el ítem (concepto único).
       crecimiento:
-        "Se cubre con el tono deseado solo en el nuevo crecimiento.",
-      global:
-        "Es cuando hacés un tono sobre tu cabello natural, o tu tono artificial está desmerecido.",
+        "Se cubre con el tono deseado solo en el nuevo crecimiento. Incluye cierre técnico y modelado.",
       tecnico:
         "Color técnico: es cuando hay que decolorar para aclarar el cabello. Incluye reflejos con gorra, balayage, air touch, diseño de mechas o decapage (quitar el pigmento artificial para cambiar el tono o matiz).",
     },
@@ -51,59 +45,77 @@ export const SERVICE_PAGE_CATEGORY_COPY: Record<
         "Tratamiento: es cuando reparamos la fibra interna del cabello mediante botox, células madre o lifting.",
       mascaras:
         "Máscaras: es cuando trabajamos en la fibra externa del cabello mediante nutrición, hidratación o reparación.",
-      adicional:
-        "Cirugía Capilar: la herramienta adecuada para cabellos elastizados o sobreprocesados por decoloración o alisados.",
+      // adicional / cirugía: texto va en el ítem.
     },
   },
   "Cambio de estructura": {
-    intro:
-      "Es cuando pasamos de un cabello lacio a rulos permanentes mediante un proceso químico (permanente), o de un cabello ondulado a lacio mediante un proceso químico (alisado).",
+    // Permanente y alisado: un ítem cada uno con su descripción (sin corto/medio/largo).
   },
 };
 
-/** Descripciones educativas para el listado de /servicios (catálogo). */
+/**
+ * Descripciones por servicio en /servicios.
+ * `""` = no mostrar párrafo (el texto educativo ya está en la nota del grupo).
+ * Si el id no está, se usa `service.description` del catálogo.
+ */
 export const SERVICE_EDUCATIONAL_DESCRIPTIONS: Record<string, string> = {
+  // --- Cortes (grupo de 1: texto completo acá) ---
   puntas:
-    "Mantenemos la línea de corte y solo cortamos las puntas del cabello para oxigenarlo y que crezca.",
+    "Es cuando mantenemos la línea de corte y solo cortamos las puntas del cabello para oxigenarlo y que crezca.",
   "diseno-tendencias":
-    "Cambiamos la línea de corte y hacemos otro diseño. Diseños posibles: Mariposa o Butterfly, Bob, Pixie, entre otros.",
-  "peinado-novia-quinceanera": "Peinado para novia o quinceañera.",
-  "peinado-fiesta": "Peinado para fiesta o egresadas.",
-  "peinado-alisado-temporal": "Alisado temporal con plancha.",
-  "peinado-ondas": "Ondas con buclera o quebradas con plancha.",
+    "Es cuando cambiamos la línea de corte y hacemos otro diseño. Entre estos diseños podés elegir: Mariposa o Butterfly, Bob, Pixie, entre otros.",
+  // Peinados: overview en groupNotes
+  "peinado-novia-quinceanera": "",
+  "peinado-fiesta": "",
+  "peinado-alisado-temporal": "",
+  "peinado-ondas": "",
+
+  // --- Color ---
   "correccion-color":
     "Es cuando hay varios colores y queremos lograr un color uniforme. El valor varía según diagnóstico.",
-  "color-crecimiento":
-    "Se cubre con el tono deseado solo en el nuevo crecimiento. Incluye cierre técnico y modelado.",
-  "color-crecimiento-corte-nutricion":
-    "Color en el nuevo crecimiento con corte y nutrición. Incluye cierre técnico y modelado.",
-  "color-global-corto":
-    "Un tono sobre tu cabello natural, o cuando tu tono artificial está desmerecido. Incluye cierre técnico y modelado.",
-  "color-global-medio":
-    "Un tono sobre tu cabello natural, o cuando tu tono artificial está desmerecido. Incluye cierre técnico y modelado.",
-  "color-global-largo":
-    "Un tono sobre tu cabello natural, o cuando tu tono artificial está desmerecido. Incluye cierre técnico y modelado.",
-  "botox-cauterizado":
-    "Tratamiento que repara la fibra interna del cabello. Incluye modelado.",
-  "celulas-madre":
-    "Tratamiento regenerador que repara la fibra interna del cabello. Incluye lavado y modelado.",
-  "lifting-capilar":
-    "Tratamiento que repara y alisa la fibra interna del cabello de forma temporal. Incluye modelado.",
-  "mascara-nutricion": "Máscara que trabaja la fibra externa del cabello con nutrición.",
-  "mascara-hidratacion": "Máscara que trabaja la fibra externa del cabello con hidratación.",
-  "mascara-reparacion": "Máscara que trabaja la fibra externa del cabello con reparación.",
+  "color-crecimiento": "",
+  "color-crecimiento-corte-nutricion": "Con corte y nutrición.",
+  /** Concepto único en /servicios (sin corto/medio/largo). */
+  "color-global":
+    "Es cuando hacés un tono sobre tu cabello natural, o tu tono artificial está desmerecido. Incluye cierre técnico y modelado.",
+  // Técnico: overview en groupNotes; el nombre ya indica la técnica y el largo
+  "mechas-papel-corto": "",
+  "mechas-papel-medio": "",
+  "mechas-papel-largo": "",
+  "balayage-corto": "",
+  "balayage-medio": "",
+  "balayage-largo": "",
+  "air-touch-corto": "",
+  "air-touch-medio": "",
+  "air-touch-largo": "",
+  "reflejos-gorra-corto": "",
+  "reflejos-gorra-medio": "",
+  "reflejos-gorra-largo": "",
+
+  // --- Tratamientos ---
+  "botox-cauterizado": "",
+  "celulas-madre": "Incluye lavado y modelado.",
+  "lifting-capilar": "Alisado temporal de la fibra. Incluye modelado.",
+  "mascara-nutricion": "",
+  "mascara-hidratacion": "",
+  "mascara-reparacion": "",
   "cirugia-capilar":
-    "Ideal para cabellos elastizados o sobreprocesados por decoloración o alisados.",
-  "permanente-corto":
-    "Pasamos de cabello lacio a rulos permanentes mediante un proceso químico.",
-  "permanente-medio":
-    "Pasamos de cabello lacio a rulos permanentes mediante un proceso químico.",
-  "permanente-largo":
-    "Pasamos de cabello lacio a rulos permanentes mediante un proceso químico.",
-  "alisado-vegano-corto":
-    "Pasamos de cabello ondulado a lacio mediante un proceso químico (alisado sin formol).",
-  "alisado-vegano-medio":
-    "Pasamos de cabello ondulado a lacio mediante un proceso químico (alisado sin formol).",
-  "alisado-vegano-largo":
-    "Pasamos de cabello ondulado a lacio mediante un proceso químico (alisado sin formol).",
+    "Cirugía Capilar: la herramienta adecuada para cabellos elastizados o sobreprocesados por decoloración o alisados.",
+
+  // --- Cambio de estructura: concepto único (sin corto/medio/largo) ---
+  permanente:
+    "Es cuando pasamos de un cabello lacio a rulos permanentes mediante un proceso químico.",
+  alisado:
+    "Es cuando pasamos de un cabello ondulado a lacio mediante un proceso químico (alisado vegano sin formol). El valor depende de lo procesado que esté el cabello.",
 };
+
+/** Resuelve el texto a mostrar bajo el nombre del servicio en /servicios. */
+export function resolveServicePageDescription(
+  serviceId: string,
+  catalogDescription: string,
+): string {
+  if (Object.prototype.hasOwnProperty.call(SERVICE_EDUCATIONAL_DESCRIPTIONS, serviceId)) {
+    return SERVICE_EDUCATIONAL_DESCRIPTIONS[serviceId] ?? "";
+  }
+  return catalogDescription;
+}

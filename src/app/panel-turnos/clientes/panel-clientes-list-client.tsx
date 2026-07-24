@@ -2,7 +2,7 @@
 
 import { ChevronLeft, Search, User } from "lucide-react";
 import Link from "next/link";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import {
   panelBackBtn,
@@ -18,6 +18,8 @@ type ClientRow = {
   customerPhone: string;
   visitCount: number;
   lastVisitDateKey: string;
+  isVip?: boolean;
+  vipSource?: "auto" | "manual" | "none";
 };
 
 function formatDateKey(key: string): string {
@@ -32,6 +34,7 @@ export function PanelClientesListClient() {
   const [clients, setClients] = useState<ClientRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [vipOnly, setVipOnly] = useState(false);
 
   useEffect(() => {
     const t = window.setTimeout(() => setDebounced(query.trim()), 280);
@@ -63,6 +66,11 @@ export function PanelClientesListClient() {
     void load(debounced);
   }, [debounced, load]);
 
+  const visibleClients = useMemo(
+    () => (vipOnly ? clients.filter((c) => c.isVip) : clients),
+    [clients, vipOnly],
+  );
+
   return (
     <div className={`${panelPage} bg-[#F0F1F3]`}>
       <div className={`${panelContainer} pt-6`}>
@@ -73,11 +81,11 @@ export function PanelClientesListClient() {
           <div className="min-w-0 flex-1">
             <p className="text-[12px] font-medium uppercase tracking-[0.12em] text-gray-500">Panel</p>
             <h1 className="font-montserrat text-[22px] font-bold leading-tight text-gray-900">Clientes</h1>
-            <p className="mt-1 text-[14px] text-gray-500">Historial y ficha técnica por visita</p>
+            <p className="mt-1 text-[14px] text-gray-500">Historial, VIP y ficha técnica</p>
           </div>
         </header>
 
-        <div className={`${panelCard} p-4`}>
+        <div className={`${panelCard} space-y-3 p-4`}>
           <label htmlFor="panel-clientes-search" className="sr-only">
             Buscar por nombre o WhatsApp
           </label>
@@ -93,6 +101,23 @@ export function PanelClientesListClient() {
               autoComplete="off"
             />
           </div>
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <label className="inline-flex cursor-pointer items-center gap-2 text-[14px] text-gray-700">
+              <input
+                type="checkbox"
+                checked={vipOnly}
+                onChange={(e) => setVipOnly(e.target.checked)}
+                className="h-4 w-4 rounded border-gray-300 text-[#7da3c4] focus:ring-[#7da3c4]"
+              />
+              Solo VIP
+            </label>
+            <Link
+              href="/panel-turnos/vip"
+              className="text-[13px] font-medium text-[#7da3c4] underline-offset-2 hover:underline"
+            >
+              Ver página VIP
+            </Link>
+          </div>
         </div>
 
         <section className="mt-4 space-y-3 pb-8">
@@ -102,12 +127,16 @@ export function PanelClientesListClient() {
             <p role="alert" className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-[15px] text-red-800">
               {error}
             </p>
-          ) : clients.length === 0 ? (
+          ) : visibleClients.length === 0 ? (
             <p className="py-8 text-center text-[15px] text-gray-500">
-              {debounced ? "No hay resultados para esa búsqueda." : "Todavía no hay clientas con turnos registrados."}
+              {vipOnly
+                ? "No hay clientas VIP en esta lista."
+                : debounced
+                  ? "No hay resultados para esa búsqueda."
+                  : "Todavía no hay clientas con turnos registrados."}
             </p>
           ) : (
-            clients.map((c) => (
+            visibleClients.map((c) => (
               <Link
                 key={c.phoneDigits}
                 href={`/panel-turnos/clientes/${encodeURIComponent(c.phoneDigits)}`}
@@ -117,10 +146,19 @@ export function PanelClientesListClient() {
                   <User className="h-6 w-6 text-[#7da3c4]" strokeWidth={1.6} />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="truncate font-montserrat text-[17px] font-semibold text-gray-900">{c.customerName}</p>
+                  <div className="flex items-center gap-2">
+                    <p className="truncate font-montserrat text-[17px] font-semibold text-gray-900">
+                      {c.customerName}
+                    </p>
+                    {c.isVip ? (
+                      <span className="shrink-0 rounded-full bg-[var(--premium-gold-light)]/15 px-2 py-0.5 text-[10px] font-bold tracking-wide text-[var(--premium-gold-light)] uppercase">
+                        VIP{c.vipSource === "manual" ? " · manual" : ""}
+                      </span>
+                    ) : null}
+                  </div>
                   <p className="mt-0.5 truncate text-[14px] text-gray-500">{c.customerPhone}</p>
                   <p className="mt-1 text-[13px] text-gray-400">
-                    {c.visitCount} {c.visitCount === 1 ? "visita" : "visitas"} · última{" "}
+                    {c.visitCount} {c.visitCount === 1 ? "visita realizada" : "visitas realizadas"} · última{" "}
                     {formatDateKey(c.lastVisitDateKey)}
                   </p>
                 </div>

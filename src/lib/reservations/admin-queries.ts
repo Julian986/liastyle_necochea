@@ -2,6 +2,8 @@ import type { Db } from "mongodb";
 
 import { canonicalPhoneDigitsAR, customerPhoneDigitsQueryValues } from "@/lib/customer/phone-canonical-ar";
 import { normalizePhoneDigits } from "@/lib/booking/salon-availability";
+import { getVipManualMapForPhones } from "@/lib/vip/customer-profiles";
+import { resolveVipStatus, type VipSource } from "@/lib/vip/eligibility";
 
 import type { ReservationDoc } from "./types";
 
@@ -19,8 +21,11 @@ export type ClientSummaryRow = {
   phoneDigits: string;
   customerName: string;
   customerPhone: string;
+  /** Visitas realizadas (misma regla que VIP / historial). */
   visitCount: number;
   lastVisitDateKey: string;
+  isVip: boolean;
+  vipSource: VipSource;
 };
 
 type ClientAggregateRow = {
@@ -30,6 +35,47 @@ type ClientAggregateRow = {
   visitCount: number;
   lastVisitDateKey: string;
 };
+
+/** Condición Mongo alineada con `isPastSessionForHistory`. */
+function pastVisitSumExpression(now: Date) {
+  const nowMs = now.getTime();
+  return {
+    $sum: {
+      $cond: [
+        {
+          $or: [
+            { $eq: ["$reservationStatus", "completed"] },
+            {
+              $and: [
+                { $not: { $in: ["$reservationStatus", ["pending_payment", "cancelled", "no_show"]] } },
+                {
+                  $lt: [
+                    {
+                      $add: [
+                        { $toLong: "$startsAt" },
+                        {
+                          $multiply: [
+                            {
+                              $ifNull: ["$durationMinutes", { $ifNull: ["$totalDurationMinutes", 60] }],
+                            },
+                            60_000,
+                          ],
+                        },
+                      ],
+                    },
+                    nowMs,
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+        1,
+        0,
+      ],
+    },
+  };
+}
 
 function buildClientSearchFilter(q: string): Record<string, unknown> | null {
   const trimmed = q.trim();
@@ -84,6 +130,7 @@ export async function listClientsSummary(db: Db, opts?: { q?: string; limit?: nu
     match.$and = [search];
   }
 
+  const now = new Date();
   const rows = await db
     .collection<ReservationDoc>(COLLECTION)
     .aggregate<ClientAggregateRow>([
@@ -94,7 +141,7 @@ export async function listClientsSummary(db: Db, opts?: { q?: string; limit?: nu
           _id: "$customerPhoneDigits",
           customerName: { $first: "$customerName" },
           customerPhone: { $first: "$customerPhone" },
-          visitCount: { $sum: 1 },
+          visitCount: pastVisitSumExpression(now),
           lastVisitDateKey: { $first: "$dateKey" },
         },
       },
@@ -103,13 +150,26 @@ export async function listClientsSummary(db: Db, opts?: { q?: string; limit?: nu
     ])
     .toArray();
 
-  return rows.map((r) => ({
-    phoneDigits: r._id,
-    customerName: r.customerName?.trim() || "Cliente",
-    customerPhone: r.customerPhone?.trim() || r._id,
-    visitCount: r.visitCount,
-    lastVisitDateKey: r.lastVisitDateKey,
-  }));
+  const vipMap = await getVipManualMapForPhones(
+    db,
+    rows.map((r) => r._id),
+  );
+
+  return rows.map((r) => {
+    const phoneDigits = r._id;
+    const canonical = canonicalPhoneDigitsAR(phoneDigits) || phoneDigits;
+    const vipManual = vipMap.get(canonical) ?? vipMap.get(phoneDigits) ?? null;
+    const vip = resolveVipStatus({ pastVisitCount: r.visitCount, vipManual });
+    return {
+      phoneDigits,
+      customerName: r.customerName?.trim() || "Cliente",
+      customerPhone: r.customerPhone?.trim() || r._id,
+      visitCount: r.visitCount,
+      lastVisitDateKey: r.lastVisitDateKey,
+      isVip: vip.isVip,
+      vipSource: vip.source,
+    };
+  });
 }
 
 /** Historial de turnos de una clienta (por teléfono canónico). */

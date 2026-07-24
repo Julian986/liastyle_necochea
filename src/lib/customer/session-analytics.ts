@@ -4,10 +4,10 @@ import type { Db } from "mongodb";
 const COLLECTION = "customer_session_events";
 const DAILY_ACTIVE_COLLECTION = "customer_daily_active_users";
 
-const ALLOWED_SOURCES = new Set(["perfil", "confirmado"]);
+const ALLOWED_SOURCES = new Set(["perfil", "confirmado", "promociones"]);
 const ALLOWED_ACTIVITY_SOURCES = new Set(["turnos", "perfil_home", "mis_turnos", "unknown"]);
 
-export type CustomerSessionEventSource = "perfil" | "confirmado" | "unknown";
+export type CustomerSessionEventSource = "perfil" | "confirmado" | "promociones" | "unknown";
 export type CustomerActivitySource = "turnos" | "perfil_home" | "mis_turnos" | "unknown";
 
 function analyticsSecret(): string {

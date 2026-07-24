@@ -20,6 +20,10 @@ type ClientInfo = {
   customerName: string;
   customerPhone: string;
   visitCount: number;
+  isVip?: boolean;
+  vipSource?: "auto" | "manual" | "none";
+  vipManual?: boolean | null;
+  threshold?: number;
 };
 
 type Props = {
@@ -49,6 +53,8 @@ export function PanelClienteFichaClient({ phoneDigits }: Props) {
   const [draftNote, setDraftNote] = useState("");
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
+  const [vipBusy, setVipBusy] = useState(false);
+  const [vipError, setVipError] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -122,7 +128,55 @@ export function PanelClienteFichaClient({ phoneDigits }: Props) {
     }
   }
 
+  async function updateVip(vipManual: true | null) {
+    setVipBusy(true);
+    setVipError(null);
+    try {
+      const res = await fetch(`/api/panel-turnos/clientes/${encodeURIComponent(phoneDigits)}/vip`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        credentials: "same-origin",
+        body: JSON.stringify({ vipManual }),
+      });
+      const data = (await res.json()) as {
+        error?: string;
+        pastVisitCount?: number;
+        isVip?: boolean;
+        vipSource?: "auto" | "manual" | "none";
+        vipManual?: boolean | null;
+        threshold?: number;
+      };
+      if (!res.ok) {
+        setVipError(data.error ?? "No se pudo actualizar el VIP.");
+        return;
+      }
+      setClient((prev) =>
+        prev
+          ? {
+              ...prev,
+              visitCount: data.pastVisitCount ?? prev.visitCount,
+              isVip: data.isVip,
+              vipSource: data.vipSource,
+              vipManual: data.vipManual ?? null,
+              threshold: data.threshold ?? prev.threshold,
+            }
+          : prev,
+      );
+    } catch {
+      setVipError("Sin conexión. Probá de nuevo.");
+    } finally {
+      setVipBusy(false);
+    }
+  }
+
   const waUrl = client ? whatsAppChatUrl(client.customerPhone) : null;
+  const threshold = client?.threshold ?? 10;
+  const vipLabel =
+    client?.vipSource === "manual"
+      ? "VIP manual"
+      : client?.vipSource === "auto"
+        ? "VIP automático"
+        : "Aún no es VIP";
 
   return (
     <div className={`${panelPage} bg-[#F0F1F3]`}>
@@ -140,7 +194,7 @@ export function PanelClienteFichaClient({ phoneDigits }: Props) {
                 <h1 className="font-montserrat text-[22px] font-bold leading-tight text-gray-900">{client.customerName}</h1>
                 <p className="mt-1 text-[14px] text-gray-500">{client.customerPhone}</p>
                 <p className="mt-1 text-[13px] text-gray-400">
-                  {client.visitCount} {client.visitCount === 1 ? "visita" : "visitas"} registradas
+                  {client.visitCount} {client.visitCount === 1 ? "visita realizada" : "visitas realizadas"}
                 </p>
               </>
             ) : (
@@ -167,8 +221,57 @@ export function PanelClienteFichaClient({ phoneDigits }: Props) {
           <p role="alert" className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-[15px] text-red-800">
             {error}
           </p>
-        ) : (
+        ) : client ? (
           <section className="space-y-4 pb-10">
+            <article className={`${panelCard} p-4`}>
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <div>
+                  <p className="text-[12px] font-semibold tracking-wide text-gray-500 uppercase">Cliente VIP</p>
+                  <p className="mt-1 font-montserrat text-[17px] font-semibold text-gray-900">{vipLabel}</p>
+                  <p className="mt-1 text-[14px] text-gray-600">
+                    {client.visitCount} / {threshold} visitas realizadas
+                  </p>
+                </div>
+                <Link
+                  href="/panel-turnos/vip"
+                  className="text-[13px] font-medium text-[#7da3c4] underline-offset-2 hover:underline"
+                >
+                  Ver página VIP
+                </Link>
+              </div>
+              {vipError ? (
+                <p role="alert" className="mt-3 text-[14px] text-red-700">
+                  {vipError}
+                </p>
+              ) : null}
+              <div className="mt-4 flex flex-col gap-2 sm:flex-row">
+                {client.vipManual === true ? (
+                  <button
+                    type="button"
+                    disabled={vipBusy}
+                    onClick={() => void updateVip(null)}
+                    className="flex h-11 flex-1 cursor-pointer items-center justify-center rounded-full border border-gray-200 bg-white text-[14px] font-medium text-gray-700 disabled:opacity-60"
+                  >
+                    {vipBusy ? "Guardando…" : "Usar regla automática"}
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    disabled={vipBusy || client.isVip}
+                    onClick={() => void updateVip(true)}
+                    className={`${panelPrimaryBtn} h-11 flex-1 text-[14px] disabled:opacity-60`}
+                  >
+                    {vipBusy ? "Guardando…" : client.isVip ? "Ya es VIP automática" : "Marcar VIP"}
+                  </button>
+                )}
+              </div>
+              {client.vipManual !== true && client.isVip ? (
+                <p className="mt-2 text-[12px] text-gray-500">
+                  Alcanzó el umbral de {threshold} visitas. No hace falta marcarla a mano.
+                </p>
+              ) : null}
+            </article>
+
             <p className="text-[13px] font-semibold tracking-wide text-gray-500 uppercase">Historial de visitas</p>
 
             {visits.map((visit) => {
@@ -251,7 +354,7 @@ export function PanelClienteFichaClient({ phoneDigits }: Props) {
               );
             })}
           </section>
-        )}
+        ) : null}
       </div>
     </div>
   );

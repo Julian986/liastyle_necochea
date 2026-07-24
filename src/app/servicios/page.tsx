@@ -22,10 +22,55 @@ import {
   SERVICE_PAGE_CATEGORY_COPY,
   SERVICE_PAGE_INTRO_LINES,
   SERVICE_PAGE_VIP_HIGHLIGHT,
+  resolveServicePageDescription,
 } from "@/lib/treatments/service-page-copy";
 
 const GROUP_TITLE_CLASS =
   "mb-1 text-[11px] font-semibold tracking-[0.14em] text-[var(--premium-gold-light)] uppercase";
+
+function titlesMatch(a: string | undefined, b: string): boolean {
+  if (!a) return false;
+  return a.trim().toLowerCase() === b.trim().toLowerCase();
+}
+
+/** Unifica variantes corto/medio/largo en un solo ítem de catálogo para /servicios. */
+function asConceptService(
+  base: SalonTreatment,
+  opts: { id: string; name: string },
+): SalonTreatment {
+  return {
+    ...base,
+    id: opts.id,
+    name: opts.name,
+    description: "",
+  };
+}
+
+/**
+ * En grupos de un solo servicio: evita título duplicado (grupo = ítem)
+ * y deja una sola descripción (la más completa).
+ */
+function dedupeSingleServiceGroups(groups: ServiceDisplayGroup[]): ServiceDisplayGroup[] {
+  return groups.map((group) => {
+    if (group.services.length !== 1) return group;
+
+    const service = group.services[0];
+    const itemDescription = resolveServicePageDescription(service.id, service.description).trim();
+    const note = group.note?.trim() ?? "";
+    const bestDescription =
+      note.length > itemDescription.length ? note : itemDescription || note;
+
+    return {
+      ...group,
+      title: titlesMatch(group.title, service.name) ? undefined : group.title,
+      titleClassName: titlesMatch(group.title, service.name) ? undefined : group.titleClassName,
+      note: undefined,
+      services: bestDescription
+        ? [{ ...service, description: bestDescription }]
+        : [service],
+    };
+  });
+}
 
 function buildGroupsForCategory(
   category: TreatmentCategory,
@@ -34,91 +79,112 @@ function buildGroupsForCategory(
   const copy = SERVICE_PAGE_CATEGORY_COPY[category];
 
   if (category === "Cortes y peinado") {
-    return CORTES_PEINADO_DISPLAY_SECTIONS.map((section) => ({
-      id: section.id,
-      title: section.title,
-      titleClassName: GROUP_TITLE_CLASS,
-      note: copy.groupNotes?.[section.id],
-      services: section.treatmentIds.flatMap((id) => {
-        const service = servicesById.get(id);
-        return service ? [service] : [];
-      }),
-    })).filter((group) => group.services.length > 0);
+    return dedupeSingleServiceGroups(
+      CORTES_PEINADO_DISPLAY_SECTIONS.map((section) => ({
+        id: section.id,
+        title: section.title,
+        titleClassName: GROUP_TITLE_CLASS,
+        note: copy.groupNotes?.[section.id],
+        services: section.treatmentIds.flatMap((id) => {
+          const service = servicesById.get(id);
+          return service ? [service] : [];
+        }),
+      })).filter((group) => group.services.length > 0),
+    );
   }
 
   if (category === "Color") {
-    return COLOR_BOOKING_SECTIONS.flatMap((section) => {
-      if (section.subsections) {
-        return section.subsections.map((subsection, index) => ({
-          id: `${section.id}-${subsection.title}`,
-          title: subsection.title,
-          titleClassName: GROUP_TITLE_CLASS,
-          // El texto educativo de color técnico va una sola vez, al primer subgrupo.
-          note: index === 0 ? copy.groupNotes?.[section.id] : undefined,
-          services: subsection.treatmentIds.flatMap((id) => {
-            const service = servicesById.get(id);
-            return service ? [service] : [];
-          }),
-        }));
-      }
+    return dedupeSingleServiceGroups(
+      COLOR_BOOKING_SECTIONS.flatMap((section) => {
+        if (section.subsections) {
+          return section.subsections.map((subsection, index) => ({
+            id: `${section.id}-${subsection.title}`,
+            title: subsection.title,
+            titleClassName: GROUP_TITLE_CLASS,
+            // El texto educativo de color técnico va una sola vez, al primer subgrupo.
+            note: index === 0 ? copy.groupNotes?.[section.id] : undefined,
+            services: subsection.treatmentIds.flatMap((id) => {
+              const service = servicesById.get(id);
+              return service ? [service] : [];
+            }),
+          }));
+        }
 
-      const services = (section.treatmentIds ?? []).flatMap((id) => {
-        const service = servicesById.get(id);
-        return service ? [service] : [];
-      });
+        const services = (section.treatmentIds ?? []).flatMap((id) => {
+          const service = servicesById.get(id);
+          return service ? [service] : [];
+        });
 
-      if (services.length === 0) return [];
+        if (services.length === 0) return [];
 
-      return [
-        {
-          id: section.id,
-          title: section.title || undefined,
-          titleClassName: section.title ? GROUP_TITLE_CLASS : undefined,
-          note: copy.groupNotes?.[section.id],
-          services,
-        },
-      ];
-    }).filter((group) => group.services.length > 0);
+        // Color global: un solo concepto (sin corto / medio / largo).
+        if (section.id === "global") {
+          return [
+            {
+              id: section.id,
+              services: [asConceptService(services[0], { id: "color-global", name: "Color global" })],
+            },
+          ];
+        }
+
+        return [
+          {
+            id: section.id,
+            title: section.title || undefined,
+            titleClassName: section.title ? GROUP_TITLE_CLASS : undefined,
+            note: copy.groupNotes?.[section.id],
+            services,
+          },
+        ];
+      }).filter((group) => group.services.length > 0),
+    );
   }
 
   if (category === "Tratamientos") {
-    return TRATAMIENTOS_BOOKING_SECTIONS.flatMap((section) => {
-      const services = (section.treatmentIds ?? []).flatMap((id) => {
-        const service = servicesById.get(id);
-        if (!service) return [];
-        const shortName = MASCARA_BOOKING_LABELS[id];
-        return shortName ? [{ ...service, name: shortName }] : [service];
-      });
+    return dedupeSingleServiceGroups(
+      TRATAMIENTOS_BOOKING_SECTIONS.flatMap((section) => {
+        const services = (section.treatmentIds ?? []).flatMap((id) => {
+          const service = servicesById.get(id);
+          if (!service) return [];
+          const shortName = MASCARA_BOOKING_LABELS[id];
+          return shortName ? [{ ...service, name: shortName }] : [service];
+        });
 
-      if (services.length === 0) return [];
+        if (services.length === 0) return [];
 
-      const title =
-        section.id === "terapias" ? "Tratamiento" : section.title || undefined;
+        const title =
+          section.id === "terapias" ? "Tratamiento" : section.title || undefined;
 
-      return [
-        {
-          id: section.id,
-          title,
-          titleClassName: title ? GROUP_TITLE_CLASS : undefined,
-          note: copy.groupNotes?.[section.id],
-          services,
-        },
-      ];
-    }).filter((group) => group.services.length > 0);
+        return [
+          {
+            id: section.id,
+            title,
+            titleClassName: title ? GROUP_TITLE_CLASS : undefined,
+            note: copy.groupNotes?.[section.id],
+            services,
+          },
+        ];
+      }).filter((group) => group.services.length > 0),
+    );
   }
 
   if (category === "Cambio de estructura") {
-    return CAMBIO_ESTRUCTURA_DISPLAY_GROUPS.map((group) => ({
-      id: group.id,
-      title: group.title,
-      titleClassName: GROUP_TITLE_CLASS,
-      imageUrl: group.imageUrl,
-      imageObjectPosition: group.imageObjectPosition,
-      services: group.treatmentIds.flatMap((id) => {
-        const service = servicesById.get(id);
-        return service ? [service] : [];
-      }),
-    })).filter((group) => group.services.length > 0);
+    return dedupeSingleServiceGroups(
+      CAMBIO_ESTRUCTURA_DISPLAY_GROUPS.map((group) => {
+        const firstId = group.treatmentIds[0];
+        const base = firstId ? servicesById.get(firstId) : undefined;
+        if (!base) return { id: group.id, services: [] as SalonTreatment[] };
+
+        return {
+          id: group.id,
+          title: group.title,
+          titleClassName: GROUP_TITLE_CLASS,
+          imageUrl: group.imageUrl,
+          imageObjectPosition: group.imageObjectPosition,
+          services: [asConceptService(base, { id: group.id, name: group.title })],
+        };
+      }).filter((group) => group.services.length > 0),
+    );
   }
 
   const services = SALON_TREATMENTS.filter((service) => service.category === category);
