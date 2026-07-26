@@ -34,7 +34,7 @@ export async function createCheckoutProPreference(
   const body: PreferenceBody = {
     items: [
       {
-        title: `Seña reserva · ${reservation.treatmentName}`,
+        title: `Reserva · ${reservation.treatmentName}`,
         quantity: 1,
         unit_price: amount,
         currency_id: "ARS",

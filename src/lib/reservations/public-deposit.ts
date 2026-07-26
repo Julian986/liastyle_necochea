@@ -1,6 +1,6 @@
 /**
- * Seña en reserva pública: cortes básicos y peinados simples sin seña.
- * En combos, si algún servicio exige seña, el turno completo va por Mercado Pago.
+ * Pago online en reserva pública: cortes básicos y peinados simples sin cobro online.
+ * En combos, si algún servicio exige pago, el turno completo va por Mercado Pago (total).
  */
 const NO_DEPOSIT_IDS = new Set([
   "diseno-tendencias",

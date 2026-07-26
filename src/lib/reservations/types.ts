@@ -71,7 +71,7 @@ export type ReservationDoc = {
   mpPaymentStatusLast?: string | null;
   mpPaymentApprovedAt?: Date | null;
   paymentDeadlineAt?: Date | null;
-  /** Seña (20% del precio base); cobro online vía Mercado Pago cuando aplica. */
+  /** Monto cobrado online vía Mercado Pago (total del servicio/combo cuando aplica). */
   depositAmountArs?: number;
   depositRate?: number;
   /** True si el precio base del servicio/combo es “desde”. */

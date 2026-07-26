@@ -61,7 +61,7 @@ export const SALON_TREATMENTS: SalonTreatment[] = [
     durationLabel: "45 min",
     durationMinutes: 45,
     // priceFromArs: 30000, // precio real (restaurar después de prueba MP)
-    priceFromArs: 30, // TEMP prueba MP → seña 20% = $6
+    priceFromArs: 30, // TEMP prueba MP → total a cobrar = $30
     imageUrl: IMG.corte,
   },
   // Combos de corte fuera del menú (Analia, jul 2026): ver ARCHIVED_CORTE_COMBO_TREATMENTS abajo.

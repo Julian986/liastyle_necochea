@@ -1,7 +1,7 @@
 # Checklist manual — Mercado Pago Checkout Pro + reservas
 
 1. **Variables (producción / Vercel)**: `MONGODB_URI`, `MERCADOPAGO_ACCESS_TOKEN`, `APP_BASE_URL` (HTTPS público del dominio), `PENDING_RESERVATION_TTL_MINUTES`, `CRON_SECRET`.  
-   Opcional: `MERCADOPAGO_DEPOSIT_AMOUNT_ARS` solo como fallback si una reserva vieja no tiene `depositAmountArs` (la seña normal es el **20%** guardado en la reserva).
+   Opcional: `MERCADOPAGO_DEPOSIT_AMOUNT_ARS` solo como fallback si una reserva vieja no tiene `depositAmountArs` (lo normal es el **total** del servicio guardado en la reserva).
 
 2. **Crear pendiente**: `POST /api/reservations/pending` con datos de turno válidos → respuesta con `id`, `checkoutToken`, `paymentDeadlineAt`; en Mongo la reserva debe quedar `pending_payment` y `paymentStatus: pending`.
 

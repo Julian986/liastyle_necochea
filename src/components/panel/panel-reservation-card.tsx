@@ -74,7 +74,7 @@ function reservationStatusChip(
   }
   if (reservationStatus === "pending_payment") {
     return {
-      badge: "Esperando seña",
+      badge: "Esperando pago",
       badgeClass: "bg-amber-50 text-amber-800 ring-1 ring-amber-200",
       showCheck: false,
     };
@@ -128,7 +128,7 @@ function paymentStatusChip(paymentStatus: string): {
       };
     case "not_required":
       return {
-        badge: "Pago: sin seña",
+        badge: "Pago: no requerido",
         badgeClass: "bg-gray-100 text-gray-700",
       };
     default:

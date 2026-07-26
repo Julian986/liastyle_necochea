@@ -83,7 +83,7 @@ export function BookingCategoryStep({
           ) : null}
           {depositSummary && depositSummary.depositAmountArs > 0 ? (
             <p className="mt-1.5 text-[12px] font-medium text-[#1c1b1b]">
-              Seña 20%: {depositSummary.priceIsFrom ? "desde " : ""}
+              Total: {depositSummary.priceIsFrom ? "desde " : ""}
               {formatArs(depositSummary.depositAmountArs)}
             </p>
           ) : null}
@@ -114,7 +114,7 @@ export function BookingCategoryStep({
         </div>
       ) : (
         <p className="px-0.5 text-[12px] leading-snug text-[#7f7c7a]">
-          Para reservar se solicita una seña del 20% del valor del servicio, abonada con Mercado Pago.
+          En la mayoría de los servicios, para reservar se abona el valor con Mercado Pago.
         </p>
       )}
 

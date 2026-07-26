@@ -744,28 +744,26 @@ export default function TurnosClient({ initialTreatment = "" }: TurnosClientProp
                 >
                   <p className="text-[11px] tracking-[0.14em] text-[#7f7c7a]">Paso 5</p>
                   <p className="mt-1 font-heading text-[18px] text-[#1c1b1b]">
-                    {requiresDeposit ? "Seña con Mercado Pago" : "Confirmar turno"}
+                    {requiresDeposit ? "Pagar con Mercado Pago" : "Confirmar turno"}
                   </p>
                   <p className="mt-1 text-[12px] text-[#7f7c7a]">
                     {requiresDeposit
-                      ? "Para reservar el horario abonás la seña del 20% con Mercado Pago. El turno se confirma al acreditar el pago."
-                      : "Este servicio se reserva sin seña. Te enviamos recordatorio por WhatsApp antes del turno."}
+                      ? "Para reservar el horario abonás el valor del servicio con Mercado Pago. El turno se confirma al acreditar el pago."
+                      : "Este servicio se reserva sin pago online. Te enviamos recordatorio por WhatsApp antes del turno."}
                   </p>
                   {requiresDeposit && depositSummary && depositSummary.depositAmountArs > 0 ? (
                     <div className="mt-3 rounded-xl border border-[var(--premium-gold-light)]/25 bg-[var(--premium-gold-light)]/8 px-3 py-3">
                       <p className="text-[10px] font-bold tracking-[0.12em] text-[var(--premium-gold-light)] uppercase">
-                        Seña para reservar
+                        Total a pagar
                       </p>
                       <p className="mt-1 font-heading text-[22px] font-semibold text-[#1c1b1b]">
                         {depositSummary.priceIsFrom ? "Desde " : ""}
                         {formatArs(depositSummary.depositAmountArs)}
                       </p>
                       <p className="mt-1 text-[11px] leading-snug text-[#7f7c7a]">
-                        20%
-                        {depositSummary.priceIsFrom
-                          ? ` sobre el valor desde ${formatArs(depositSummary.priceFromArs)}`
-                          : ` de ${formatArs(depositSummary.priceFromArs)}`}
-                        . Te redirigimos a Mercado Pago para abonarla.
+                        Te redirigimos a Mercado Pago para abonar
+                        {depositSummary.priceIsFrom ? " el valor desde indicado" : " el total"}
+                        .
                       </p>
                     </div>
                   ) : null}
@@ -774,7 +772,7 @@ export default function TurnosClient({ initialTreatment = "" }: TurnosClientProp
                       <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[var(--premium-gold-light)]" />
                       <span>
                         {requiresDeposit
-                          ? "Pagá la seña: te llevamos a Mercado Pago"
+                          ? "Pagá el total: te llevamos a Mercado Pago"
                           : "Confirmá para agendar tu turno"}
                       </span>
                     </div>
@@ -808,7 +806,7 @@ export default function TurnosClient({ initialTreatment = "" }: TurnosClientProp
                             ? "Preparando pago…"
                             : "Confirmando…"
                           : requiresDeposit
-                            ? "Pagar seña con Mercado Pago"
+                            ? "Pagar con Mercado Pago"
                             : "Confirmar reserva"}
                       </span>
                     </button>
