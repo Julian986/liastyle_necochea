@@ -22,6 +22,21 @@ type ServiceCategorySectionProps = {
   intro?: ReactNode;
 };
 
+/** Resalta la etiqueta inicial (ej. "Tratamiento:", "Máscaras:"). */
+function ServiceGroupNote({ note }: { note: string }) {
+  const match = /^([^:]{1,40}:)\s*([\s\S]*)$/.exec(note.trim());
+  if (!match) {
+    return <p className="mb-3 text-[17px] leading-relaxed text-[#7f7c7a]">{note}</p>;
+  }
+
+  return (
+    <p className="mb-3 text-[17px] leading-relaxed text-[#7f7c7a]">
+      <span className="text-[19px] font-bold text-[#1c1b1b]">{match[1]}</span>
+      {match[2] ? <> {match[2]}</> : null}
+    </p>
+  );
+}
+
 export function ServiceCategorySection({
   anchorId,
   sectionTitle,
@@ -70,9 +85,7 @@ export function ServiceCategorySection({
                 {group.title}
               </h3>
             ) : null}
-            {group.note ? (
-              <p className="mb-3 text-[17px] leading-relaxed text-[#7f7c7a]">{group.note}</p>
-            ) : null}
+            {group.note ? <ServiceGroupNote note={group.note} /> : null}
             <div className="space-y-0">
               {group.services.map((service, index) => (
                 <ServiceListItem

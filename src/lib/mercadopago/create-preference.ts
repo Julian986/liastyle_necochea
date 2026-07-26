@@ -16,11 +16,19 @@ type PreferenceBody = {
   auto_return?: string;
 };
 
+function resolvePreferenceAmountArs(reservation: ReservationDoc): number {
+  const fromReservation = reservation.depositAmountArs;
+  if (typeof fromReservation === "number" && Number.isFinite(fromReservation) && fromReservation > 0) {
+    return Math.round(fromReservation);
+  }
+  return getDepositAmountArs();
+}
+
 export async function createCheckoutProPreference(
   reservation: ReservationDoc,
 ): Promise<{ ok: true; preference: PreferenceResponse } | { ok: false; error: string }> {
   const base = getAppBaseUrl();
-  const amount = getDepositAmountArs();
+  const amount = resolvePreferenceAmountArs(reservation);
   const ext = reservation.externalReference ?? reservation._id.toHexString();
 
   const body: PreferenceBody = {

@@ -45,11 +45,11 @@ function ServiceLineIcon({ category, muted }: { category: string; muted?: boolea
   return <Sparkles className={cls} strokeWidth={1.85} />;
 }
 
-function statusChip(
+function reservationStatusChip(
   reservation: PanelReservation,
   inProgress: boolean,
 ): { badge: string; badgeClass: string; showCheck: boolean; detail?: string | null } {
-  const { reservationStatus, paymentStatus, cancelledBy } = reservation;
+  const { reservationStatus, cancelledBy } = reservation;
 
   if (reservationStatus === "cancelled") {
     const detail =
@@ -72,10 +72,24 @@ function statusChip(
       showCheck: false,
     };
   }
-  if (reservationStatus === "pending_payment" || paymentStatus === "pending") {
+  if (reservationStatus === "pending_payment") {
     return {
-      badge: "Pendiente de pago",
+      badge: "Esperando seña",
       badgeClass: "bg-amber-50 text-amber-800 ring-1 ring-amber-200",
+      showCheck: false,
+    };
+  }
+  if (reservationStatus === "completed") {
+    return {
+      badge: "Realizada",
+      badgeClass: "bg-sky-50 text-sky-800 ring-1 ring-sky-200",
+      showCheck: true,
+    };
+  }
+  if (reservationStatus === "no_show") {
+    return {
+      badge: "No asistió",
+      badgeClass: "bg-orange-50 text-orange-800 ring-1 ring-orange-200",
       showCheck: false,
     };
   }
@@ -86,6 +100,45 @@ function statusChip(
   };
 }
 
+function paymentStatusChip(paymentStatus: string): {
+  badge: string;
+  badgeClass: string;
+} {
+  switch (paymentStatus) {
+    case "approved":
+    case "simulated_paid":
+      return {
+        badge: "Pago: pagado",
+        badgeClass: "bg-emerald-50 text-emerald-800 ring-1 ring-emerald-200",
+      };
+    case "pending":
+      return {
+        badge: "Pago: pendiente",
+        badgeClass: "bg-amber-50 text-amber-800 ring-1 ring-amber-200",
+      };
+    case "failed":
+      return {
+        badge: "Pago: fallido",
+        badgeClass: "bg-red-50 text-red-800 ring-1 ring-red-200",
+      };
+    case "refunded":
+      return {
+        badge: "Pago: reembolsado",
+        badgeClass: "bg-purple-50 text-purple-800 ring-1 ring-purple-200",
+      };
+    case "not_required":
+      return {
+        badge: "Pago: sin seña",
+        badgeClass: "bg-gray-100 text-gray-700",
+      };
+    default:
+      return {
+        badge: `Pago: ${paymentStatus || "—"}`,
+        badgeClass: "bg-gray-100 text-gray-700",
+      };
+  }
+}
+
 export const PanelReservationCard = forwardRef<HTMLElement, PanelReservationCardProps>(
   function PanelReservationCard(
     { reservation: r, selectedDateKey, whatsAppUrl, onRequestCancel, cancelDisabled = false },
@@ -93,7 +146,8 @@ export const PanelReservationCard = forwardRef<HTMLElement, PanelReservationCard
   ) {
     const focused = isReservationTimeFocused(r.timeLocal, selectedDateKey);
     const inProgress = isReservationInProgress(r.timeLocal, r.treatmentId, selectedDateKey);
-    const chip = statusChip(r, inProgress);
+    const chip = reservationStatusChip(r, inProgress);
+    const payChip = paymentStatusChip(r.paymentStatus);
     const duration = panelDurationLabel(r.treatmentName, r.category);
     const customerName = r.customerName.trim() || "Cliente";
     const canManage = r.reservationStatus === "confirmed" || r.reservationStatus === "pending_payment";
@@ -169,7 +223,7 @@ export const PanelReservationCard = forwardRef<HTMLElement, PanelReservationCard
             </Link>
           ) : null}
 
-          <div className="mt-3">
+          <div className="mt-3 flex flex-wrap items-center gap-2">
             <span
               className={[
                 "inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[13px] font-semibold",
@@ -179,10 +233,18 @@ export const PanelReservationCard = forwardRef<HTMLElement, PanelReservationCard
               {chip.showCheck ? <Check className="h-3.5 w-3.5 shrink-0" strokeWidth={2.5} /> : null}
               {chip.badge}
             </span>
-            {chip.detail ? (
-              <p className="mt-1.5 text-[11px] font-medium text-gray-500">{chip.detail}</p>
-            ) : null}
+            <span
+              className={[
+                "inline-flex items-center rounded-full px-3 py-1.5 text-[13px] font-semibold",
+                payChip.badgeClass,
+              ].join(" ")}
+            >
+              {payChip.badge}
+            </span>
           </div>
+          {chip.detail ? (
+            <p className="mt-1.5 text-[11px] font-medium text-gray-500">{chip.detail}</p>
+          ) : null}
         </div>
 
         {canManage ? (

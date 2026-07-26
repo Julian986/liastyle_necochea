@@ -105,7 +105,7 @@ export default async function TurnoConfirmadoPage({ searchParams }: ConfirmPageP
                       depositPriceIsFrom ? " orientativo" : ""
                     })`
                   : ""}
-                . La seña se abona por fuera de la app.
+                . La seña se abona con Mercado Pago al reservar.
               </p>
             </div>
           ) : null}

@@ -1,4 +1,4 @@
-/** Seña pública informativa (sin cobro online por ahora). */
+/** Seña pública (20%). En servicios con seña se cobra online vía Mercado Pago. */
 
 export const PUBLIC_DEPOSIT_RATE = 0.2;
 

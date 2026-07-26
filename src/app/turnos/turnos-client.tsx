@@ -18,6 +18,7 @@ import {
   formatSalonDisplayDate,
   isLikelyWhatsappNumber,
 } from "@/lib/booking/salon-availability";
+import { treatmentRequiresPublicDeposit } from "@/lib/reservations/public-deposit";
 import { findSalonTreatmentById } from "@/lib/treatments/catalog";
 import type { TreatmentCategory } from "@/lib/treatments/catalog";
 import { formatArs, summarizeDepositForTreatments } from "@/lib/treatments/deposit";
@@ -119,6 +120,7 @@ export default function TurnosClient({ initialTreatment = "" }: TurnosClientProp
     return summarizeDepositForTreatments(treatments);
   }, [selectedServiceIds]);
   const primaryService = selectedServices[0];
+  const requiresDeposit = selectedServices.some((s) => treatmentRequiresPublicDeposit(s.id));
 
   const hasSlot = Boolean(selectedServices.length > 0 && selectedDate && selectedTime);
   const datosComplete = Boolean(
@@ -436,13 +438,51 @@ export default function TurnosClient({ initialTreatment = "" }: TurnosClientProp
         return;
       }
 
-      gaEvent("reservation_confirmed_no_deposit", {
-        treatment_id: primaryService.id,
-        treatment_name: selectedServicesSummary,
-        date_key: selectedDate,
-        time_local: selectedTime,
+      // Sin seña online: confirmación directa.
+      if (dataPending.bookingMode === "confirmed") {
+        gaEvent("reservation_confirmed_no_deposit", {
+          treatment_id: primaryService.id,
+          treatment_name: selectedServicesSummary,
+          date_key: selectedDate,
+          time_local: selectedTime,
+        });
+        const qs = new URLSearchParams({
+          treatment: selectedServicesSummary,
+          subtitle: `${selectedServices.length} servicio${selectedServices.length === 1 ? "" : "s"} combinados`,
+          date: formatSalonDisplayDate(selectedDate),
+          time: selectedTime,
+          name: customerName.trim(),
+          phone: customerPhone.trim(),
+          id: dataPending.id,
+        });
+        window.location.href = `/turnos/confirmado?${qs.toString()}`;
+        return;
+      }
+
+      if (!dataPending.checkoutToken) {
+        setConfirmError("Respuesta inválida del servidor.");
+        return;
+      }
+
+      const resPref = await fetch("/api/mercadopago/preferences", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          reservationId: dataPending.id,
+          checkoutToken: dataPending.checkoutToken,
+        }),
       });
-      const qs = new URLSearchParams({
+      const dataPref = (await resPref.json()) as { error?: string; initPoint?: string };
+      if (!resPref.ok) {
+        setConfirmError(dataPref.error ?? "No se pudo iniciar Mercado Pago.");
+        return;
+      }
+      if (!dataPref.initPoint) {
+        setConfirmError("Mercado Pago no devolvió el enlace de pago.");
+        return;
+      }
+
+      const snapshot = {
         treatment: selectedServicesSummary,
         subtitle: `${selectedServices.length} servicio${selectedServices.length === 1 ? "" : "s"} combinados`,
         date: formatSalonDisplayDate(selectedDate),
@@ -450,13 +490,15 @@ export default function TurnosClient({ initialTreatment = "" }: TurnosClientProp
         name: customerName.trim(),
         phone: customerPhone.trim(),
         id: dataPending.id,
+      };
+      sessionStorage.setItem("mp_turno_snapshot", JSON.stringify(snapshot));
+      gaEvent("reservation_checkout_start", {
+        treatment_id: primaryService.id,
+        treatment_name: selectedServicesSummary,
+        date_key: selectedDate,
+        time_local: selectedTime,
       });
-      if (depositSummary) {
-        qs.set("deposit", String(depositSummary.depositAmountArs));
-        qs.set("depositFrom", depositSummary.priceIsFrom ? "1" : "0");
-        qs.set("price", String(depositSummary.priceFromArs));
-      }
-      window.location.href = `/turnos/confirmado?${qs.toString()}`;
+      window.location.href = dataPref.initPoint;
     } catch {
       setConfirmError("Sin conexión o error de red. Probá de nuevo.");
     } finally {
@@ -701,11 +743,15 @@ export default function TurnosClient({ initialTreatment = "" }: TurnosClientProp
                   className={`${lightCard} px-4 py-4 transition-all ${activeStep === 5 ? lightCardActive : ""}`}
                 >
                   <p className="text-[11px] tracking-[0.14em] text-[#7f7c7a]">Paso 5</p>
-                  <p className="mt-1 font-heading text-[18px] text-[#1c1b1b]">Confirmar turno</p>
-                  <p className="mt-1 text-[12px] text-[#7f7c7a]">
-                    Te enviamos recordatorio por WhatsApp antes del turno.
+                  <p className="mt-1 font-heading text-[18px] text-[#1c1b1b]">
+                    {requiresDeposit ? "Seña con Mercado Pago" : "Confirmar turno"}
                   </p>
-                  {depositSummary && depositSummary.depositAmountArs > 0 ? (
+                  <p className="mt-1 text-[12px] text-[#7f7c7a]">
+                    {requiresDeposit
+                      ? "Para reservar el horario abonás la seña del 20% con Mercado Pago. El turno se confirma al acreditar el pago."
+                      : "Este servicio se reserva sin seña. Te enviamos recordatorio por WhatsApp antes del turno."}
+                  </p>
+                  {requiresDeposit && depositSummary && depositSummary.depositAmountArs > 0 ? (
                     <div className="mt-3 rounded-xl border border-[var(--premium-gold-light)]/25 bg-[var(--premium-gold-light)]/8 px-3 py-3">
                       <p className="text-[10px] font-bold tracking-[0.12em] text-[var(--premium-gold-light)] uppercase">
                         Seña para reservar
@@ -719,21 +765,30 @@ export default function TurnosClient({ initialTreatment = "" }: TurnosClientProp
                         {depositSummary.priceIsFrom
                           ? ` sobre el valor desde ${formatArs(depositSummary.priceFromArs)}`
                           : ` de ${formatArs(depositSummary.priceFromArs)}`}
-                        . Para reservar se solicita una seña del 20%. El turno queda agendado; la seña se abona por
-                        fuera de la app.
+                        . Te redirigimos a Mercado Pago para abonarla.
                       </p>
                     </div>
                   ) : null}
                   {activeStep === 5 && datosComplete ? (
                     <div className="mt-2 flex items-center gap-2 text-[11px] text-[var(--premium-gold-light)]">
                       <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[var(--premium-gold-light)]" />
-                      <span>Confirmá para agendar tu turno</span>
+                      <span>
+                        {requiresDeposit
+                          ? "Pagá la seña: te llevamos a Mercado Pago"
+                          : "Confirmá para agendar tu turno"}
+                      </span>
                     </div>
                   ) : null}
-                  <p className="mt-3 text-[11px] leading-snug text-[#7f7c7a]">
-                    Al confirmar, el turno queda agendado. Podés cambiar fecha u horario arriba si necesitás otro
-                    servicio.
-                  </p>
+                  {requiresDeposit ? (
+                    <p className="mt-3 text-[11px] leading-snug text-[#7f7c7a]">
+                      El turno se confirma cuando Mercado Pago acredita el pago (no al volver del navegador).
+                    </p>
+                  ) : (
+                    <p className="mt-3 text-[11px] leading-snug text-[#7f7c7a]">
+                      Al confirmar, el turno queda agendado. Podés cambiar fecha u horario arriba si necesitás otro
+                      servicio.
+                    </p>
+                  )}
                   <div className="mt-4">
                     <button
                       type="button"
@@ -741,12 +796,20 @@ export default function TurnosClient({ initialTreatment = "" }: TurnosClientProp
                       onClick={() => void handleConfirmReservation()}
                       className={`flex h-[52px] w-full items-center justify-center rounded-xl text-[16px] font-semibold transition-all ${
                         datosComplete && !checkoutLoading
-                          ? "cursor-pointer bg-[var(--premium-gold-light)] text-[var(--on-accent)] shadow-[0_8px_24px_rgba(125,163,196,0.28)]"
+                          ? requiresDeposit
+                            ? "cursor-pointer bg-[#009EE3] text-white shadow-[0_8px_24px_rgba(0,158,227,0.35)]"
+                            : "cursor-pointer bg-[var(--premium-gold-light)] text-[var(--on-accent)] shadow-[0_8px_24px_rgba(125,163,196,0.28)]"
                           : "cursor-not-allowed bg-[#e5e2e1] text-[#7f7c7a]"
                       } ${checkoutLoading ? "cursor-wait" : ""}`}
                     >
                       <span className="text-[13px] font-medium opacity-95">
-                        {checkoutLoading ? "Confirmando…" : "Confirmar reserva"}
+                        {checkoutLoading
+                          ? requiresDeposit
+                            ? "Preparando pago…"
+                            : "Confirmando…"
+                          : requiresDeposit
+                            ? "Pagar seña con Mercado Pago"
+                            : "Confirmar reserva"}
                       </span>
                     </button>
                   </div>

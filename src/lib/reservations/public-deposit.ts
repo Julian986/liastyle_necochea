@@ -4,7 +4,7 @@
  */
 const NO_DEPOSIT_IDS = new Set([
   "diseno-tendencias",
-  "puntas",
+  // "puntas", // TEMP prueba MP: forzar seña para poder pagar en Checkout Pro
   "peinado-alisado-temporal",
   "peinado-ondas",
   // Catálogo anterior (reservas legacy)

@@ -217,7 +217,13 @@ export async function insertPendingReservation(
   db: Db,
   input: CreateReservationInput,
 ): Promise<
-  | { id: string; checkoutToken: string; externalReference: string }
+  | {
+      id: string;
+      checkoutToken: string;
+      externalReference: string;
+      depositAmountArs: number;
+      depositPriceIsFrom: boolean;
+    }
   | { error: string; code?: string }
 > {
   const v = await validatePublicTurnosReservation(db, input);
@@ -228,6 +234,13 @@ export async function insertPendingReservation(
   const paymentDeadlineAt = new Date(now.getTime() + pendingTtlMs());
   const treatmentNameCombo = serviceItems.map((s) => s.treatmentName).join(" + ");
   const subtitleCombo = `${serviceItems.length} servicios · ${totalDurationMinutes} min`;
+
+  const depositTreatments = serviceItems
+    .map((s) => findSalonTreatmentById(s.treatmentId))
+    .filter((t): t is SalonTreatment => Boolean(t));
+  const deposit = summarizeDepositForTreatments(
+    depositTreatments.length > 0 ? depositTreatments : [primaryTreatment],
+  );
 
   const doc = {
     treatmentId: primaryTreatment.id,
@@ -248,6 +261,9 @@ export async function insertPendingReservation(
     whatsappOptIn: input.whatsappOptIn,
     reservationStatus: "pending_payment" as ReservationStatus,
     paymentStatus: "pending" as const,
+    depositAmountArs: deposit.depositAmountArs,
+    depositRate: PUBLIC_DEPOSIT_RATE,
+    depositPriceIsFrom: deposit.priceIsFrom,
     source: "app_turnos" as const,
     createdAt: now,
     updatedAt: now,
@@ -262,7 +278,13 @@ export async function insertPendingReservation(
       { _id: result.insertedId },
       { $set: { externalReference: id, updatedAt: new Date() } },
     );
-    return { id, checkoutToken, externalReference: id };
+    return {
+      id,
+      checkoutToken,
+      externalReference: id,
+      depositAmountArs: deposit.depositAmountArs,
+      depositPriceIsFrom: deposit.priceIsFrom,
+    };
   } catch (e) {
     if (e instanceof MongoServerError && e.code === 11000) {
       return {
@@ -275,8 +297,8 @@ export async function insertPendingReservation(
 }
 
 /**
- * Reserva desde la app pública: confirmada de inmediato.
- * Guarda seña informativa (20%); el cobro online (MP) aún no está activo.
+ * Reserva desde la app pública sin seña online: confirmada de inmediato
+ * (cortes básicos / peinados simples).
  */
 export async function insertPublicConfirmedReservationWithoutPayment(
   db: Db,

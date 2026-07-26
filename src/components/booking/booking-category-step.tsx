@@ -114,7 +114,7 @@ export function BookingCategoryStep({
         </div>
       ) : (
         <p className="px-0.5 text-[12px] leading-snug text-[#7f7c7a]">
-          Para reservar se solicita una seña del 20% del valor del servicio.
+          Para reservar se solicita una seña del 20% del valor del servicio, abonada con Mercado Pago.
         </p>
       )}
 
