@@ -92,20 +92,20 @@ export default async function TurnoConfirmadoPage({ searchParams }: ConfirmPageP
           {hasDeposit ? (
             <div className="mt-3 rounded-xl border border-[var(--premium-gold-light)]/25 bg-[var(--premium-gold-light)]/8 px-3 py-3">
               <p className="text-[10px] font-bold tracking-[0.12em] text-[var(--premium-gold-light)] uppercase">
-                Total abonado
+                Seña abonada (20%)
               </p>
               <p className="mt-1 font-heading text-[20px] font-semibold text-[#1c1b1b]">
                 {depositPriceIsFrom ? "Desde " : ""}
                 {formatArs(depositAmount)}
               </p>
               <p className="mt-1 text-[11px] leading-snug text-[#7f7c7a]">
-                Valor del servicio
+                Sobre el valor del servicio
                 {Number.isFinite(priceFrom) && priceFrom > 0
                   ? ` (${depositPriceIsFrom ? "desde " : ""}${formatArs(priceFrom)}${
                       depositPriceIsFrom ? " orientativo" : ""
                     })`
                   : ""}
-                , abonado con Mercado Pago al reservar.
+                . El resto se abona en el salón.
               </p>
             </div>
           ) : null}

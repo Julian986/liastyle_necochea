@@ -1,6 +1,6 @@
-/** Monto a cobrar online vía Mercado Pago (= total del servicio / combo). */
+/** Seña online vía Mercado Pago (20% del valor del servicio / combo). */
 
-export const PUBLIC_DEPOSIT_RATE = 1;
+export const PUBLIC_DEPOSIT_RATE = 0.2;
 
 export function depositAmountArs(priceFromArs: number): number {
   if (!Number.isFinite(priceFromArs) || priceFromArs <= 0) return 0;
@@ -18,7 +18,7 @@ export function formatArs(amount: number): string {
 
 export type DepositSummary = {
   priceFromArs: number;
-  /** Monto a cobrar en Mercado Pago (hoy = total). */
+  /** Monto de seña a cobrar en Mercado Pago. */
   depositAmountArs: number;
   /** Algún servicio del combo (o el único) tiene precio “desde”. */
   priceIsFrom: boolean;

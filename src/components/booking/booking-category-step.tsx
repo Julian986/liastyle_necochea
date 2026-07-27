@@ -83,7 +83,7 @@ export function BookingCategoryStep({
           ) : null}
           {depositSummary && depositSummary.depositAmountArs > 0 ? (
             <p className="mt-1.5 text-[12px] font-medium text-[#1c1b1b]">
-              Total: {depositSummary.priceIsFrom ? "desde " : ""}
+              Seña: {depositSummary.priceIsFrom ? "desde " : ""}
               {formatArs(depositSummary.depositAmountArs)}
             </p>
           ) : null}

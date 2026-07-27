@@ -809,7 +809,7 @@ export function BookingPicker({
               ) : null}
               {bookingContext === "public" && depositSummary && depositSummary.depositAmountArs > 0 ? (
                 <p className={`mt-1.5 text-[11px] font-medium ${textPrimary}`}>
-                  Total: {depositSummary.priceIsFrom ? "desde " : ""}
+                  Seña: {depositSummary.priceIsFrom ? "desde " : ""}
                   {formatArs(depositSummary.depositAmountArs)}
                 </p>
               ) : null}
@@ -843,7 +843,7 @@ export function BookingPicker({
               ) : null}
               {bookingContext === "public" && depositSummary && depositSummary.depositAmountArs > 0 ? (
                 <p className={`mt-1 text-[11px] font-medium ${textPrimary}`}>
-                  Total: {depositSummary.priceIsFrom ? "desde " : ""}
+                  Seña: {depositSummary.priceIsFrom ? "desde " : ""}
                   {formatArs(depositSummary.depositAmountArs)}
                 </p>
               ) : null}
@@ -1192,7 +1192,7 @@ export function BookingPicker({
                   depositSummary.depositAmountArs > 0 &&
                   selectedTreatmentIds.length > 0 ? (
                     <p className={`mt-1.5 text-[11px] font-medium ${textPrimary}`}>
-                      Total: {depositSummary.priceIsFrom ? "desde " : ""}
+                      Seña: {depositSummary.priceIsFrom ? "desde " : ""}
                       {formatArs(depositSummary.depositAmountArs)}
                     </p>
                   ) : null}
