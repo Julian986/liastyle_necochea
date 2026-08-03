@@ -53,14 +53,13 @@ export async function createCheckoutProPreference(
       pending: `${base}/turnos/pago-retorno?estado=pending`,
     },
     auto_return: "approved",
+    // Solo débito (+ dinero en cuenta: MP no permite excluir account_money).
     payment_methods: {
       excluded_payment_types: [
         { id: "credit_card" },
         { id: "ticket" },
         { id: "atm" },
-        { id: "prepaid_card" },
         { id: "bank_transfer" },
-        { id: "account_money" },
       ],
       installments: 1,
     },
