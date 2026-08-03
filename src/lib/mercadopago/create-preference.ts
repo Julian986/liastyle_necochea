@@ -14,6 +14,11 @@ type PreferenceBody = {
   notification_url: string;
   back_urls: { success: string; failure: string; pending: string };
   auto_return?: string;
+  /** Solo débito: sin crédito, efectivo, transferencia ni dinero en cuenta. */
+  payment_methods?: {
+    excluded_payment_types?: { id: string }[];
+    installments?: number;
+  };
 };
 
 function resolvePreferenceAmountArs(reservation: ReservationDoc): number {
@@ -48,6 +53,17 @@ export async function createCheckoutProPreference(
       pending: `${base}/turnos/pago-retorno?estado=pending`,
     },
     auto_return: "approved",
+    payment_methods: {
+      excluded_payment_types: [
+        { id: "credit_card" },
+        { id: "ticket" },
+        { id: "atm" },
+        { id: "prepaid_card" },
+        { id: "bank_transfer" },
+        { id: "account_money" },
+      ],
+      installments: 1,
+    },
   };
 
   const r = await mpFetchJson<PreferenceResponse>("/checkout/preferences", {

@@ -53,13 +53,14 @@ export const SALON_TREATMENTS: SalonTreatment[] = [
   {
     id: "puntas",
     name: "Corte de puntas",
-    subtitle: "45 min · $30.000",
+    // TEMP test MP débito — restaurar: subtitle: "45 min · $30.000", priceFromArs: 30000
+    subtitle: "45 min · $30", // real: $30.000
     // bookingNote: "Incluye modelado",
     description: "Mantenimiento de puntas. Incluye modelado.",
     category: "Cortes y peinado",
     durationLabel: "45 min",
     durationMinutes: 45,
-    priceFromArs: 30000,
+    priceFromArs: 30, // real: 30000
     imageUrl: IMG.corte,
   },
   // Combos de corte fuera del menú (Analia, jul 2026): ver ARCHIVED_CORTE_COMBO_TREATMENTS abajo.

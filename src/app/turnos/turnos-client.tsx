@@ -60,6 +60,7 @@ export default function TurnosClient({ initialTreatment = "" }: TurnosClientProp
   const [whatsappOptIn, setWhatsappOptIn] = useState(true);
   const [checkoutLoading, setCheckoutLoading] = useState(false);
   const [confirmError, setConfirmError] = useState<string | null>(null);
+  const [depositExempt, setDepositExempt] = useState(false);
   const [sessionStatus, setSessionStatus] = useState<"unknown" | "guest" | "authed">("unknown");
   const [sessionDisplayName, setSessionDisplayName] = useState<string | null>(null);
   /** Horarios con solapes resueltos en servidor; `undefined` = no aplica, `null` = cargando. */
@@ -120,7 +121,8 @@ export default function TurnosClient({ initialTreatment = "" }: TurnosClientProp
     return summarizeDepositForTreatments(treatments);
   }, [selectedServiceIds]);
   const primaryService = selectedServices[0];
-  const requiresDeposit = selectedServices.some((s) => treatmentRequiresPublicDeposit(s.id));
+  const treatmentNeedsDeposit = selectedServices.some((s) => treatmentRequiresPublicDeposit(s.id));
+  const requiresDeposit = treatmentNeedsDeposit && !depositExempt;
 
   const hasSlot = Boolean(selectedServices.length > 0 && selectedDate && selectedTime);
   const datosComplete = Boolean(
@@ -209,6 +211,33 @@ export default function TurnosClient({ initialTreatment = "" }: TurnosClientProp
   useEffect(() => {
     if (!selectedDate) setDateStepConfirmed(false);
   }, [selectedDate]);
+
+  useEffect(() => {
+    if (!isLikelyWhatsappNumber(customerPhone)) {
+      setDepositExempt(false);
+      return;
+    }
+    let cancelled = false;
+    const t = window.setTimeout(() => {
+      void (async () => {
+        try {
+          const res = await fetch(
+            `/api/reservations/deposit-status?phone=${encodeURIComponent(customerPhone.trim())}`,
+            { cache: "no-store" },
+          );
+          if (!res.ok || cancelled) return;
+          const data = (await res.json()) as { depositExempt?: boolean };
+          if (!cancelled) setDepositExempt(Boolean(data.depositExempt));
+        } catch {
+          if (!cancelled) setDepositExempt(false);
+        }
+      })();
+    }, 350);
+    return () => {
+      cancelled = true;
+      window.clearTimeout(t);
+    };
+  }, [customerPhone]);
 
   useEffect(() => {
     if (!dateStepConfirmed) return;
@@ -748,8 +777,10 @@ export default function TurnosClient({ initialTreatment = "" }: TurnosClientProp
                   </p>
                   <p className="mt-1 text-[12px] text-[#7f7c7a]">
                     {requiresDeposit
-                      ? "Para reservar el horario abonás una seña del 20% con Mercado Pago. El turno se confirma al acreditar el pago."
-                      : "Este servicio se reserva sin pago online. Te enviamos recordatorio por WhatsApp antes del turno."}
+                      ? "Para reservar el horario abonás una seña del 20% con débito en Mercado Pago. El turno se confirma al acreditar el pago."
+                      : depositExempt && treatmentNeedsDeposit
+                        ? "Como clienta preferencial no abonás seña online. Al confirmar, el turno queda agendado."
+                        : "Este servicio se reserva sin pago online. Te enviamos recordatorio por WhatsApp antes del turno."}
                   </p>
                   {requiresDeposit && depositSummary && depositSummary.depositAmountArs > 0 ? (
                     <div className="mt-3 rounded-xl border border-[var(--premium-gold-light)]/25 bg-[var(--premium-gold-light)]/8 px-3 py-3">
@@ -761,7 +792,7 @@ export default function TurnosClient({ initialTreatment = "" }: TurnosClientProp
                         {formatArs(depositSummary.depositAmountArs)}
                       </p>
                       <p className="mt-1 text-[11px] leading-snug text-[#7f7c7a]">
-                        Te redirigimos a Mercado Pago para abonar la seña
+                        Te redirigimos a Mercado Pago para abonar la seña con débito
                         {depositSummary.priceIsFrom ? " (sobre el valor desde indicado)" : ""}
                         . El resto se abona en el salón.
                       </p>

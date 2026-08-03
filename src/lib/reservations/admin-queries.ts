@@ -2,8 +2,15 @@ import type { Db } from "mongodb";
 
 import { canonicalPhoneDigitsAR, customerPhoneDigitsQueryValues } from "@/lib/customer/phone-canonical-ar";
 import { normalizePhoneDigits } from "@/lib/booking/salon-availability";
-import { getVipManualMapForPhones } from "@/lib/vip/customer-profiles";
+import {
+  getDepositExemptManualMapForPhones,
+  getVipManualMapForPhones,
+} from "@/lib/vip/customer-profiles";
 import { resolveVipStatus, type VipSource } from "@/lib/vip/eligibility";
+import {
+  resolveDepositExempt,
+  type DepositExemptSource,
+} from "@/lib/reservations/deposit-exempt";
 
 import type { ReservationDoc } from "./types";
 
@@ -26,6 +33,8 @@ export type ClientSummaryRow = {
   lastVisitDateKey: string;
   isVip: boolean;
   vipSource: VipSource;
+  depositExempt: boolean;
+  depositExemptSource: DepositExemptSource;
 };
 
 type ClientAggregateRow = {
@@ -150,16 +159,23 @@ export async function listClientsSummary(db: Db, opts?: { q?: string; limit?: nu
     ])
     .toArray();
 
-  const vipMap = await getVipManualMapForPhones(
-    db,
-    rows.map((r) => r._id),
-  );
+  const phones = rows.map((r) => r._id);
+  const [vipMap, depositMap] = await Promise.all([
+    getVipManualMapForPhones(db, phones),
+    getDepositExemptManualMapForPhones(db, phones),
+  ]);
 
   return rows.map((r) => {
     const phoneDigits = r._id;
     const canonical = canonicalPhoneDigitsAR(phoneDigits) || phoneDigits;
     const vipManual = vipMap.get(canonical) ?? vipMap.get(phoneDigits) ?? null;
     const vip = resolveVipStatus({ pastVisitCount: r.visitCount, vipManual });
+    const depositExemptManual =
+      depositMap.get(canonical) ?? depositMap.get(phoneDigits) ?? null;
+    const deposit = resolveDepositExempt({
+      isVip: vip.isVip,
+      depositExemptManual,
+    });
     return {
       phoneDigits,
       customerName: r.customerName?.trim() || "Cliente",
@@ -168,6 +184,8 @@ export async function listClientsSummary(db: Db, opts?: { q?: string; limit?: nu
       lastVisitDateKey: r.lastVisitDateKey,
       isVip: vip.isVip,
       vipSource: vip.source,
+      depositExempt: deposit.depositExempt,
+      depositExemptSource: deposit.source,
     };
   });
 }

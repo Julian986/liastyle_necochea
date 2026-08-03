@@ -20,6 +20,8 @@ type ClientRow = {
   lastVisitDateKey: string;
   isVip?: boolean;
   vipSource?: "auto" | "manual" | "none";
+  depositExempt?: boolean;
+  depositExemptSource?: "vip" | "manual_exempt" | "manual_charge" | "none";
 };
 
 function formatDateKey(key: string): string {
@@ -146,13 +148,19 @@ export function PanelClientesListClient() {
                   <User className="h-6 w-6 text-[#7da3c4]" strokeWidth={1.6} />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-2">
+                  <div className="flex flex-wrap items-center gap-1.5">
                     <p className="truncate font-montserrat text-[17px] font-semibold text-gray-900">
                       {c.customerName}
                     </p>
                     {c.isVip ? (
                       <span className="shrink-0 rounded-full bg-[var(--premium-gold-light)]/15 px-2 py-0.5 text-[10px] font-bold tracking-wide text-[var(--premium-gold-light)] uppercase">
                         VIP{c.vipSource === "manual" ? " · manual" : ""}
+                      </span>
+                    ) : null}
+                    {c.depositExempt ? (
+                      <span className="shrink-0 rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-bold tracking-wide text-emerald-700 uppercase">
+                        Sin seña
+                        {c.depositExemptSource === "manual_exempt" ? " · manual" : ""}
                       </span>
                     ) : null}
                   </div>

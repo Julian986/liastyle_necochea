@@ -24,6 +24,9 @@ type ClientInfo = {
   vipSource?: "auto" | "manual" | "none";
   vipManual?: boolean | null;
   threshold?: number;
+  depositExempt?: boolean;
+  depositExemptSource?: "vip" | "manual_exempt" | "manual_charge" | "none";
+  depositExemptManual?: boolean | null;
 };
 
 type Props = {
@@ -55,6 +58,8 @@ export function PanelClienteFichaClient({ phoneDigits }: Props) {
   const [saveError, setSaveError] = useState<string | null>(null);
   const [vipBusy, setVipBusy] = useState(false);
   const [vipError, setVipError] = useState<string | null>(null);
+  const [depositBusy, setDepositBusy] = useState(false);
+  const [depositError, setDepositError] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -159,6 +164,21 @@ export function PanelClienteFichaClient({ phoneDigits }: Props) {
               vipSource: data.vipSource,
               vipManual: data.vipManual ?? null,
               threshold: data.threshold ?? prev.threshold,
+              // Recalcular seña en cliente: al marcar VIP, si no hay override, queda exenta.
+              depositExempt:
+                prev.depositExemptManual === true
+                  ? true
+                  : prev.depositExemptManual === false
+                    ? false
+                    : Boolean(data.isVip),
+              depositExemptSource:
+                prev.depositExemptManual === true
+                  ? "manual_exempt"
+                  : prev.depositExemptManual === false
+                    ? "manual_charge"
+                    : data.isVip
+                      ? "vip"
+                      : "none",
             }
           : prev,
       );
@@ -166,6 +186,48 @@ export function PanelClienteFichaClient({ phoneDigits }: Props) {
       setVipError("Sin conexión. Probá de nuevo.");
     } finally {
       setVipBusy(false);
+    }
+  }
+
+  async function updateDepositExempt(depositExemptManual: boolean | null) {
+    setDepositBusy(true);
+    setDepositError(null);
+    try {
+      const res = await fetch(
+        `/api/panel-turnos/clientes/${encodeURIComponent(phoneDigits)}/deposit-exempt`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          credentials: "same-origin",
+          body: JSON.stringify({ depositExemptManual }),
+        },
+      );
+      const data = (await res.json()) as {
+        error?: string;
+        depositExempt?: boolean;
+        depositExemptSource?: ClientInfo["depositExemptSource"];
+        depositExemptManual?: boolean | null;
+        isVip?: boolean;
+      };
+      if (!res.ok) {
+        setDepositError(data.error ?? "No se pudo actualizar la seña.");
+        return;
+      }
+      setClient((prev) =>
+        prev
+          ? {
+              ...prev,
+              isVip: data.isVip ?? prev.isVip,
+              depositExempt: data.depositExempt,
+              depositExemptSource: data.depositExemptSource,
+              depositExemptManual: data.depositExemptManual ?? null,
+            }
+          : prev,
+      );
+    } catch {
+      setDepositError("Sin conexión. Probá de nuevo.");
+    } finally {
+      setDepositBusy(false);
     }
   }
 
@@ -177,6 +239,15 @@ export function PanelClienteFichaClient({ phoneDigits }: Props) {
       : client?.vipSource === "auto"
         ? "VIP automático"
         : "Aún no es VIP";
+  const depositLabel = client?.depositExempt
+    ? client.depositExemptSource === "manual_exempt"
+      ? "No cobra seña (elegido a mano)"
+      : client.depositExemptSource === "vip"
+        ? "No cobra seña (VIP)"
+        : "No cobra seña"
+    : client?.depositExemptSource === "manual_charge"
+      ? "Cobra seña (elegido a mano)"
+      : "Cobra seña online";
 
   return (
     <div className={`${panelPage} bg-[#F0F1F3]`}>
@@ -270,6 +341,53 @@ export function PanelClienteFichaClient({ phoneDigits }: Props) {
                   Alcanzó el umbral de {threshold} visitas. No hace falta marcarla a mano.
                 </p>
               ) : null}
+            </article>
+
+            <article className={`${panelCard} p-4`}>
+              <div>
+                <p className="text-[12px] font-semibold tracking-wide text-gray-500 uppercase">
+                  Seña online
+                </p>
+                <p className="mt-1 font-montserrat text-[17px] font-semibold text-gray-900">
+                  {depositLabel}
+                </p>
+                <p className="mt-1 text-[14px] text-gray-600">
+                  Por defecto las VIP no pagan seña. Acá elegís excepciones.
+                </p>
+              </div>
+              {depositError ? (
+                <p role="alert" className="mt-3 text-[14px] text-red-700">
+                  {depositError}
+                </p>
+              ) : null}
+              <div className="mt-4 flex flex-col gap-2">
+                <button
+                  type="button"
+                  disabled={depositBusy || client.depositExemptManual == null}
+                  onClick={() => void updateDepositExempt(null)}
+                  className="flex h-11 w-full cursor-pointer items-center justify-center rounded-full border border-gray-200 bg-white text-[14px] font-medium text-gray-700 disabled:opacity-60"
+                >
+                  {depositBusy ? "Guardando…" : "Usar regla automática (VIP sin seña)"}
+                </button>
+                <div className="flex flex-col gap-2 sm:flex-row">
+                  <button
+                    type="button"
+                    disabled={depositBusy || client.depositExemptManual === true}
+                    onClick={() => void updateDepositExempt(true)}
+                    className={`${panelPrimaryBtn} h-11 flex-1 text-[14px] disabled:opacity-60`}
+                  >
+                    {depositBusy ? "Guardando…" : "No cobrar seña"}
+                  </button>
+                  <button
+                    type="button"
+                    disabled={depositBusy || client.depositExemptManual === false}
+                    onClick={() => void updateDepositExempt(false)}
+                    className="flex h-11 flex-1 cursor-pointer items-center justify-center rounded-full border border-gray-200 bg-white text-[14px] font-medium text-gray-700 disabled:opacity-60"
+                  >
+                    {depositBusy ? "Guardando…" : "Cobrar seña"}
+                  </button>
+                </div>
+              </div>
             </article>
 
             <p className="text-[13px] font-semibold tracking-wide text-gray-500 uppercase">Historial de visitas</p>

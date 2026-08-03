@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getDb } from "@/lib/mongodb";
 import { parseCreateReservationBody } from "@/lib/reservations/parse-body";
+import { resolveDepositExemptForPhone } from "@/lib/reservations/deposit-exempt";
 import { treatmentRequiresPublicDeposit } from "@/lib/reservations/public-deposit";
 import { findSalonTreatmentById } from "@/lib/treatments/catalog";
 import {
@@ -30,7 +31,9 @@ export async function POST(request: Request) {
     if (normalizedIds.length === 0 || normalizedIds.some((id) => !findSalonTreatmentById(id))) {
       return NextResponse.json({ error: "Tratamiento inválido.", code: "INVALID_TREATMENT" }, { status: 400 });
     }
-    const needsDeposit = normalizedIds.some((id) => treatmentRequiresPublicDeposit(id));
+    const treatmentNeedsDeposit = normalizedIds.some((id) => treatmentRequiresPublicDeposit(id));
+    const depositStatus = await resolveDepositExemptForPhone(db, parsed.value.customerPhone);
+    const needsDeposit = treatmentNeedsDeposit && !depositStatus.depositExempt;
 
     if (needsDeposit) {
       const result = await insertPendingReservation(db, parsed.value);
@@ -63,6 +66,8 @@ export async function POST(request: Request) {
         bookingMode: "confirmed" as const,
         depositAmountArs: result.depositAmountArs,
         depositPriceIsFrom: result.depositPriceIsFrom,
+        depositExempt: depositStatus.depositExempt,
+        depositExemptSource: depositStatus.source,
       },
       { status: 201 },
     );

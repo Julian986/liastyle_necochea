@@ -1,10 +1,12 @@
 /**
  * Pago online en reserva pública: cortes básicos y peinados simples sin cobro online.
- * En combos, si algún servicio exige pago, el turno completo va por Mercado Pago (total).
+ * En combos, si algún servicio exige pago, el turno completo va por Mercado Pago (seña 20%),
+ * salvo clientas exentas (VIP / override en panel).
  */
 const NO_DEPOSIT_IDS = new Set([
   "diseno-tendencias",
-  "puntas",
+  // TEMP test MP débito — restaurar "puntas" en esta lista
+  // "puntas",
   "peinado-alisado-temporal",
   "peinado-ondas",
   // Catálogo anterior (reservas legacy)
