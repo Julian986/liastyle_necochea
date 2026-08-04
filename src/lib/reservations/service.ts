@@ -17,6 +17,10 @@ import { SALON_TREATMENTS, findSalonTreatmentById, type SalonTreatment } from "@
 import { PUBLIC_DEPOSIT_RATE, summarizeDepositForTreatments } from "@/lib/treatments/deposit";
 
 import { backfillCustomerPhoneDigitsBatch, renormalizeCustomerPhoneDigitsBatch } from "@/lib/reservations/customer-queries";
+import {
+  canCustomerCancelByStartsAt,
+  CUSTOMER_CANCEL_TOO_LATE_MESSAGE,
+} from "@/lib/reservations/cancel-policy";
 
 import type {
   CreateReservationInput,
@@ -720,6 +724,9 @@ export async function cancelReservation(
     const docDigits = doc.customerPhoneDigits ?? canonicalPhoneDigitsAR(doc.customerPhone);
     if (!customerPhoneDigitsQueryValues(canon).includes(docDigits)) {
       return { error: "No podés modificar un turno de otro cliente.", code: "FORBIDDEN" };
+    }
+    if (!canCustomerCancelByStartsAt(doc.startsAt, input.now)) {
+      return { error: CUSTOMER_CANCEL_TOO_LATE_MESSAGE, code: "TOO_LATE" };
     }
   }
 

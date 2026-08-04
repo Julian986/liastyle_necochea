@@ -50,13 +50,9 @@ export function reservationEndMs(r: Pick<CustomerReservationPublic, "startsAtIso
   return start + r.durationMinutes * 60_000;
 }
 
-/** Próximos: turno aún no terminó y no está cancelado / no_show. */
+/** Próximos: turno aún no terminó (incluye cancelados recientes, para ver el resultado). */
 export function isUpcomingReservation(r: CustomerReservationPublic, nowMs = Date.now()): boolean {
   if (r.reservationStatus === "no_show") return false;
-  if (r.reservationStatus === "cancelled") {
-    // Si el salón lo canceló, mantenemos visible mientras la fecha no pase.
-    if (r.cancelledBy === "panel") return reservationEndMs(r) >= nowMs;
-    return false;
-  }
+  // Cancelados (clienta o panel) siguen en “próximos” hasta que pase el horario del turno.
   return reservationEndMs(r) >= nowMs;
 }

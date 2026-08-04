@@ -36,6 +36,7 @@ function statusFromCancelCode(code: string | undefined): number {
     case "FORBIDDEN":
       return 403;
     case "NOT_CANCELLABLE":
+    case "TOO_LATE":
     case "CONFLICT":
       return 409;
     default:

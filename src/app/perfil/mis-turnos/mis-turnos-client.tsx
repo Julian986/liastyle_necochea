@@ -10,6 +10,12 @@ import { usePerfilSession } from "@/components/perfil/perfil-session-provider";
 import type { CustomerReservationPublic } from "@/lib/reservations/customer-public-serialize";
 import { isUpcomingReservation } from "@/lib/reservations/customer-public-serialize";
 import { reservationStatusLabel } from "@/lib/reservations/customer-ui-copy";
+import {
+  canCustomerCancelByStartsAt,
+  CUSTOMER_CANCEL_CONFIRM_HINT,
+  CUSTOMER_CANCEL_POLICY_NOTE,
+  CUSTOMER_CANCEL_TOO_LATE_MESSAGE,
+} from "@/lib/reservations/cancel-policy";
 
 function formatDayMonthFromKey(dateKey: string): string {
   const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(dateKey.trim());
@@ -81,8 +87,19 @@ export function MisTurnosClient() {
           setError(data.error ?? "No se pudo cancelar el turno.");
           return;
         }
-        await ctxReload();
+        // Actualización inmediata en UI; después sincronizamos con el servidor.
+        setRows((prev) =>
+          (prev ?? []).map((r) =>
+            r.id === reservationId
+              ? { ...r, reservationStatus: "cancelled" as const, cancelledBy: "customer" as const }
+              : r,
+          ),
+        );
+        setCancelConfirmId(null);
         setSuccessMessage("Turno cancelado con éxito.");
+        void ctxReload().then(() => {
+          // ctxReservations refresca rows vía effect
+        });
       } catch {
         setError("Sin conexión.");
       } finally {
@@ -103,6 +120,12 @@ export function MisTurnosClient() {
           <p className="mt-0.5 text-[16px] text-gray-500">Próximos y pasados</p>
         </div>
       </header>
+
+      {tab === "upcoming" ? (
+        <p className="mb-4 rounded-xl border border-[#7da3c4]/25 bg-[#7da3c4]/8 px-4 py-3 text-[14px] leading-snug text-[#3d4f5c]">
+          {CUSTOMER_CANCEL_POLICY_NOTE}
+        </p>
+      ) : null}
 
       <div className="mb-5 flex rounded-2xl border border-gray-200 bg-[#F5F5F5] p-1">
         <button
@@ -154,53 +177,84 @@ export function MisTurnosClient() {
         </div>
       ) : (
         <ul className="space-y-4">
-          {list.map((r) => (
-            <li key={r.id} className={`${perfilCard} px-5 py-5`}>
-              <p className="text-[18px] font-semibold leading-tight text-gray-900">
-                <span className="text-[#7da3c4]">
-                  {r.timeLocal}
-                  <span className="ml-1 text-[15px] font-medium text-[#7da3c4]/80">hs</span>
-                </span>
-                <span className="text-gray-700"> · {formatDayMonthFromKey(r.dateKey)}</span>
-              </p>
-              <p className="mt-1 text-[15px] text-gray-500">{r.displayDate}</p>
-              <p className="mt-3 text-[17px] font-semibold text-gray-900">{r.treatmentName}</p>
-              <p className="mt-0.5 text-[15px] text-gray-500">{r.subtitle}</p>
-              <div className="mt-3 flex flex-wrap items-center gap-2">
-                <span className="rounded-full bg-[#F5F5F5] px-3 py-1 text-[13px] font-medium text-gray-700">
-                  {reservationStatusLabel(r.reservationStatus)}
-                </span>
-                {r.source === "panel" ? (
-                  <span className="rounded-full bg-sky-100 px-3 py-1 text-[13px] font-semibold text-sky-800">
-                    Cargado en salón
+          {list.map((r) => {
+            const canCancel =
+              tab === "upcoming" &&
+              (r.reservationStatus === "confirmed" || r.reservationStatus === "pending_payment") &&
+              canCustomerCancelByStartsAt(r.startsAtIso);
+            const showActions =
+              tab === "upcoming" &&
+              (r.reservationStatus === "confirmed" || r.reservationStatus === "pending_payment");
+            const tooLateToCancel =
+              showActions && !canCustomerCancelByStartsAt(r.startsAtIso);
+
+            return (
+              <li key={r.id} className={`${perfilCard} px-5 py-5`}>
+                <p className="text-[18px] font-semibold leading-tight text-gray-900">
+                  <span className="text-[#7da3c4]">
+                    {r.timeLocal}
+                    <span className="ml-1 text-[15px] font-medium text-[#7da3c4]/80">hs</span>
                   </span>
-                ) : null}
-              </div>
-              {r.reservationStatus === "cancelled" && r.cancelledBy === "panel" ? (
-                <p className="mt-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-[15px] leading-snug text-amber-900">
-                  Este turno fue cancelado desde el panel del salón.
+                  <span className="text-gray-700"> · {formatDayMonthFromKey(r.dateKey)}</span>
                 </p>
-              ) : null}
-              {tab === "upcoming" && (r.reservationStatus === "confirmed" || r.reservationStatus === "pending_payment") ? (
-                <div className="mt-4 flex flex-wrap items-center gap-2">
-                  <Link
-                    href={`/perfil/mis-turnos/${encodeURIComponent(r.id)}/reprogramar`}
-                    className="inline-flex h-10 cursor-pointer items-center rounded-xl border border-[#7da3c4] bg-[#7da3c4]/10 px-4 text-[14px] font-semibold text-[#5f7a8f] transition hover:bg-[#7da3c4]/18"
-                  >
-                    Cambiar horario
-                  </Link>
-                  <button
-                    type="button"
-                    disabled={cancellingId === r.id}
-                    onClick={() => setCancelConfirmId(r.id)}
-                    className="inline-flex h-10 cursor-pointer items-center rounded-xl border border-red-200 bg-red-50 px-4 text-[14px] font-semibold text-red-700 transition hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-60"
-                  >
-                    {cancellingId === r.id ? "Cancelando..." : "Cancelar turno"}
-                  </button>
+                <p className="mt-1 text-[15px] text-gray-500">{r.displayDate}</p>
+                <p className="mt-3 text-[17px] font-semibold text-gray-900">{r.treatmentName}</p>
+                <p className="mt-0.5 text-[15px] text-gray-500">{r.subtitle}</p>
+                <div className="mt-3 flex flex-wrap items-center gap-2">
+                  <span className="rounded-full bg-[#F5F5F5] px-3 py-1 text-[13px] font-medium text-gray-700">
+                    {reservationStatusLabel(r.reservationStatus)}
+                  </span>
+                  {r.source === "panel" ? (
+                    <span className="rounded-full bg-sky-100 px-3 py-1 text-[13px] font-semibold text-sky-800">
+                      Cargado en salón
+                    </span>
+                  ) : null}
                 </div>
-              ) : null}
-            </li>
-          ))}
+                {r.reservationStatus === "cancelled" && r.cancelledBy === "panel" ? (
+                  <p className="mt-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-[15px] leading-snug text-amber-900">
+                    Este turno fue cancelado desde el panel del salón.
+                  </p>
+                ) : null}
+                {r.reservationStatus === "cancelled" && r.cancelledBy === "customer" ? (
+                  <p className="mt-3 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-[15px] leading-snug text-emerald-900">
+                    Cancelaste este turno.
+                  </p>
+                ) : null}
+                {r.reservationStatus === "cancelled" && !r.cancelledBy ? (
+                  <p className="mt-3 rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-[15px] leading-snug text-gray-700">
+                    Este turno está cancelado.
+                  </p>
+                ) : null}
+                {showActions ? (
+                  <div className="mt-4 space-y-2">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <Link
+                        href={`/perfil/mis-turnos/${encodeURIComponent(r.id)}/reprogramar`}
+                        className="inline-flex h-10 cursor-pointer items-center rounded-xl border border-[#7da3c4] bg-[#7da3c4]/10 px-4 text-[14px] font-semibold text-[#5f7a8f] transition hover:bg-[#7da3c4]/18"
+                      >
+                        Cambiar horario
+                      </Link>
+                      {canCancel ? (
+                        <button
+                          type="button"
+                          disabled={cancellingId === r.id}
+                          onClick={() => setCancelConfirmId(r.id)}
+                          className="inline-flex h-10 cursor-pointer items-center rounded-xl border border-red-200 bg-red-50 px-4 text-[14px] font-semibold text-red-700 transition hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-60"
+                        >
+                          {cancellingId === r.id ? "Cancelando..." : "Cancelar turno"}
+                        </button>
+                      ) : null}
+                    </div>
+                    {tooLateToCancel ? (
+                      <p className="text-[13px] leading-snug text-amber-800">
+                        {CUSTOMER_CANCEL_TOO_LATE_MESSAGE}
+                      </p>
+                    ) : null}
+                  </div>
+                ) : null}
+              </li>
+            );
+          })}
         </ul>
       )}
 
@@ -229,6 +283,7 @@ export function MisTurnosClient() {
             <p className="mt-3 text-[16px] leading-relaxed text-gray-600">
               ¿Estás seguro que deseás cancelar este turno? Esta acción no se puede deshacer.
             </p>
+            <p className="mt-3 text-[14px] leading-snug text-[#5c5856]">{CUSTOMER_CANCEL_CONFIRM_HINT}</p>
             <div className="mt-6 flex items-center justify-end gap-3">
               <button
                 type="button"
@@ -244,7 +299,6 @@ export function MisTurnosClient() {
                   const id = cancelConfirmId;
                   if (!id) return;
                   await handleCancelReservation(id);
-                  setCancelConfirmId(null);
                 }}
                 disabled={cancellingId === cancelConfirmId}
                 className="inline-flex h-10 items-center rounded-xl border border-red-200 bg-red-50 px-4 text-[15px] font-semibold text-red-700 transition hover:bg-red-100 disabled:opacity-60"

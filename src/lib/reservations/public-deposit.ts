@@ -5,8 +5,8 @@
  */
 const NO_DEPOSIT_IDS = new Set([
   "diseno-tendencias",
-  // TEMP test MP débito — restaurar "puntas" en esta lista
-  // "puntas",
+  // TEMP: sin seña online para test (después sacar de la lista si vuelve a cobrar)
+  "puntas",
   "peinado-alisado-temporal",
   "peinado-ondas",
   // Catálogo anterior (reservas legacy)
