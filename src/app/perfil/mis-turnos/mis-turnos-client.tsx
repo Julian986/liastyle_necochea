@@ -7,13 +7,13 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { perfilBackBtn, perfilCard, perfilFabBtn, perfilPrimaryBtn } from "@/components/perfil/perfil-ui";
 import { usePerfilSession } from "@/components/perfil/perfil-session-provider";
+import { DepositCancelPolicyNotice } from "@/components/deposit-cancel-policy-notice";
 import type { CustomerReservationPublic } from "@/lib/reservations/customer-public-serialize";
 import { isUpcomingReservation } from "@/lib/reservations/customer-public-serialize";
 import { reservationStatusLabel } from "@/lib/reservations/customer-ui-copy";
 import {
   canCustomerCancelByStartsAt,
   CUSTOMER_CANCEL_CONFIRM_HINT,
-  CUSTOMER_CANCEL_POLICY_NOTE,
   CUSTOMER_CANCEL_TOO_LATE_MESSAGE,
 } from "@/lib/reservations/cancel-policy";
 
@@ -121,11 +121,7 @@ export function MisTurnosClient() {
         </div>
       </header>
 
-      {tab === "upcoming" ? (
-        <p className="mb-4 rounded-xl border border-[#7da3c4]/25 bg-[#7da3c4]/8 px-4 py-3 text-[14px] leading-snug text-[#3d4f5c]">
-          {CUSTOMER_CANCEL_POLICY_NOTE}
-        </p>
-      ) : null}
+      {tab === "upcoming" ? <DepositCancelPolicyNotice variant="subtle" className="mb-4" /> : null}
 
       <div className="mb-5 flex rounded-2xl border border-gray-200 bg-[#F5F5F5] p-1">
         <button

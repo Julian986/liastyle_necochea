@@ -16,8 +16,12 @@ export function canCustomerCancelByStartsAt(
   return hoursUntilStart(startsAt, now) >= CUSTOMER_CANCEL_MIN_HOURS;
 }
 
-export const CUSTOMER_CANCEL_POLICY_NOTE =
-  `Podés cancelar hasta ${CUSTOMER_CANCEL_MIN_HOURS} h antes del turno. Si cancelás después, se pierde la seña.`;
+/** Aviso al reservar / pagar seña y en confirmación. */
+export const DEPOSIT_CANCEL_POLICY_NOTICE =
+  `Podés cancelar hasta ${CUSTOMER_CANCEL_MIN_HOURS} h antes del turno. Si no cancelás dentro de ese plazo, se pierde la seña.`;
+
+/** Nota fija en Mis turnos. */
+export const CUSTOMER_CANCEL_POLICY_NOTE = DEPOSIT_CANCEL_POLICY_NOTICE;
 
 export const CUSTOMER_CANCEL_TOO_LATE_MESSAGE =
   `Ya no podés cancelar desde la app: faltan menos de ${CUSTOMER_CANCEL_MIN_HOURS} h. En este caso se pierde la seña. Si necesitás ayuda, contactá al salón.`;

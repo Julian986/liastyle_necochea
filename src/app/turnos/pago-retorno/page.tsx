@@ -8,6 +8,7 @@ import { useSearchParams } from "next/navigation";
 import { AppBottomNav } from "@/components/app-bottom-nav";
 import { BrandLogo } from "@/components/brand-logo";
 import { ConfirmadoIrPerfilButton } from "@/components/confirmado-ir-perfil-button";
+import { DepositCancelPolicyNotice } from "@/components/deposit-cancel-policy-notice";
 
 import styles from "./page.module.css";
 
@@ -95,6 +96,7 @@ function PagoRetornoContent() {
               <p className={`${styles.riseDelay2} mt-2 text-[13px] tracking-wide text-[#8a8684]`}>
                 Te avisamos por WhatsApp antes de tu cita.
               </p>
+              <DepositCancelPolicyNotice className={`${styles.riseDelay2} mt-3 max-w-sm text-left`} />
             </header>
 
             {snap?.treatment ? (

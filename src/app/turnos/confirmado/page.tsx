@@ -1,6 +1,7 @@
 import { AppBottomNav } from "@/components/app-bottom-nav";
 import { BrandLogo } from "@/components/brand-logo";
 import { ConfirmadoIrPerfilButton } from "@/components/confirmado-ir-perfil-button";
+import { DepositCancelPolicyNotice } from "@/components/deposit-cancel-policy-notice";
 import { formatArs } from "@/lib/treatments/deposit";
 import { CalendarDays, CheckCircle2, Clock3, User } from "lucide-react";
 import Link from "next/link";
@@ -109,6 +110,8 @@ export default async function TurnoConfirmadoPage({ searchParams }: ConfirmPageP
               </p>
             </div>
           ) : null}
+
+          {hasDeposit ? <DepositCancelPolicyNotice className="mt-3" /> : null}
 
           {reservationId ? (
             <p className="mt-4 text-center text-[11px] tracking-[0.04em] text-[#7f7c7a]">
